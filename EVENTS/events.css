@@ -1,0 +1,63 @@
+body {
+    font-family: "Montserrat", sans-serif;
+    background-color: #f4f4f4;
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+  
+  form {
+    max-width: 500px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  input,
+  textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  button {
+    padding: 8px 16px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #79b3f1;
+    color: white;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    opacity: 0.7;
+  }
+  
+  .event-list {
+    max-width: 700px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  li {
+    margin-bottom: 15px;
+    padding: 10px;
+  }
+  
+  .actions button {
+    margin-left: 10px;
+    background-color: #f0ad4e;
+  }
+  
+  .actions .delete {
+    background-color: #d9534f;
+  }

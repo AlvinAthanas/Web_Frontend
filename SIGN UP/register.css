@@ -1,0 +1,169 @@
+      /* --------General Styling--------- */
+body {
+    background: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "montserrat", sans-serif;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 10px;
+    text-align: center;
+    width: 60%;
+  }
+  .container h5 {
+    text-transform: uppercase;
+    font-size: 25px;
+    color: #79b3f1;
+    margin: 0 auto;
+  }
+
+  /* -----------Image---------- */
+  img {
+    align-items: center;
+    margin: 10px 0;
+    width: 150px;
+  }
+
+  /* ---------Input Items----------- */
+  .input-group {
+    text-align: left;
+    margin: 10px 0;
+  }
+  .input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 15px 0;
+    font-size: 15px;
+    background: #f4f4f4;
+    border: none;
+    border-radius: 5px;
+  }
+  .gender {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* ---------Register--------- */
+  .register {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin: 25px 0px;
+    align-items: center;
+  }
+  .checkbox-container {
+    align-items: center;
+    text-align: left;
+  }
+
+  /* -----------Forgot Link----------- */
+  .forgot-link {
+    text-decoration: none;
+    color: #79b3f1;
+    text-align: right;
+  }
+  .forgot-link:hover {
+    color: #7090ad;
+  }
+
+  /* --------Divider--------- */
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 25px auto;
+    width: 90%;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #333;
+    opacity: 0.5;
+  }
+
+  .divider:not(:empty)::before {
+    margin-right: 5px;
+  }
+
+  .divider:not(:empty)::after {
+    margin-left: 5px;
+  }
+
+  .divider span {
+    opacity: 0.5; /* Makes text slightly transparent (opaque look) */
+  }
+
+  /* -------Buttons-------- */
+  .button {
+    display: flex;
+    gap: 15px;
+  }
+
+  /* ---------Login Button--------- */
+  .Login-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #79b3f1;
+  }
+  .Login-btn a {
+    font-weight: 500;
+    text-decoration: none;
+    color: white;
+  }
+  .Login-btn:hover {
+    background: #7090ad;
+  }
+
+  /* -------Back Button--------- */
+  .back-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #f4f4f4;
+  }
+  .back-btn a {
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #a8a1a1;
+  }
+  .back-btn:hover {
+    background: #d5f0f0;
+  }
+
+  /* ----------SignUp Button---------- */
+  .Signup-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #79b3f1;
+  }
+  .Signup-btn a {
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    color: white;
+  }
+  .Signup-btn:hover {
+    background: #7090ad;
+  }
