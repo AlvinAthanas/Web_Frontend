@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Backend",
+			"path": "../../../../../../xampp/imma/htdocs/New folder/Backend"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Treasurer"
+	}
+}

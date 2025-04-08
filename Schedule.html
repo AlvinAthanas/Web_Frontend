@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Event</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        /* padding: 30px; */
+        background: #f9f9f9;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #333;
+        opacity: 0.5;
+      }
+
+      .divider:not(:empty)::before {
+        margin-right: 10px;
+      }
+
+      .divider:not(:empty)::after {
+        margin-left: 10px;
+      }
+
+      .divider span {
+        font-size: 20px;
+        font-weight: bold;
+        opacity: 0.8;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      input[type="text"],
+      input[type="time"] {
+        padding: 8px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        padding: 8px 12px;
+        border: none;
+        background-color: #79b3f1;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        opacity: 0.7;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background: #f2f2f2;
+      }
+
+      .edit-btn {
+        background-color: #f0ad4e;
+        margin-right: 5px;
+      }
+
+      .delete-btn {
+        background-color: #d9534f;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="divider"><span>Enter Mass Schedule</span></div>
+        <form id="scheduleForm">
+          <input type="text" id="massName" placeholder="Mass Name" required />
+          <input type="time" id="massTime" required />
+          <button type="submit">Add Schedule</button>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Mass Name</th>
+              <th>Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleTableBody"></tbody>
+        </table>
+        <script>
+          const form = document.getElementById("scheduleForm");
+          const nameInput = document.getElementById("massName");
+          const timeInput = document.getElementById("massTime");
+          const tableBody = document.getElementById("scheduleTableBody");
+          let schedules = JSON.parse(localStorage.getItem("schedules")) || [];
+          function renderTable() {
+            tableBody.innerHTML = "";
+            schedules.forEach((schedule, index) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                  <td>${index + 1}</td>
+                  <td>${schedule.name}</td>
+                  <td>${schedule.time}</td>
+                  <td>
+                    <button class="edit-btn" onclick="editSchedule(${index})">Edit</button>
+                    <button class="delete-btn" onclick="deleteSchedule(${index})">Delete</button>
+                  </td>
+                `;
+              tableBody.appendChild(row);
+            });
+          }
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const name = nameInput.value.trim();
+            const time = timeInput.value;
+            if (name && time) {
+              schedules.push({ name, time });
+              localStorage.setItem("schedules", JSON.stringify(schedules));
+              renderTable();
+              form.reset();
+            }
+          });
+          function deleteSchedule(index) {
+            schedules.splice(index, 1);
+            localStorage.setItem("schedules", JSON.stringify(schedules));
+            renderTable();
+          }
+          function editSchedule(index) {
+            const schedule = schedules[index];
+            nameInput.value = schedule.name;
+            timeInput.value = schedule.time;
+            // Remove the old entry before adding the updated one
+            schedules.splice(index, 1);
+            localStorage.setItem("schedules", JSON.stringify(schedules));
+            renderTable();
+          }
+          // Load table initially
+          renderTable();
+        </script>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

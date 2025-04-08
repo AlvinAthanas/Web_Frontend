@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Event</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        .container {
+            /* max-width: 600px; */
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .community-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .community-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .community-list li a {
+            text-decoration: none;
+            color: black;
+            flex-grow: 1;
+        }
+
+        .buttonGroup {
+            /* display: flex; */
+            gap: 15px;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+
+        .add-btn {
+            background-color: #79b3f1;
+        }
+
+        .add-btn:hover{
+            opacity: 0.7;
+        }
+
+        .edit-btn {
+            background-color: #f0ad4e;
+        }
+
+        .delete-btn {
+            background-color: #d9534f;
+            margin-left: 5px;
+        }
+
+        .cancel-btn {
+            background: #79b3f1;
+            margin-left: 5px;
+        }
+
+        .save-btn {
+            background: rgb(251, 227, 185);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="grid-container" id="containerId">
+        <main class="main-container">
+            <div class="container">
+                <h2>Community List</h2>
+                <input type="text" id="communityInput" placeholder="Enter community name" required>
+                <button class="add-btn" onclick="addCommunity()">Add</button>
+                <ul class="community-list" id="communityList"></ul>
+            </div>
+
+            <script>
+                function addCommunity() {
+                    let communityInput = document.getElementById('communityInput');
+                    let communityName = communityInput.value.trim();
+                    if (communityName === '') return;
+
+                    let list = document.getElementById('communityList');
+                    let li = document.createElement('li');
+                    let link = document.createElement('a');
+                    let delButton = document.createElement('button');
+                    let editButton = document.createElement('button');
+
+                    link.href = '#'; // Change this to a valid URL if needed
+                    link.textContent = communityName;
+
+                    delButton.textContent = 'Delete';
+                    delButton.classList.add('delete-btn');
+                    delButton.onclick = function () {
+                        list.removeChild(li);
+                    };
+
+                    editButton.textContent = 'Edit';
+                    editButton.classList.add('edit-btn');
+                    editButton.onclick = function () {
+                        // Create an input field with the current name
+                        let inputField = document.createElement('input');
+                        inputField.type = 'text';
+                        inputField.value = link.textContent;
+                        inputField.classList.add('edit-input');
+
+                        // Create Save button
+                        let saveButton = document.createElement('button');
+                        saveButton.textContent = 'Save';
+                        saveButton.classList.add('save-btn');
+
+                        // Create Cancel button
+                        let cancelButton = document.createElement('button');
+                        cancelButton.textContent = 'Cancel';
+                        cancelButton.classList.add('cancel-btn');
+
+                        // Store original name in case of cancel
+                        let originalName = link.textContent;
+
+                        // Replace text with input field
+                        li.replaceChild(inputField, link);
+                        li.replaceChild(saveButton, editButton);
+                        li.appendChild(cancelButton);
+
+                        // Hide the delete button
+                        delButton.style.display = 'none';
+
+                        // Save on Enter key
+                        inputField.addEventListener('keypress', function (event) {
+                            if (event.key === 'Enter') {
+                                saveButton.click();
+                            }
+                        });
+
+                        // Save functionality
+                        saveButton.onclick = function () {
+                            let newName = inputField.value.trim();
+                            if (newName !== '') {
+                                link.textContent = newName;
+                            }
+                            resetView();
+                        };
+
+                        // Cancel functionality
+                        cancelButton.onclick = function () {
+                            link.textContent = originalName;
+                            resetView();
+                        };
+
+                        // Reset view function
+                        function resetView() {
+                            li.replaceChild(link, inputField);
+                            li.replaceChild(editButton, saveButton);
+                            li.removeChild(cancelButton);
+                            delButton.style.display = 'inline-block';
+                        }
+
+                        // Auto-focus on input field
+                        inputField.focus();
+                    };
+
+
+                    li.appendChild(link);
+                    li.appendChild(editButton);
+                    li.appendChild(delButton);
+                    list.appendChild(li);
+                    li.appendChild(buttonGroup);
+
+                    companyInput.value = '';
+                }
+            </script>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Event</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="grid-container" id="containerId">
+      <!-- Main -->
+      <main class="main-container">
+            <div class="table-title">
+                <h2>CONTRIBUTION RECORDS</h2>
+            </div>
+          
+            <!-- Filter Section -->
+            <div class="filter-container">
+              <label for="year">Select Contribution Type:</label>
+              <select id="year">
+                <option value="">All</option>
+                <option value="sadaka">Sadaka</option>
+                <option value="zaka">Zaka</option>
+              </select>
+
+              <label for="month">Select Month:</label>
+              <select id="month">
+                <option value="">All</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+          
+              <label for="year">Select Year:</label>
+              <select id="year">
+                <option value="">All</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+              </select>
+
+              <button id="filter-btn">Filter</button>
+            </div>
+          
+            <!-- Contribution Table -->
+            <table id="table" class="table">
+              <thead>
+                <tr>
+                  <th>Contribution Type</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sadaka</td>
+                  <td>Sadaka 1</td>
+                  <td>5000</td>
+                  <td>2024-03-10</td>
+                </tr>
+                <tr>
+                  <td>Sadaka</td>
+                  <td>sadaka 2</td>
+                  <td>20000</td>
+                  <td>2024-03-10</td>
+                </tr>
+                <tr>
+                  <td>sadaka</td>
+                  <td>Church Fundraiser</td>
+                  <td>15000</td>
+                  <td>2023-07-22</td>
+                </tr>
+                <tr>
+                    <td>Sadaka</td>
+                    <td>morning masses</td>
+                    <td>20000</td>
+                    <td>2024-03-10</td>
+                  </tr>
+                  <tr>
+                    <td>Sadaka</td>
+                    <td>sadaka 2 (Harambee)</td>
+                    <td>20000</td>
+                    <td>2024-03-17</td>
+                  </tr>
+              </tbody>
+            </table>
+              
+      </main>
+      <!-- End Main -->
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

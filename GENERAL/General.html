@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- <div class="grid-container"> -->
+    <!-- Header -->
+    <header class="header">
+      <div class="menu-icon" onclick="openSidebar()">
+        <span class="material-icons-outlined"> menu </span>
+      </div>
+      <div class="header-left">
+        <span class="material-icons-outlined"> search </span>
+      </div>
+      <div class="header-right">
+        <span class="material-icons-outlined"> notifications </span>
+        <span class="material-icons-outlined"> mail </span>
+        <span class="material-icons-outlined"> account_circle </span>
+      </div>
+    </header>
+    <!-- End Header -->
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-title">
+        <div class="sidebar-brand">
+          <span class="material-icons-outlined"></span> MENU
+        </div>
+        <span class="material-icons-outlined" onclick="closeSidebar()"
+          >close</span
+        >
+      </div>
+      <ul class="sidebar-list">
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined">dashboard</span>
+          <a href="dashboard.html">Dashboard</a>
+        </li>
+
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined">groups</span> Members
+        </li>
+
+        <li class="sidebar-list-item dropdown">
+          <div class="dropdown-toggle">
+            <span class="material-icons-outlined"> payments </span> Contribution
+            <span class="material-icons-outlined dropdown-icon">
+              expand_more
+            </span>
+          </div>
+          <ul class="dropdown-menu">
+            <li><a href="add-contribution.html">Add Contribution</a></li>
+            <li><a href="sadaka.html">View Contribution</a></li>
+            <li><a href="view-event.html">Miscellaneous</a></li>
+          </ul>
+        </li>
+
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined">calendar_month</span>
+          <a href="Schedule.html">Schedule</a>
+        </li>
+
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined"> event </span>
+          <a href="Events.html">Events</a>
+        </li>
+
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined"> fact_check </span>
+          <a href="Community.html">Community</a>
+        </li>
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined"> insert_chart </span>
+          <a href="regForm.html">Registration</a>
+        </li>
+        <li class="sidebar-list-item">
+          <span class="material-icons-outlined"> settings </span> Settings
+        </li>
+      </ul>
+      <!-- Bottom Content -->
+      <div class="bottom-content">
+        <a href="" class="logout">
+          <span class="material-icons-outlined">logout</span>Logout
+        </a>
+        <li class="mode">
+          <div class="moon-sun">
+            <span class="material-icons-outlined moon">dark_mode</span>
+            <span class="material-icons-outlined sun">light_mode</span>
+          </div>
+          <span class="mode-text text">Dark Mode</span>
+          <div class="toogle-switch">
+            <span class="switch"></span>
+          </div>
+        </li>
+      </div>
+      <!-- End Bottom Content -->
+    </aside>
+    <!-- End Sidebar -->
+  </body>
+</html>
