@@ -89,36 +89,43 @@
       }
 
       function fetchUsers() {
-        const token = localStorage.getItem("authToken"); // Retrieve the token
+    const token = localStorage.getItem("authToken");
 
-        if (!token) {
-          document.getElementById("error-message").textContent =
+    if (!token) {
+        document.getElementById("error-message").textContent =
             "No auth token found! Please login first.";
-          return;
-        }
+        return;
+    }
 
-        fetch("http://localhost:8080/users", {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`, // Ensure token is formatted correctly
+    fetch("http://localhost:8080/users", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.status === 403) {
-              throw new Error("Access Denied: Unauthorized");
+        },
+    })
+    .then(async (response) => {
+        if (!response.ok) {
+            // Handle empty response
+            const text = await response.text();
+            if (!text) {
+                throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
             }
-            return response.json();
-          })
-          .then((users) => {
-            console.log("Users:", users);
-            alert("Users fetched successfully! Check console for details.");
-          })
-          .catch((error) => {
-            document.getElementById("error-message").textContent =
-              error.message;
-          });
-      }
+            return JSON.parse(text);
+        }
+        return response.json();
+    })
+    .then((users) => {
+        console.log("Users:", users);
+        alert("Users fetched successfully! Check console for details.");
+    })
+    .catch((error) => {
+        console.error("Fetch error:", error);
+        document.getElementById("error-message").textContent = error.message;
+    });
+}
+
+
     </script>
   </body>
 </html>
