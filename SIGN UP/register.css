@@ -43,7 +43,7 @@ body {
   }
   .input-group input {
     width: 100%;
-    padding: 15px 0;
+    padding: 13px 0;
     font-size: 15px;
     background: #f4f4f4;
     border: none;
@@ -115,7 +115,7 @@ body {
 
   /* ---------Login Button--------- */
   .Login-btn {
-    padding: 10px;
+    padding: 13px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -133,7 +133,7 @@ body {
   /* -------Back Button--------- */
   .back-btn {
     width: 100%;
-    padding: 15px;
+    padding: 13px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -152,7 +152,7 @@ body {
   /* ----------SignUp Button---------- */
   .Signup-btn {
     width: 100%;
-    padding: 15px;
+    padding: 13px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
