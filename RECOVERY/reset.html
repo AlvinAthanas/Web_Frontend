@@ -12,6 +12,12 @@
       rel="stylesheet"
     />
 
+      <!-- Material Icons -->
+      <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="reset.css">
 
   </head>
@@ -22,18 +28,28 @@
         <p>Enter your email address below to reset your password</p>
 
         <div class="input-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required />
-        </div>
+          <span class="material-icons-outlined"> mail </span>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Email"
+            required
+          />
 
-        <div class="input-group">
-          <label for="phone">Phone Number</label>
-          <input type="phone" id="phone" name="phone" required />
-        </div>
+          <div class="input-group">
+            <span class="material-icons-outlined"> call </span>
+            <input
+              type="tel"
+              name="phone"
+              id="phone"
+              placeholder="+255"
+              required
+            />
        
-          <div class="Signup-btn">
-            <a href="#">Submit information</a>
-        </div>
+            <button type="submit" class="Signup-btn">
+              Submit Information
+            </button>
       </form>
     </div>
   </body>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roles</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+    <link rel="stylesheet" href="../ROLES/roles.css" />
+  </head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="container">
+          <h5>Assign Roles</h5>
+          <hr />
+          <form action="" class="form">
+            <div class="Member-name">
+              <label for="name">Member Name:</label>
+              <input type="text" name="name" id="name" required />
+            </div>
+
+            <div class="roles">
+              <label for="roles">Roles:</label>
+              <div class="input"><input type="checkbox" />Church Member</div>
+              <div class="input">
+                <input type="checkbox" /> Community Treasurer
+              </div>
+              <div class="input">
+                <input type="checkbox" /> Community Secretary
+              </div>
+              <div class="input">
+                <input type="checkbox" /> Community Chairperson
+              </div>
+              <div class="input"><input type="checkbox" /> Catechist</div>
+              <div class="input">
+                <input type="checkbox" />Committee Treasurer
+              </div>
+              <div class="input">
+                <input type="checkbox" /> Committee Secretary
+              </div>
+              <div class="input">
+                <input type="checkbox" /> Committee Chairperson
+              </div>
+              <div class="input"><input type="checkbox" />Parishioner</div>
+            </div>
+
+            <button class="assign-btn">Assign</button>
+          </form>
+        </div>
+      </main>
+    </div>
+    
+
+    <script src="../GENERAL/script.js"></script>
+  </body>
+</html>

@@ -13,6 +13,13 @@
       rel="stylesheet"
     />
 
+     <!-- Material Icons -->
+     <link
+     href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+     rel="stylesheet"
+   />
+
+
     <style>
       /* --------General Styling--------- */
       body {
@@ -24,12 +31,18 @@
         height: 100vh;
         margin: 0;
       }
+      .material-icons-outlined {
+        vertical-align: middle;
+        line-height: 1px;
+        font-size: 23px;
+        opacity: 0.6;
+      }
       .container {
         background: white;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        font-size: 10px;
+        font-size: 12px;
         text-align: center;
         width: 35%;
       }
@@ -38,6 +51,11 @@
         font-size: 25px;
         color: #79b3f1;
         margin: 0 auto;
+      }
+      h6 {
+        text-align: left;
+        font-size: 12px;
+        font-weight: bold;
       }
 
       /* -----------Image---------- */
@@ -58,64 +76,66 @@
         margin-bottom: 5px;
       }
       .input-group input {
-        width: 100%;
-        padding: 13px 0;
-        font-size: 12px;
+        width: 80%;
+        padding: 12px;
+        font-size: 13px;
         background: #f4f4f4;
         border: none;
+        border-radius: 5px;
+        padding-left: 40px;
+        margin: 5px;
+      }
+      .input-group span {
+        position: absolute;
+        margin-left: 12px;
+        margin-top: 23px;
+        color: #aaa;
       }
 
-      /* ---------Register--------- */
-      .register {
-        display: flex;
-        gap: 10px;
-        justify-content: space-between;
-        margin: 25px 0px;
-        align-items: center;
-      }
-      .checkbox-container{
-        align-items: center;
-        text-align: left;
-      }
-
+     
       /* -----------Forgot Link----------- */
       .forgot-link {
         text-decoration: none;
-        color: #79b3f1;
         text-align: right;
+        margin: 25px 0;
       }
-      .forgot-link:hover {
+      .forgot-link a{
+        text-decoration: none;
+        color: #79b3f1;
+
+      }
+      .forgot-link a:hover {
         color: #7090ad;
       }
 
-     /* --------Divider--------- */
-     .divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin: 25px auto;
-      width: 90%;
-    }
+      /* --------Divider--------- */
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 25px auto;
+        width: 90%;
+      }
 
-    .divider::before,
-    .divider::after {
-      content: "";
-      flex: 1;
-      border-bottom: 1px solid #333;
-      opacity: 0.5;
-    }
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #333;
+        opacity: 0.5;
+      }
 
-    .divider:not(:empty)::before {
-      margin-right: 5px;
-    }
+      .divider:not(:empty)::before {
+        margin-right: 5px;
+      }
 
-    .divider:not(:empty)::after {
-      margin-left: 5px;
-    }
+      .divider:not(:empty)::after {
+        margin-left: 5px;
+      }
 
-    .divider span {
-      opacity: 0.5; /* Makes text slightly transparent (opaque look) */
-    }
+      .divider span {
+        opacity: 0.5; /* Makes text slightly transparent (opaque look) */
+      }
 
       /* ---------Login Button--------- */
       .Login-btn {
@@ -124,6 +144,9 @@
         border-radius: 5px;
         cursor: pointer;
         background: #79b3f1;
+        color: white;
+        font-weight: 500;
+        width: 100%;
       }
       .Login-btn a {
         font-weight: 500;
@@ -136,16 +159,15 @@
 
       /* ----------SignUp Button---------- */
       .Signup-btn {
-        padding: 13px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         background: #4baf50;
-      }
-      .Signup-btn a {
-        font-weight: 500;
-        text-decoration: none;
         color: white;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 13px;
+        width: 100%;
       }
       .Signup-btn:hover {
         background: #5d805f;
@@ -154,46 +176,80 @@
   </head>
   <body>
     <div class="container">
-      <h5>Sign In</h5>
-      <!-- <img src="user.png" alt="user icon" /> -->
+      <!-- <h5>Sign In</h5> -->
+      <img src="user.png" alt="user icon" />
 
       <form action="#" class="form">
-        <div class="input-group">
-          <label for="username/email">Email</label>
-          <input type="text" name="username" id="username" required />
-        </div>
+        <div class="input-group ">
+          <span class="material-icons-outlined"> mail </span>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Email"
+            required
+          />
 
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input type="password" name="password" id="password" required />
-        </div>
+          <div class="input-group">
+            <span class="material-icons-outlined"> lock </span>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Password"
+              required
+            />
 
-        <div class="register">
-          <div class="checkbox-container">
-            <input type="checkbox" id="remember" />
-            <label for="remember"> Remember me</label>
-          </div>
-          <div>
-            <a href="../RECOVERY/reset.html" class="forgot-link">Forgot Password?</a>
-          </div>
+         
+          <div class="forgot-link">
+            <a href="RECOVERY/reset.html" 
+              >Forgot Password?</a
+            >
         </div>
       </form>
 
-      <div class="Login-btn">
-        <a href="#"> Login</a>
-      </div>
+      <button onclick="login()" class="Login-btn">Login</button>
+      <p id="error-message" class="error"></p>
 
-      <div class="divider"><span>Don't have an account?</span></div>
-
-      <div class="Signup-btn">
-        <a href="../SIGN UP/register.html"> Sign up</a>
-      </div>
+      <h6>Don't have a account? <a href="../SIGN UP/register.html">Sign up</a></h6>
     </div>
+
+    <p id="error-message" class="error"></p>
 
     <script>
       function login() {
-        const username = document.getElementById
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const errorMessage = document.getElementById("error-message");
+
+        const loginData = {
+          email: username,
+          password: password,
+        };
+
+        fetch("http://localhost:8080/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginData),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Invalid credentials");
+            }
+            return response.text(); // Get the token
+          })
+          .then((token) => {
+            localStorage.setItem("authToken", token); // Store token in localStorage
+            alert("Login successful!");
+          })
+          .catch((error) => {
+            errorMessage.textContent = error.message;
+          });
       }
+
+      
     </script>
   </body>
 </html>

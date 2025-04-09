@@ -1,0 +1,62 @@
+.container {
+    width: 90%;
+    background: #f4f7fb;
+    border: 1px ;
+    padding: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h5 {
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.form {
+    padding: 10px;
+    margin: 10px;
+    font-size: 16px;
+}
+
+.Member-name label {
+    font-weight: bold;
+}
+
+.Member-name input {
+    margin-top: 8px;
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.roles  {
+    display: block;
+    margin: 20px 0;
+}
+
+.roles label {
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.roles .input {
+    /* padding: 2px 0; */
+    margin: 10px 15px;
+}
+
+hr {
+    color:#79b3f1 ;
+}
+
+/* ---------Assign Button--------- */
+button {
+    padding: 10px;
+    width: 15%;
+    background: #79b3f1;
+    border: none;
+    border-radius: 5px;
+    color: white;
+}
+
+button:hover {
+    opacity: .7;
+}
