@@ -37,6 +37,11 @@
             required
           />
         </div>
+        <div
+          id="response-name"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
+
         <div class="input-group">
           <span class="material-icons-outlined"> mail </span>
           <input
@@ -47,6 +52,11 @@
             required
           />
         </div>
+        <div
+          id="response-email"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
+
         <div class="input-group">
           <span class="material-icons-outlined"> home </span>
           <input
@@ -67,6 +77,11 @@
             required
           />
         </div>
+        <div
+          id="response-phone"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
+
         <div class="input-group">
           <span class="material-icons-outlined"> calendar_month </span>
           <input type="date" name="birthDate" id="birthDate" required />
@@ -101,6 +116,10 @@
             required
           />
         </div>
+        <div
+          id="response-password"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
 
         <button type="submit" class="Signup-btn">
           Submit <span class="material-icons-outlined"> chevron_right </span>
@@ -108,40 +127,82 @@
 
         <h6>Have an account?<a href="../indexx.html">Login</a></h6>
       </form>
-      <div id="response" style="font-size: 18px; margin: 5px"></div>
+      <div id="response" style="font-size: 14px; margin: 5px; color: red"></div>
     </div>
 
     <script>
       const formEl = document.querySelector(".form");
       const responseEl = document.getElementById("response");
+      const responseName = document.getElementById("response-name");
+      const responseEmail = document.getElementById("response-email");
+      const responsePhone = document.getElementById("response-phone");
+      const responsePassword = document.getElementById("response-password");
 
       formEl.addEventListener("submit", (event) => {
         event.preventDefault();
         const formData = new FormData(formEl);
         const data = Object.fromEntries(formData);
+        const password = document.getElementById("password").value;
+        const password2 = document.getElementById("password2").value;
 
-        fetch("http://localhost:8080/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-          .then(async (response) => {
-            const responseData = await response.json(); // Convert response to JSON
-            if (!response.ok) {
-              throw new Error(responseData.message || "An error occurred");
-            }
-            return responseData;
+        if (password == password2) {
+          responsePassword.innerHTML = "";
+          fetch("http://localhost:8080/user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
           })
-          .then(() => {
-            responseEl.style.color = "green";
-            responseEl.innerText = "Registration Successful!";
-            formEl.reset();
-          })
+            .then(async (response) => {
+              const responseData = await response.json(); // Convert response to JSON
+              if (!response.ok) {
+                throw new Error(responseData.message || "An error occurred");
+              }
+              return responseData;
+            })
+            .then(() => {
+              responseName.innerHTML = "";
+              responseEmail.innerHTML = "";
+              responsePhone.innerHTML = "";
+              responsePassword.innerHTML = "";
+              responseEl.style.color = "green";
+              responseEl.innerText = "Registration Successful!";
+              formEl.reset();
+            })
 
-          .catch((error) => {
-            responseEl.style.color = "red";
-            responseEl.innerText = error.message; // Display only the error message
-          });
+            .catch((error) => {
+              responseEl.style.color = "red";
+              var message = error.message;
+              if (message == "Full name is required") {
+                responseEmail.innerHTML = "";
+                responsePhone.innerHTML = "";
+                responsePassword.innerHTML = "";
+                responseName.innerHTML = "*" + message + "!";
+              } else if (message == "Invalid email") {
+                responsePhone.innerHTML = "";
+                responsePassword.innerHTML = "";
+                responseName.innerHTML = "";
+                responseEmail.innerHTML = "*" + message + "!";
+              } else if (message == "Invalid phone number") {
+                responseEmail.innerHTML = "";
+                responsePassword.innerHTML = "";
+                responseName.innerHTML = "";
+                responsePhone.innerHTML = "*" + message + "!";
+              } else if (message == "Email already exists") {
+                responsePassword.innerHTML = "";
+                responseName.innerHTML = "";
+                responsePhone.innerHTML = "";
+                responseEmail.innerHTML = "*" + message + "!";
+              } else {
+                responseEmail.innerHTML = "";
+                responseName.innerHTML = "";
+                responsePhone.innerHTML = "";
+                responsePassword.innerHTML = "";
+                responseEl.innerText = message; // Display only the error message
+              }
+            });
+        } else {
+          responsePassword.innerHTML = "*Password do not match!";
+        }
       });
     </script>
   </body>
