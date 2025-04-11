@@ -6,7 +6,7 @@
     align-items: center;
     height: 100vh;
     margin: 0 auto;
-    font-family: "montserrat", sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   .material-icons-outlined {
     vertical-align: middle;
@@ -21,7 +21,8 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     font-size: 13px;
     text-align: center;
-    width: 35%;
+    width: 50%;
+    max-width: 400px;
   }
   .container h5 {
     font-size: 25px;
@@ -32,6 +33,13 @@
   p {
     opacity: 0.5;
   }
+  img {
+    align-items: center;
+    margin: 12px 0;
+    width:80px;
+    /* opacity: .5; */
+  }
+
 
   /* ---------Input Items----------- */
   .input-group {
@@ -44,14 +52,14 @@
     margin-bottom: 5px;
   }
   .input-group input {
-    width: 80%;
-    padding: 12px;
+    width: 100%;
+    padding: 12px 12px 12px 40px; 
     font-size: 13px;
     background: #f4f4f4;
     border: none;
     border-radius: 5px;
-    padding-left: 40px;
-    margin: 5px;
+    box-sizing: border-box;
+    margin: 5px 0;
   }
   .input-group span {
     position: absolute;
@@ -106,4 +114,26 @@
 }
 .Signup-btn:hover {
   background: #7090ad;
+}
+
+
+/* -------Media Query--------- */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+    width: 60%;
+  }
+
+  .input-group input {
+    font-size: 13px;
+    padding: 10px 10px 10px 40px;
+  }
+
+  .Signup-btn {
+    padding: 10px;
+  }
+
+  h5 {
+    font-size: 20px;
+  }
 }

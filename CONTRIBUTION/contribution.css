@@ -1,114 +1,165 @@
-/* -----------FORM STYLING---------- */
-.form-title {
-    text-align: center;
-    font-size:35px;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    /* max-width: 300px; */
-    margin: 0 auto;
-    width: 80%;
-    font-size: 20px;
-  }
-  
-  .form label {
-    margin-top: 20px;
-    font-weight: bold;
-  }
-  
-  .form input {
-    color: var(--text-color);
-  }
-  
-  .form input:hover {
-    background: #e5eff9;
-  }
-  
-  .form input, 
-  .form select{
-    padding: 20px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 20px;
-    background: var(--sidebar-color);
-  }
-  
-  .form button {
-    margin-top: 35px;
-    padding: 20px;
-    background-color: var(--primary-color); /* Use your primary color */
-    color: black;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 20px;
-  }
-  
-  .form button:hover {
-    background: var(--primary-color-light);
-  }
-  
-  
-  /*---------- Filter Section----------- */
-  .filter-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .filter-container select,
-  .filter-container button {
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .filter-container button {
-    background-color: var(--primary-color);
-    color: white;
-    cursor: pointer;
-  }
-  
-  .filter-container button:hover {
-    background-color: darken(var(--primary-color), 10%);
-  }
-  
-  option {
-    font-size: 20px;
+/* Font & Reset */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+  /* padding: 20px; */
+  color: #333;
+}
+
+/* Title */
+.table-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.table-title h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2b2b2b;
+  margin-bottom: 10px;
+}
+
+/* Filter Section */
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.filter-container label {
+  font-weight: 500;
+  margin-right: 5px;
+}
+
+.filter-container select,
+.filter-container button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.filter-container button {
+  background-color: #79b3f1;
+  color: white;
+  border: none;
+  transition: background 0.3s ease;
+}
+
+.filter-container button:hover {
+  background-color: #5b9ce0;
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.table thead {
+  background-color: #79b3f1;
+  color: white;
+}
+
+.table th,
+.table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f7ff;
+}
+
+/* Responsive Table */
+@media screen and (max-width: 450px) {
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
-  
-  /* ---------TABLE STYLING---------- */
-.table-title {
-    text-align: center;
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 35px;
+  .filter-container {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .table{
-    width: 100%;
-    font-size: 21px;
-  }
-  
-  .table th, .table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .table th {
-    background-color: var(--primary-color); /* Use your primary color */
-    color: white;
-  }
-  
-  .table td {
-    padding: 20px;
-  }
-  
+}
+
+/* ---------Dialog Styling--------- */
+/* ------- Add Button ------- */
+.add-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+.add-btn:hover {
+  opacity: 0.7;
+}
+
+/* ------- Dialog Styling ------- */
+.dialog-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-box {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+.dialog-box h3 {
+  margin-top: 0;
+  text-align: center;
+}
+.dialog-box form {
+  display: flex;
+  flex-direction: column;
+}
+.dialog-box input,
+.dialog-box select {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.dialog-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+.dialog-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.dialog-buttons button[type="submit"] {
+  background-color: #79b3f1;
+  color: white;
+}
+.dialog-buttons #cancelBtn {
+  background-color: #aaa;
+  color: white;
+}

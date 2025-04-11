@@ -26,99 +26,134 @@
   <body>
     <div class="grid-container" id="containerId">
       <main class="main-container">
-        <h2>Add Event</h2>
-        <form id="eventForm">
-          <input type="text" id="name" placeholder="Event Name" required />
-          <input type="date" id="date" required />
-          <input type="time" id="time" required />
-          <input type="text" id="venue" placeholder="Venue" required />
-          <textarea
-            id="description"
-            placeholder="Description"
-            rows="3"
-            required
-          ></textarea>
-          <button type="submit">Add Event</button>
-        </form>
-
+        <h2>Church Events</h2>
+    
+           
+        <!-- Dialog Form -->
+        <div id="formDialog" class="dialog-overlay">
+          <div class="dialog-box">
+            <h3>Add Event</h3>
+            <form id="eventForm">
+              <input type="text" id="name" placeholder="Event Name" required />
+              <input type="date" id="date" required />
+              <input type="time" id="time" required />
+              <input type="text" id="venue" placeholder="Venue" required />
+              <textarea
+                id="description"
+                placeholder="Description"
+                rows="3"
+                required
+              ></textarea>
+              <div class="dialog-buttons">
+                <button type="submit">Save</button>
+                <button type="button" id="cancelBtn">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+    
+        <!-- Event List -->
         <div class="event-list">
-          <h2>Event List</h2>
           <ol id="eventList"></ol>
         </div>
 
-        <script>
-          const eventForm = document.getElementById("eventForm");
-          const eventList = document.getElementById("eventList");
-          let events = JSON.parse(localStorage.getItem("events")) || [];
-          let editIndex = null;
+         <!-- Add Event Button -->
+         <div style="text-align: center; margin-bottom: 20px;">
+          <button id="openDialogBtn" class="add-btn">+ Add Event</button>
+        </div>
 
-          function saveToLocalStorage() {
-            localStorage.setItem("events", JSON.stringify(events));
-          }
-
-          function renderEvents() {
-            eventList.innerHTML = "";
-            events.forEach((event, index) => {
-              const li = document.createElement("li");
-              li.innerHTML = `
-                <strong>${event.name}</strong><br>
-                ${event.date} at ${event.time} — ${event.venue}<br>
-                ${event.description}
-                <div class="actions">
-                  <button onclick="editEvent(${index})">Edit</button>
-                  <button class="delete" onclick="deleteEvent(${index})">Delete</button>
-                </div>
-              `;
-              eventList.appendChild(li);
-            });
-          }
-
-          function deleteEvent(index) {
-            if (confirm("Are you sure you want to delete this event?")) {
-              events.splice(index, 1);
-              saveToLocalStorage();
-              renderEvents();
-            }
-          }
-
-          function editEvent(index) {
-            const event = events[index];
-            document.getElementById("name").value = event.name;
-            document.getElementById("date").value = event.date;
-            document.getElementById("time").value = event.time;
-            document.getElementById("venue").value = event.venue;
-            document.getElementById("description").value = event.description;
-            editIndex = index;
-          }
-
-          eventForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-
-            const event = {
-              name: document.getElementById("name").value,
-              date: document.getElementById("date").value,
-              time: document.getElementById("time").value,
-              venue: document.getElementById("venue").value,
-              description: document.getElementById("description").value,
-            };
-
-            if (editIndex !== null) {
-              events[editIndex] = event;
-              editIndex = null;
-            } else {
-              events.push(event);
-            }
-
-            saveToLocalStorage();
-            renderEvents();
-            eventForm.reset();
-          });
-
-          // Initial render
-          renderEvents();
-        </script>
       </main>
     </div>
-    <script src="../GENERAL/script.js"></script>
+
+    <script>
+      const eventForm = document.getElementById("eventForm");
+      const eventList = document.getElementById("eventList");
+      const formDialog = document.getElementById("formDialog");
+      const openDialogBtn = document.getElementById("openDialogBtn");
+      const cancelBtn = document.getElementById("cancelBtn");
+    
+      let events = JSON.parse(localStorage.getItem("events")) || [];
+      let editIndex = null;
+    
+      openDialogBtn.onclick = () => {
+        formDialog.style.display = "flex";
+      };
+    
+      cancelBtn.onclick = () => {
+        formDialog.style.display = "none";
+        eventForm.reset();
+        editIndex = null;
+      };
+    
+      function saveToLocalStorage() {
+        localStorage.setItem("events", JSON.stringify(events));
+      }
+    
+      function renderEvents() {
+        eventList.innerHTML = "";
+        events.forEach((event, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>${event.name}</strong><br>
+            ${event.date} at ${event.time} — ${event.venue}<br>
+            ${event.description}
+            <div class="actions">
+              <button onclick="editEvent(${index})">Edit</button>
+              <button class="delete" onclick="deleteEvent(${index})">Delete</button>
+            </div>
+          `;
+          eventList.appendChild(li);
+        });
+      }
+    
+      function deleteEvent(index) {
+        if (confirm("Are you sure you want to delete this event?")) {
+          events.splice(index, 1);
+          saveToLocalStorage();
+          renderEvents();
+        }
+      }
+    
+      function editEvent(index) {
+        const event = events[index];
+        document.getElementById("name").value = event.name;
+        document.getElementById("date").value = event.date;
+        document.getElementById("time").value = event.time;
+        document.getElementById("venue").value = event.venue;
+        document.getElementById("description").value = event.description;
+        editIndex = index;
+        formDialog.style.display = "flex";
+      }
+    
+      eventForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+    
+        const event = {
+          name: document.getElementById("name").value,
+          date: document.getElementById("date").value,
+          time: document.getElementById("time").value,
+          venue: document.getElementById("venue").value,
+          description: document.getElementById("description").value,
+        };
+    
+        if (editIndex !== null) {
+          events[editIndex] = event;
+          editIndex = null;
+        } else {
+          events.push(event);
+        }
+    
+        saveToLocalStorage();
+        renderEvents();
+        eventForm.reset();
+        formDialog.style.display = "none";
+      });
+    
+      // Initial render
+      renderEvents();
+    </script>
+    
+
+        <script src="../GENERAL/script.js"></script>
   </body>
 </html>

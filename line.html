@@ -1,292 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
-    <!-- Montserrat Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile</title>
 
-    <link rel="stylesheet" href="register.css" />
+  <!-- Font + Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="profile.css" />
 
-    <!-- Material Icons -->
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"
-    />
+  <style>
+    body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f7f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    <style>
-      /* --------General Styling--------- */
-      body {
-        background: #f4f4f4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: sans-serif;
-        height: 100vh;
-        margin: 0;
-      }
-      .material-icons-outlined {
-        vertical-align: middle;
-        line-height: 1px;
-        font-size: 23px;
-        opacity: 0.6;
-      }
-      .container {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        font-size: 12px;
-        text-align: center;
-        width: 70%;
-      }
-      .container h5 {
-        text-transform: uppercase;
-        font-size: 25px;
-        color: #79b3f1;
-        margin: 0 auto;
-      }
-      p {
-        opacity: 0.5;
-      }
-      h6 {
-        text-align: left;
-        font-size: 12px;
-        font-weight: bold;
-      }
+.profile-container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-      /* -----------Image---------- */
-      img {
-        align-items: center;
-        margin: 10px 0;
-        width: 150px;
-      }
+.image-upload {
+  margin-top: 20px;
+  position: relative;
+  cursor: pointer;
+}
 
-      /* ---------Input Items----------- */
-      .input-group {
-        text-align: left;
-        margin: 10px 0;
-      }
-      .input-group label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-      .gender {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }   
-      .input-group input {
-        width: 80%;
-        padding: 12px;
-        font-size: 13px;
-        background: #f4f4f4;
-        border: none;
-        border-radius: 5px;
-        padding-left: 40px;
-        margin: 5px;
-      }
-      .input-group span {
-        position: absolute;
-        margin-left: 12px;
-        margin-top: 22px;
-        color: #aaa;
-      }
-      .input-group-icon {
-        position: relative;
-      }
-    
+.image-upload input[type="file"] {
+  display: none;
+}
 
-      /* -----------Forgot Link----------- */
-      .forgot-link {
-        text-decoration: none;
-        color: #79b3f1;
-        text-align: right;
-      }
-      .forgot-link:hover {
-        color: #7090ad;
-      }
+#profilePic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #79b3f1;
+  transition: transform 0.2s;
+}
 
-      /* --------Divider--------- */
-      .divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        margin: 25px auto;
-        width: 90%;
-      }
+#profilePic:hover {
+  transform: scale(1.05);
+}
 
-      .divider::before,
-      .divider::after {
-        content: "";
-        flex: 1;
-        border-bottom: 1px solid #333;
-        opacity: 0.5;
-      }
+  </style>
 
-      .divider:not(:empty)::before {
-        margin-right: 5px;
-      }
+</head>
+<body>
+  <div class="profile-container">
+    <h2>User Profile</h2>
 
-      .divider:not(:empty)::after {
-        margin-left: 5px;
-      }
-
-      .divider span {
-        opacity: 0.5; /* Makes text slightly transparent (opaque look) */
-      }
-
-      /* -------Buttons-------- */
-      /* ----------SignUp Button---------- */
-      .Signup-btn {
-        margin-top: 20px;
-        width: 100%;
-        padding: 13px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background: #79b3f1;
-        color: white;
-      }
-      .Signup-btn span {
-        margin-left: 8px;
-        color: white;
-      }
-      .Signup-btn:hover {
-        background: #7090ad;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h5>Sign Up</h5>
-      <p>All fields are required</p>
-      <form action="" class="form">
-        <div class="divider"><span>Personal Details</span></div>
-
-        <div class="input-group">
-          <span class="material-icons-outlined"> person </span>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Fullname"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <span class="material-icons-outlined"> mail </span>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Email"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <span class="material-icons-outlined"> home </span>
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            id="address"
-          />
-        </div>
-
-        <div class="input-group">
-          <span class="material-icons-outlined"> call </span>
-          <input
-            type="tel"
-            name="phone"
-            id="phone"
-            placeholder="+255"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <span class="material-icons-outlined"> calendar_month </span>
-          <input type="date" name="birthDate" id="birthDate" required />
-        </div>
-        <div class="input-group">
-          <label for="gender">Gender</label>
-        </div>
-        <div class="gender">
-          <input type="radio" name="Male" id="Male" />Male
-          <input type="radio" name="Female" id="Female" />Female
-        </div>
-
-        <div class="divider"><span>Your credentials</span></div>
-
-        <div class="input-group">
-          <span class="material-icons-outlined"> lock </span>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <div class="input-group">
-          <span class="material-icons-outlined"> lock </span>
-          <input
-            type="password"
-            name="password2"
-            id="password2"
-            placeholder="Repeat Password"
-            required
-          />
-        </div>
-
-        <button type="submit" class="Signup-btn">
-          Submit <span class="material-icons-outlined"> chevron_right </span>
-        </button>
-
-        <h6>Have an account?<a href="indexx.html">Login</a></h6>
-      </form>
-      <div id="response" style="font-size: 18px; margin: 5px"></div>
+    <!-- Profile Image Upload -->
+    <div class="image-upload">
+      <label for="fileInput">
+        <img id="profilePic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile Picture" />
+        <input type="file" id="fileInput" accept="image/*" />
+      </label>
+      <p>Click on the icon to upload a profile picture</p>
     </div>
+  </div>
 
-    <script>
-      const formEl = document.querySelector(".form");
-      const responseEl = document.getElementById("response");
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const profilePic = document.getElementById("profilePic");
 
-      formEl.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const formData = new FormData(formEl);
-        const data = Object.fromEntries(formData);
+    // Load stored image on page load
+    const storedImage = localStorage.getItem("profileImage");
+    if (storedImage) {
+      profilePic.src = storedImage;
+    }
 
-        fetch("http://localhost:8080/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-          .then(async (response) => {
-            const responseData = await response.json(); // Convert response to JSON
-            if (!response.ok) {
-              throw new Error(responseData.message || "An error occurred");
-            }
-            return responseData;
-          })
-          .then(() => {
-            responseEl.style.color = "green";
-            responseEl.innerText = "Registration Successful!";
-            formEl.reset();
-          })
-
-          .catch((error) => {
-            responseEl.style.color = "red";
-            responseEl.innerText = error.message; // Display only the error message
-          });
-      });
-    </script>
-  </body>
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          profilePic.src = e.target.result;
+          localStorage.setItem("profileImage", e.target.result); // Save in localStorage
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
 </html>

@@ -27,7 +27,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: "montserrat", sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         height: 100vh;
         margin: 0;
       }
@@ -44,7 +44,8 @@
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         font-size: 12px;
         text-align: center;
-        width: 35%;
+        width: 50%;
+        max-width: 400px;
       }
       .container h5 {
         text-transform: uppercase;
@@ -62,7 +63,7 @@
       img {
         align-items: center;
         margin: 10px 0;
-        width: 150px;
+        width: 130px;
       }
 
       /* ---------Input Items----------- */
@@ -76,14 +77,14 @@
         margin-bottom: 5px;
       }
       .input-group input {
-        width: 80%;
-        padding: 12px;
-        font-size: 13px;
-        background: #f4f4f4;
-        border: none;
-        border-radius: 5px;
-        padding-left: 40px;
-        margin: 5px;
+        width: 100%;
+       padding: 12px 12px 12px 40px; 
+  font-size: 13px;
+  background: #f4f4f4;
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin: 5px 0;
       }
       .input-group span {
         position: absolute;
@@ -172,6 +173,27 @@
       .Signup-btn:hover {
         background: #5d805f;
       }
+
+/* -------Media Query--------- */
+      @media (max-width: 600px) {
+  .container {
+    padding: 15px;
+    width: 60%;
+  }
+
+  .input-group input {
+    font-size: 13px;
+    padding: 10px 10px 10px 40px;
+  }
+
+  .Login-btn {
+    padding: 10px;
+  }
+
+  h5 {
+    font-size: 20px;
+  }
+}
     </style>
   </head>
   <body>

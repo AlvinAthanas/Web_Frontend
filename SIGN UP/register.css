@@ -4,7 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   height: 100vh;
   margin: 0;
 }
@@ -21,7 +21,8 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   font-size: 12px;
   text-align: center;
-  width: 70%;
+  width: 60%;
+  max-width: 550px;
 }
 .container h5 {
   text-transform: uppercase;
@@ -42,7 +43,8 @@ h6 {
 img {
   align-items: center;
   margin: 10px 0;
-  width: 150px;
+  width: 130px;
+  margin-top: 100px;
 }
 
 /* ---------Input Items----------- */
@@ -61,14 +63,14 @@ img {
   align-items: center;
 }   
 .input-group input {
-  width: 80%;
-  padding: 12px;
+  width: 100%;
+  padding: 12px 12px 12px 40px; 
   font-size: 13px;
   background: #f4f4f4;
   border: none;
   border-radius: 5px;
-  padding-left: 40px;
-  margin: 5px;
+  box-sizing: border-box;
+  margin: 5px 0;
 }
 .input-group span {
   position: absolute;
@@ -117,7 +119,7 @@ img {
 }
 
 .divider span {
-  opacity: 0.5; /* Makes text slightly transparent (opaque look) */
+  opacity: 0.5; 
 }
 
 /* -------Buttons-------- */
@@ -138,4 +140,26 @@ img {
 }
 .Signup-btn:hover {
   background: #7090ad;
+}
+
+
+/* -------Media Query--------- */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+    width: 70%;
+  }
+
+  .input-group input {
+    font-size: 13px;
+    padding: 10px 10px 10px 40px;
+  }
+
+  .Signup-btn {
+    padding: 10px;
+  }
+
+  h5 {
+    font-size: 20px;
+  }
 }

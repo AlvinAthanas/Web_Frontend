@@ -19,16 +19,69 @@
       rel="stylesheet"
     />
 
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../DASHBOARD/dashboard.css">
     <link rel="stylesheet" href="../GENERAL/style.css" />
   </head>
   <body>
     <div class="grid-container" id="containerId">
       <main class="main-container">
-        <button onclick="fetchUsers()">Fetch Users</button>
+        <div class="main-title">
+          <!-- <h2>DASHBOARD</h2> -->
+        </div>
+        <div class="main-cards">
+          <div class="card">
+            <div class="card-inner">
+              <h3>REGISTERED MEMBERS</h3>
+              <span class="material-icons-outlined"> people </span>
+            </div>
+            <h1>249</h1>
+          </div>
+
+          <div class="card">
+            <div class="card-inner">
+              <h3>TOTAL CONTRIBUTION</h3>
+              <span class="material-icons-outlined"> payments </span>
+            </div>
+            <h1>250000</h1>
+          </div>
+
+                   <div class="card">
+            <div class="card-inner">
+              <h3>COMMUNITIES</h3>
+              <span class="material-icons-outlined">
+                groups
+              </span>
+            </div>
+            <h1>34</h1>
+          </div>
+
+          <div class="card">
+            <div class="card-inner">
+              <h3>ONGOING PROJECTS</h3>
+              <span class="material-icons-outlined">
+                rowing
+                </span>      </div>
+            <h1>2</h1>
+          </div>
+        </div>
+
+        <!-- <div class="charts">
+          <div class="charts-card">
+            <h2 class="chart-title">Top 5 Products</h2>
+            <div id="bar-chart"></div>
+          </div>
+
+          <div class="charts-card">
+            <h2 class="chart-title">Purchase and Sales Orders</h2>
+            <div id="area-chart"></div>
+          </div>
+        </div> -->
+
       </main>
     </div>
 
-    <script>
+    <!-- <script>
        function fetchUsers() {
     const token = localStorage.getItem("authToken");
 
@@ -66,7 +119,7 @@
     });
 }
 
-    </script>
+    </script> -->
 
     <script src="../GENERAL/script.js"></script>
   </body>
