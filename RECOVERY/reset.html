@@ -20,6 +20,31 @@
 
     <link rel="stylesheet" href="reset.css">
 
+    <style>
+      .form-footer {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.nav-btn {
+  padding: 10px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.nav-btn:hover {
+  background-color: #ccc;
+}
+
+    </style>
+
   </head>
   <body>
     <div class="container">
@@ -51,6 +76,15 @@
             <button type="submit" class="Signup-btn">
               Submit Information
             </button>
+
+            <div class="form-footer">
+              <button type="button" onclick="window.location.href='../indexx.html'" class="nav-btn">
+                Back to Login
+              </button>
+              <button type="button" onclick="window.location.href='../SIGN UP/register.html'" class="nav-btn">
+                Sign Up
+              </button>
+            </div>
       </form>
     </div>
   </body>

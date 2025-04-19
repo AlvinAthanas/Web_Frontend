@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Members</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../MEMBERS/members.css" />
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+  </head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="table-title">
+          <h2>MEMBER LIST</h2>
+        </div>
+
+        <table id="member-table" class="table">
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Gender</th>
+            </tr>
+          </thead>
+          <tbody id="member-table-body">
+            <!-- Rows will be populated dynamically -->
+          </tbody>
+        </table>
+
+        <div id="member-message" style="margin-top: 10px; color: green"></div>
+      </main>
+      <!-- End Main -->
+    </div>
+
+    <script>
+      function loadMembers() {
+        const token = localStorage.getItem("authToken"); // Same as your contribution page
+
+        fetch("http://localhost:8080/users", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to fetch users");
+            return res.json();
+          })
+          .then((data) => {
+            const tableBody = document.getElementById("member-table-body");
+            tableBody.innerHTML = "";
+
+            data.forEach((user, index) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.phone}</td>
+          <td>${user.address}</td>
+          <td>${user.gender}</td>
+        `;
+              tableBody.appendChild(row);
+            });
+          })
+          .catch((error) => {
+            console.error("Error loading members:", error.message);
+          });
+      }
+    </script>
+    <script>
+      loadMembers();
+    </script>
+    
+
+    <script src="../GENERAL/script.js"></script>
+  </body>
+</html>
