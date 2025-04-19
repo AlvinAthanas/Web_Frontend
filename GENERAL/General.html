@@ -18,6 +18,8 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
       rel="stylesheet"
     />
+
+    <style></style>
   </head>
   <body>
     <!-- <div class="grid-container"> -->
@@ -32,7 +34,20 @@
       <div class="header-right">
         <span class="material-icons-outlined"> notifications </span>
         <span class="material-icons-outlined"> mail </span>
-        <span class="material-icons-outlined"> account_circle </span>
+        <div class="account-container">
+          <span class="material-icons-outlined"> account_circle </span>
+          <div class="account-dropdown">
+            <a href="../PROFILE/profile.html" class="dropdown-item">
+              <span class="material-icons-outlined">person</span>
+              Profile
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="../indexx.html" class="dropdown-item">
+              <span class="material-icons-outlined">logout</span>
+              Logout
+            </a>
+          </div>
+        </div>
       </div>
     </header>
     <!-- End Header -->
@@ -48,43 +63,60 @@
         >
       </div>
       <ul class="sidebar-list">
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined">dashboard</span>
-          <a href="../DASHBOARD/dashboard.html">Dashboard</a>
-        </li>
+        <a href="../DASHBOARD/dashboard.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined">dashboard</span>
+            Dashboard
+          </li>
+        </a>
 
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined">assignment_ind</span>
-          <a href="../ROLES/roles.html"> Roles</a>
-        </li>
+        <a href="../ROLES/roles.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined">assignment_ind</span> Roles
+          </li>
+        </a>
 
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined">groups</span> Members
-        </li>
+        <a href="../MEMBERS/members.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined">groups</span> Members
+          </li>
+        </a>
 
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined"> payments </span>
-          <a href="../CONTRIBUTION/contribution.html">Contribution</a>
-        </li>
+        <a href="../CONTRIBUTION/contribution.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined"> payments </span>
+            Contribution
+          </li>
+        </a>
 
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined">calendar_month</span>
-          <a href="../SCHEDULES/Schedules.html">Schedule</a>
-        </li>
+        <a href="../SCHEDULES/Schedules.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined">calendar_month</span>
+            Schedule
+          </li>
+        </a>
 
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined"> event </span>
-          <a href="../EVENTS/Events.html">Events</a>
-        </li>
+        <a href="../EVENTS/Events.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined"> event </span>
+            Events
+          </li>
+        </a>
 
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined"> fact_check </span>
-          <a href="../COMMUNITY/Community.html">Community</a>
-        </li>
-        <li class="sidebar-list-item">
-          <span class="material-icons-outlined"> insert_chart </span>
-          <a href="regForm.html">Registration</a>
-        </li>
+        <a href="../COMMUNITY/Community.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined"> fact_check </span>
+            Community
+          </li>
+        </a>
+
+        <a href="../REGISTRATION/regForm.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined"> insert_chart </span>
+            Registration
+          </li>
+        </a>
+
         <li class="sidebar-list-item">
           <span class="material-icons-outlined"> settings </span> Settings
         </li>

@@ -25,6 +25,16 @@
   padding: 25px;
   border-radius: 5px;
   color: #ffff;
+  transition: all 0.5s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+  transform-origin: center;}
+
+/* Hover effect to make cards "pop up" */
+.card:hover {
+  transform: scale(1.1); 
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer; 
+  z-index: 1; 
 }
 
 .card:first-child {
@@ -52,3 +62,4 @@
 .card-inner > .material-icons-outlined {
     font-size: 45px;
 }
+

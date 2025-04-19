@@ -122,5 +122,47 @@
     </script> -->
 
     <script src="../GENERAL/script.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("authToken"); // adjust key if named differently
+    
+        if (!token) {
+          console.error("No auth token found.");
+          return;
+        }
+    
+        // Fetch registered users count
+        fetch("http://localhost:8080/user/count", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then(res => res.json())
+          .then(userCount => {
+            document.querySelector(".card:nth-child(1) h1").textContent = userCount;
+          })
+          .catch(error => {
+            console.error("Failed to fetch user count:", error);
+          });
+    
+        // Fetch group count with description=community
+        fetch("http://localhost:8080/group/count?description=community", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then(res => res.json())
+          .then(groupCount => {
+            document.querySelector(".card:nth-child(3) h1").textContent = groupCount;
+          })
+          .catch(error => {
+            console.error("Failed to fetch group count:", error);
+          });
+      });
+    </script>
+    
+    
+
   </body>
 </html>

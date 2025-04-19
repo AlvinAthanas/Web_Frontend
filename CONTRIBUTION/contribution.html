@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>View Event</title>
+    <title>Contribution</title>
 
     <!-- Montserrat Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -70,6 +70,11 @@
           <button id="filter-btn">Filter</button>
         </div>
 
+        <!-- Add Contribution Button -->
+        <div style="text-align: center; margin-bottom: 20px">
+          <button id="openDialogBtn" class="add-btn">+ Add Contribution</button>
+        </div>
+
         <!-- Contribution Table -->
         <table id="table" class="table">
           <thead>
@@ -79,51 +84,13 @@
               <th>Description</th>
               <th>Amount</th>
               <th>Date</th>
+              <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Sadaka</td>
-              <td>Sadaka 1</td>
-              <td>5000</td>
-              <td>2024-03-10</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Sadaka</td>
-              <td>sadaka 2</td>
-              <td>20000</td>
-              <td>2024-03-10</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>sadaka</td>
-              <td>Church Fundraiser</td>
-              <td>15000</td>
-              <td>2023-07-22</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Sadaka</td>
-              <td>morning masses</td>
-              <td>20000</td>
-              <td>2024-03-10</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td>Sadaka</td>
-              <td>sadaka 2 (Harambee)</td>
-              <td>20000</td>
-              <td>2024-03-17</td>
-            </tr>
+          <tbody id="contribution-table-body">
+            <!-- Dynamic rows will be inserted here -->
           </tbody>
         </table>
-
-        <!-- Add Contribution Button -->
-        <div style="text-align: center; margin-bottom: 20px">
-          <button id="openDialogBtn" class="add-btn">+ Add Contribution</button>
-        </div>
 
         <!-- Form Dialog -->
         <div id="formDialog" class="dialog-overlay">
@@ -131,28 +98,31 @@
             <h3>Add Contribution</h3>
             <form id="contributionForm">
               <label>Contribution Type:</label>
-              <select required>
-                <option value="">Select Type</option>
-                <option value="Sadaka">Sadaka</option>
-                <option value="Zaka">Zaka</option>
-                <option value="Miscellaneous">Miscellaneous</option>
-              </select>
+              <input type="text" name="type" id="type" required />
 
               <label>Description:</label>
               <input
                 type="text"
+                name="description"
+                id="description"
                 required
                 placeholder="e.g. Sunday Mass Offering"
               />
 
               <label>Amount:</label>
-              <input type="number" required placeholder="e.g. 10000" />
+              <input
+                type="number"
+                name="amount"
+                id="amount"
+                required
+                placeholder="e.g. 10000"
+              />
 
               <label>Date:</label>
-              <input type="date" required />
+              <input type="date" name="date" id="date" required />
 
               <div class="dialog-buttons">
-                <button type="submit">Save</button>
+                <button type="submit" id="submit">Save</button>
                 <button type="button" id="cancelBtn">Cancel</button>
               </div>
             </form>
@@ -161,8 +131,10 @@
       </main>
       <!-- End Main -->
     </div>
+    <div id="response"></div>
 
     <script>
+      // Javascript code for opening and closing the form dialog
       const openDialogBtn = document.getElementById("openDialogBtn");
       const formDialog = document.getElementById("formDialog");
       const cancelBtn = document.getElementById("cancelBtn");
@@ -174,16 +146,72 @@
       cancelBtn.onclick = () => {
         formDialog.style.display = "none";
       };
+    </script>
 
-      // Optional: Handle form submission
-      document
-        .getElementById("contributionForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          alert("Contribution saved!");
-          formDialog.style.display = "none";
-          this.reset(); // Clear form
-        });
+
+    <script>
+      // Function to fetch contributions and populate the table
+      function loadContributions() {
+        fetch("http://localhost:8080/contributions")
+          .then((res) => res.json())
+          .then((data) => {
+            const tableBody = document.getElementById(
+              "contribution-table-body"
+            );
+            tableBody.innerHTML = ""; // Clear current table
+
+            data.forEach((contribution, index) => {
+              const row = document.createElement("tr");
+
+              row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${contribution.type}</td>
+            <td>${contribution.description}</td>
+            <td>${contribution.amount}</td>
+            <td>${contribution.date}</td>
+            <td>
+              <button class = "edit-btn" onclick = "editContribution(${contribution.id})">Edit</button>
+              <button class = "delete-btn" onclick = "deleteContribution(${contribution.id})">Delete</button>
+              </td>
+          `;
+
+              tableBody.appendChild(row);
+            });
+          })
+          .catch((error) => {
+            console.error("Failed to load contributions:", error);
+          });
+      }
+
+      // Call function on page load
+      window.addEventListener("DOMContentLoaded", loadContributions);
+
+      // Reload after new contribution is added
+      const formEl = document.getElementById("contributionForm");
+
+      formEl.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const formData = new FormData(formEl);
+        const data = Object.fromEntries(formData);
+
+        fetch("http://localhost:8080/contribution", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then(() => {
+            document.getElementById("response").innerText =
+              "Contribution has been added successfully!";
+            formEl.reset();
+            formDialog.style.display = "none";
+            loadContributions(); // Refresh table after adding
+          })
+          .catch((error) => {
+            document.getElementById("response").innerText =
+              "Failed to Register: " + error.message;
+          });
+      });
     </script>
 
     <script src="../GENERAL/script.js"></script>

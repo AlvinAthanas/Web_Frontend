@@ -247,6 +247,9 @@
         const password = document.getElementById("password").value;
         const errorMessage = document.getElementById("error-message");
 
+         // Clear any previous error messages
+  errorMessage.textContent = "";
+
         const loginData = {
           email: username,
           password: password,
@@ -268,14 +271,18 @@
           .then((token) => {
             localStorage.setItem("authToken", token); // Store token in localStorage
             alert("Login successful!");
-            
+            window.location.href = "DASHBOARD/dashboard.html"; // Redirect to dashboard
           })
           .catch((error) => {
             errorMessage.textContent = error.message;
           });
-      
-    });
 
+
+      });
+
+      
+
+    
     </script>
   </body>
 </html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>register member</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+
+    <style>
+    .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+    </style>
+
+  </head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="form-container">
+          <h2>Add New User</h2>
+          <form id="userForm">
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" placeholder="Enter full name" />
+            </div>
+      
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" placeholder="Enter email address" />
+            </div>
+      
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="Enter phone number" />
+            </div>
+            <div class="form-group">
+              <label>Gender</label>
+              <label><input type="radio" name="gender" value="Male" /> Male</label>
+              <label><input type="radio" name="gender" value="Female" /> Female</label>
+            </div>
+            
+      
+            <div class="form-group">
+              <label for="address">Address</label>
+              <textarea id="address" rows="3" placeholder="Enter address"></textarea>
+            </div>
+      
+            <div class="button-group">
+              <button type="button" class="close-btn">Cancel</button>
+              <button type="submit" class="activate-btn">Submit</button>
+            </div>
+          </form>
+        </div>
+      </main>
+          </div>
+
+          <script>
+            document.getElementById("userForm").addEventListener("submit", function (e) {
+              e.preventDefault();
+            
+              const fullName = document.getElementById("fullName").value;
+              const email = document.getElementById("email").value;
+              const phone = document.getElementById("phone").value;
+              const gender = document.querySelector('input[name="gender"]:checked')?.value;
+              console.log("Selected gender:", gender);
+              const address = document.getElementById("address").value;
+            
+              fetch("http://localhost:8080/user", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  fullName,
+                  email,
+                  phone,
+                  gender,
+                  address,
+                }),
+              })
+                .then((res) => {
+                  if (!res.ok) throw new Error("Failed to create user");
+                  alert("User added successfully!");
+                  window.location.href = "../MEMBERS/members.html"; // redirect after adding
+                })
+                .catch((err) => alert("Error: " + err.message));
+            });
+            </script>
+            
+
+    <script src="../GENERAL/script.js"></script>
+  </body>
+</html>

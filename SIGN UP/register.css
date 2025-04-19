@@ -39,12 +39,20 @@ h6 {
   font-weight: bold;
 }
 
+select {
+  padding: 12px 12px 12px 40px; 
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  background: #f4f4f4;
+}
+
 /* -----------Image---------- */
 img {
   align-items: center;
   margin: 10px 0;
   width: 130px;
-  margin-top: 100px;
+  margin-top: 150px;
 }
 
 /* ---------Input Items----------- */
