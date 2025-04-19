@@ -230,7 +230,7 @@
         </div>
       </form>
 
-      <button onclick="login()" class="Login-btn">Login</button>
+      <button type="submit" class="Login-btn">Login</button>
       <p id="error-message" class="error"></p>
 
       <h6>Don't have a account? <a href="SIGN UP/register.html">Sign up</a></h6>
@@ -239,7 +239,10 @@
     <p id="error-message" class="error"></p>
 
     <script>
-      function login() {
+      const formEl = document.querySelector(".form");
+
+      formEl.addEventListener("submit", (event) => {
+        event.preventDefault();
         const username = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const errorMessage = document.getElementById("error-message");
@@ -270,9 +273,9 @@
           .catch((error) => {
             errorMessage.textContent = error.message;
           });
-      }
-
       
+    });
+
     </script>
   </body>
 </html>
