@@ -13,12 +13,18 @@
       <main class="main-container">
         <div class="divider"><span>Enter Mass Schedule</span></div>
         <form id="scheduleForm">
-          <input type="text" id="name" name="name" placeholder="Mass Name" required />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Mass Name"
+            required
+          />
           <input type="time" id="dateTime" name="dateTime" required />
           <button type="submit">Add Schedule</button>
         </form>
 
-        <table>
+        <table id="tableBody">
           <thead>
             <tr>
               <th>#</th>
@@ -31,116 +37,152 @@
         </table>
       </main>
     </div>
+    <div id="response"></div>
 
     <script>
-      const apiUrl = "http://localhost:8080"; // change if needed
-      const form = document.getElementById("scheduleForm");
-      const nameInput = document.getElementById("name");
-      const timeInput = document.getElementById("dateTime");
-      const tableBody = document.getElementById("scheduleTableBody");
+      const formEl = document.getElementById("scheduleForm");
+      const responseBox = document.getElementById("response");
+      const tableBody = document.getElementById("tableBody");
+      const submitBtn = formEl.querySelector("button[type='submit']");
 
       let editingId = null;
 
-      // Fetch and display all schedules
-      async function fetchSchedules() {
-        try {
-          const response = await fetch(`${apiUrl}/events`);
-          const schedules = await response.json();
-          renderTable(schedules);
-        } catch (error) {
-          console.error("Failed to fetch schedules:", error);
-        }
-      }
+      //  Loading and displaying Schedules
+      function loadSchedules() {
+        fetch("http://localhost:8080/events")
+          .then((res) => res.json())
+          .then((data) => {
+            tableBody.innerHTML = "";
 
-      // Render table
-      function renderTable(schedules) {
-        tableBody.innerHTML = "";
-        schedules.forEach((schedule, index) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${schedule.name}</td>
-            <td>${schedule.dateTime}</td>
-            <td>
-              <button class="edit-btn" onclick="editSchedule(${schedule.id}, '${
-            schedule.name
-          }', '${schedule.dateTime}')">Edit</button>
-              <button class="delete-btn" onclick="deleteSchedule(${
+            data.forEach((schedule, index) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+  <td>${index + 1}</td>
+  <td>${schedule.name}</td>
+  <td>${schedule.dateTime}</td>
+  <td>
+ <button class="edit-btn" onclick="editSchedule(${schedule.id}, '${
+                schedule.name
+              }', '${schedule.dateTime}')">Edit</button>
+<button class="delete-btn" onclick="deleteSchedule(${
                 schedule.id
-              })">Delete</button>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
+              })">Delete</button>    </td>
+
+  `;
+              tableBody.appendChild(row);
+            });
+          })
+          .catch((err) => {
+            responseBox.innerHTML = "Failed to load schedule " + err.message;
+          });
       }
 
-      // Handle form submission (add or update)
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name = nameInput.value.trim();
-        const time = timeInput.value;
+      // Creating a new Schedule
+      function handleCreate(schedule) {
+        schedule.preventDefault();
 
-        if (!name || !time) return;
+        const name = formEl.name.value;
+        const dateTime = formEl.dateTime.value;
 
-        const scheduleData = { name, time };
+        const data = { name, dateTime };
 
-        try {
-          if (editingId) {
-            // PUT request to update
-            const response = await fetch(`${apiUrl}/event/${editingId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(scheduleData),
-            });
+        fetch("http://localhost:8080/event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((res) => res.json())
+          .then(() => {
+            responseBox.innerText = "Schedule has been added successfully!";
+            formEl.reset();
+            formDialog.style.display = "none";
+            loadSchedules();
+          })
+          .catch((error) => {
+            responseBox.innerText = "Failed to add schedule: " + error.message;
+          });
+      }
 
-            if (!response.ok) throw new Error("Failed to update schedule");
+      // Updating an Existing Schedule
+      function handleUpdate(schedule) {
+        schedule.preventDefault();
 
+        const name = formEl.name.value;
+        const dateTime = formEl.dateTime.value;
+
+        const data = { name, dateTime };
+
+        fetch(`http://localhost:8080/schedule/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Update failed");
+            return res.json();
+          })
+          .then(() => {
+            responseBox.innerText = "Schedule updated successfully!";
+            formEl.reset();
+            formDialog.style.display = "none";
             editingId = null;
-            form.querySelector("button").textContent = "Add Schedule";
-          } else {
-            // POST request to add
-            const response = await fetch(`${apiUrl}/event`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(scheduleData),
-            });
+            submitBtn.innerText = "Add Schedule";
+            loadSchedules();
+          })
+          .catch((error) => {
+            responseBox.innerText = "Failed to update: " + error.message;
+          });
+      }
 
-            if (!response.ok) throw new Error("Failed to add schedule");
-          }
+      // Deleting a Shedule
+      function deleteSchedule(id) {
+        const confirmed = confirm(
+          "Are you sure you want to delete this event?"
+        );
+        if (!confirmed) return;
 
-          form.reset();
-          fetchSchedules();
-        } catch (error) {
-          console.error("Submit error:", error);
+        fetch(`http://localhost:8080/event/${id}`, {
+          method: "DELETE",
+        })
+          .then((res) => {
+            if (res.ok) {
+              loadSchedules();
+            } else {
+              throw new Error("Delete failed");
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to delete:", error);
+            responseBox.innerText = "Failed to delete: " + error.message;
+          });
+      }
+
+      // Editing a Schedule
+      function editSchedule(id) {
+        fetch(`http://localhost:8080/events/${id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            editingId = id;
+            formEl.name.value = data.name;
+            formEl.dateTime.value = data.dateTime;
+            submitBtn.innerText = "Update Schedule";
+          })
+          .catch((err) => {
+            console.error("Error loading for edit:", err);
+            responseBox.innerText = "Failed to load schedule: " + err.message;
+          });
+      }
+
+      // Handle form submit (create or update)
+      formEl.addEventListener("submit", (e) => {
+        if (editingId === null) {
+          handleCreate(e);
+        } else {
+          handleUpdate(e);
         }
       });
 
-      // Prepare form for editing
-      function editSchedule(id, name, time) {
-        nameInput.value = name;
-        timeInput.value = e.dateTime;
-        editingId = id;
-        form.querySelector("button").textContent = "Update Schedule";
-      }
-
-      // Delete with confirmation
-      async function deleteSchedule(id) {
-        if (confirm("Are you sure you want to delete this schedule?")) {
-          try {
-            const response = await fetch(`${apiUrl}/event/${id}`, {
-              method: "DELETE",
-            });
-
-            if (!response.ok) throw new Error("Failed to delete schedule");
-            fetchSchedules();
-          } catch (error) {
-            console.error("Delete error:", error);
-          }
-        }
-      }
-
-      // Initial fetch
-      fetchSchedules();
+      window.addEventListener("DOMContentLoaded", loadSchedules);
     </script>
 
     <script src="../GENERAL/script.js"></script>
