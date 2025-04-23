@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Members</title>
 
-    <!-- Montserrat Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-
     <!-- Material Icons -->
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
@@ -28,6 +20,48 @@
       <main class="main-container">
         <div class="table-title">
           <h2>REGISTERED MEMBERS LIST</h2>
+        </div>
+
+        <div class="top">
+          <div class="import">
+            <button id="importBtn">Import</button>
+            <button id="exportBtn">Export</button>
+          </div>
+
+          <div>
+            <button id="openDialogBtn" class="add-btn">+ Add Member</button>
+          </div>
+        </div>
+
+        <!-- Form Dialog -->
+        <div id="formDialog" class="dialog-overlay">
+          <div class="dialog-box">
+            <h3>Register new member here!</h3>
+            <form id="addMemberForm">
+              <label for="fullname">FullName</label>
+              <input type="text" name="name" id="name" required />
+
+              <label for="email">Email</label>
+              <input type="email" name="email" id="email" required />
+
+              <label for="address">Address</label>
+              <input type="text" name="address" id="address" required />
+
+              <label for="phone">Phone number</label>
+              <input type="number" name="phone" id="phone" required />
+
+              <label for="gender">Gender</label>
+              <div class="gender">
+                <input type="radio" name="gender" id="Male" required />Male
+                <input type="radio" name="gender" id="Female" required />Female
+              </div>
+
+              <div class="dialog-buttons">
+                <button type="submit" id="submit">Save</button>
+                <button type="button" id="cancelBtn">Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <table id="member-table" class="table">
@@ -51,11 +85,34 @@
       <!-- End Main -->
     </div>
 
+    <div id="responseBox"></div>
+
     <script>
+      const openDialogBtn = document.getElementById("openDialogBtn");
+      const submitBtn = document.getElementById("submit");
+      const cancelBtn = document.getElementById("cancelBtn");
+      const formDialog = document.getElementById("formDialog");
+      const formEl = document.getElementById("addMemberForm");
+
+      // Opening and closing the form dialog
+      openDialogBtn.onclick = () => {
+        formEl.reset();
+        submitBtn.innerText = "Save";
+        editingId = null;
+        responseBox.innerText = "";
+
+        formDialog.style.display = "flex";
+      };
+
+      cancelBtn.onclick = () => {
+        formDialog.style.display = "none";
+      };
+
+      // Loading and Displaying Members
       function loadMembers() {
         const token = localStorage.getItem("authToken"); // Same as your contribution page
 
-        fetch("http://localhost:8080/users", {
+        fetch("http://localhost:8080/user/${id}", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -87,11 +144,57 @@
             console.error("Error loading members:", error.message);
           });
       }
-    </script>
-    <script>
+
       loadMembers();
+
+
+      // Creating new members
+      formEl.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const token = localStorage.getItem("authToken");
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const address = document.getElementById("address").value;
+        const phone = document.getElementById("phone").value;
+        const gender = document.querySelector(
+          'input[name="gender"]:checked'
+        ).id;
+
+        const memberData = {
+          name,
+          email,
+          address,
+          phone,
+          gender,
+        };
+
+        fetch("http://localhost:8080/user", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(memberData),
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to add member");
+            return res.json();
+          })
+          .then((data) => {
+            document.getElementById("responseBox").innerText =
+              "Member added successfully!";
+            formDialog.style.display = "none";
+            loadMembers(); // refresh the table
+          })
+          .catch((error) => {
+            console.error("Error adding member:", error.message);
+            document.getElementById("responseBox").innerText =
+              "Failed to add member.";
+          });
+      });
     </script>
-    
 
     <script src="../GENERAL/script.js"></script>
   </body>
