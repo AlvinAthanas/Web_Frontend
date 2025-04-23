@@ -5,7 +5,7 @@ body {
   
   h2 {
     text-align: center;
-    color: #333;
+    color: #79b3f1;
   }
   
   form {
@@ -53,12 +53,11 @@ body {
     padding: 10px;
   }
   
-  .actions button {
-    margin-left: 10px;
+  .edit  {
     background-color: #f0ad4e;
   }
   
-  .actions .delete {
+  .delete {
     background-color: #d9534f;
   }
 

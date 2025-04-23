@@ -1,12 +1,12 @@
 // Accessing Header, Sidebar and Main
 
 document.addEventListener("DOMContentLoaded", function () {
-  loadComponent("../GENERAL/General.html", "containerId",function(){
+  loadComponent("../GENERAL/General.html", "containerId", function () {
     modeToogle();
     setupDropdowns();
+    openSidebar();
+    closeSidebar();
   });
-  openSidebar();
-  closeSidebar();
 });
 
 function loadComponent(file, containerId, callback) {
@@ -14,12 +14,12 @@ function loadComponent(file, containerId, callback) {
     .then((response) => response.text())
     .then((data) => {
       document
-        .getElementById(containerId).insertAdjacentHTML("beforeend", data);
+        .getElementById(containerId)
+        .insertAdjacentHTML("beforeend", data);
       if (callback) callback(); //Run additional setup
     })
     .catch((error) => console.error("error loading component", error));
 }
-
 
 // Dropdown Styling
 function setupDropdowns() {
@@ -30,7 +30,6 @@ function setupDropdowns() {
     });
   });
 }
-
 
 // Dark Mode and Light mode toogle
 function modeToogle() {
@@ -50,23 +49,18 @@ function modeToogle() {
   });
 }
 
-
 // Opening the sidebar
 function openSidebar() {
-  var sidebarOpen = false;
-  var sidebar = document.getElementById("sidebar");
-  if (!sidebarOpen) {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
     sidebar.classList.add("sidebar-responsive");
-    sidebarOpen = true;
   }
 }
 
 // Closing the sidebar
 function closeSidebar() {
-  var sidebarOpen = true;
-  var sidebar = document.getElementById("sidebar");
-  if (sidebarOpen) {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
     sidebar.classList.remove("sidebar-responsive");
-    sidebarOpen = false;
   }
 }
