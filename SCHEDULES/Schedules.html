@@ -51,15 +51,17 @@
             let editingEvent = null;
 
             // Fetch and display all schedules
-            async function fetchSchedules() {
-              try {
-                const response = await fetch(`${apiUrl}/events`);
-                const schedules = await response.json();
-                renderTable(schedules);
-              } catch (error) {
-                console.error("Failed to fetch schedules:", error);
-              }
-            }
+   // Fetch and display Mass schedules
+async function fetchSchedules() {
+  try {
+    const response = await fetch(`${apiUrl}/event/schedules?description=Mass`);
+    const schedules = await response.json();
+    renderTable(schedules);
+  } catch (error) {
+    console.error("Failed to fetch schedules:", error);
+  }
+}
+
 
             function formatTime(dateTimeString) {
               const date = new Date(dateTimeString);
