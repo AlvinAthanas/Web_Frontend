@@ -21,6 +21,27 @@
 
     <link rel="stylesheet" href="../GENERAL/style.css" />
     <link rel="stylesheet" href="../ROLES/roles.css" />
+    <style>
+      .suggestions-list {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        width: 100%;
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .suggestions-list div {
+        padding: 8px;
+        cursor: pointer;
+      }
+
+      .suggestions-list div:hover {
+        background-color: #79b3f1;
+        color: white;
+      }
+    </style>
   </head>
   <body>
     <div class="grid-container" id="containerId">
@@ -28,35 +49,54 @@
         <div class="container">
           <h5>Assign Roles</h5>
           <hr />
-          <form action="" class="form">
-            <div class="Member-name">
+          <form class="form">
+            <div class="Member-name" style="position: relative">
               <label for="name">Member Name:</label>
-              <input type="text" name="name" id="name" required />
+              <input
+                type="text"
+                name="name"
+                id="name"
+                autocomplete="off"
+                required
+              />
+              <div id="name-suggestions" class="suggestions-list"></div>
             </div>
 
             <div class="roles">
               <label for="roles">Roles:</label>
-              <div class="input"><input type="checkbox" />Church Member</div>
               <div class="input">
-                <input type="checkbox" /> Community Treasurer
+                <input type="checkbox" value="PARISH_MEMBER" /> Church Member
               </div>
               <div class="input">
-                <input type="checkbox" /> Community Secretary
+                <input type="checkbox" value="COMMUNITY_TREASURER" /> Community
+                Treasurer
               </div>
               <div class="input">
-                <input type="checkbox" /> Community Chairperson
-              </div>
-              <div class="input"><input type="checkbox" /> Catechist</div>
-              <div class="input">
-                <input type="checkbox" />Committee Treasurer
+                <input type="checkbox" value="COMMUNITY_SECRETARY" /> Community
+                Secretary
               </div>
               <div class="input">
-                <input type="checkbox" /> Committee Secretary
+                <input type="checkbox" value="COMMUNITY_CHAIRPERSON" />
+                Community Chairperson
               </div>
               <div class="input">
-                <input type="checkbox" /> Committee Chairperson
+                <input type="checkbox" value="CATECHIST" /> Catechist
               </div>
-              <div class="input"><input type="checkbox" />Parishioner</div>
+              <div class="input">
+                <input type="checkbox" value="COMMITTEE_TREASURER" /> Committee
+                Treasurer
+              </div>
+              <div class="input">
+                <input type="checkbox" value="COMMITTEE_SECRETARY" /> Committee
+                Secretary
+              </div>
+              <div class="input">
+                <input type="checkbox" value="COMMITTEE_CHAIRPERSON" />
+                Committee Chairperson
+              </div>
+              <div class="input">
+                <input type="checkbox" value="PARISHIONER" /> Parishioner
+              </div>
             </div>
 
             <button class="assign-btn">Assign</button>
@@ -64,7 +104,114 @@
         </div>
       </main>
     </div>
-    
+
+    <script>
+      const nameInput = document.getElementById("name");
+      const suggestionBox = document.getElementById("name-suggestions");
+      let selectedUserId = null;
+
+      nameInput.addEventListener("input", function () {
+        const query = nameInput.value.trim();
+        selectedUserId = null;
+
+        if (query.length < 1) {
+          suggestionBox.innerHTML = "";
+          return;
+        }
+
+        fetch(
+          `http://localhost:8080/user/search?name=${encodeURIComponent(query)}`
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            suggestionBox.innerHTML = "";
+
+            data.forEach((user) => {
+              const div = document.createElement("div");
+              div.textContent = user.name;
+              div.dataset.id = user.id;
+              div.classList.add("user-suggestion");
+
+              div.addEventListener("click", () => {
+                nameInput.value = user.name;
+                selectedUserId = user.id;
+                suggestionBox.innerHTML = "";
+
+                 // Fetch and mark the user's existing roles
+  fetch(`http://localhost:8080/user/${selectedUserId}/roles`)
+    .then(res => res.json())
+    .then(roles => {
+      // First, uncheck all checkboxes
+      document.querySelectorAll(".roles input[type='checkbox']").forEach(cb => {
+        cb.checked = false;
+      });
+
+      // Then, check the boxes for the roles the user already has
+      roles.forEach(role => {
+        const checkbox = document.querySelector(`.roles input[type='checkbox'][value="${role}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+    })
+    .catch(err => {
+      console.error("Error fetching user roles:", err);
+    });
+              });
+
+              suggestionBox.appendChild(div);
+            });
+
+            if (data.length === 0) {
+              const noMatch = document.createElement("div");
+              noMatch.textContent = "No matching names found";
+              suggestionBox.appendChild(noMatch);
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching user names:", err);
+          });
+      });
+
+      document
+        .querySelector(".assign-btn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+
+          if (!selectedUserId) {
+            alert("Please select a user from the suggestions.");
+            return;
+          }
+
+          const checkedRoles = Array.from(
+            document.querySelectorAll(".roles input[type='checkbox']:checked")
+          ).map((cb) => cb.value);
+
+          if (checkedRoles.length === 0) {
+            alert("Please select at least one role.");
+            return;
+          }
+
+          // Assign roles one by one
+          Promise.all(
+            checkedRoles.map((role) =>
+              fetch(
+                `http://localhost:8080/user/role/${selectedUserId}?roleName=${role}`,
+                {
+                  method: "POST",
+                }
+              )
+            )
+          )
+            .then(() => {
+              alert("Roles have been assigned!");
+            })
+            .catch((err) => {
+              console.error("Error assigning roles:", err);
+              alert("Failed to assign roles.");
+            });
+        });
+    </script>
 
     <script src="../GENERAL/script.js"></script>
   </body>

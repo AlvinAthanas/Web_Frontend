@@ -32,43 +32,40 @@
           <h2>CONTRIBUTION RECORDS</h2>
         </div>
 
-        <!-- Filter Section -->
-        <div class="filter-container">
-          <label for="year">Select Contribution Type:</label>
-          <select id="year">
-            <option value="">All</option>
-            <option value="sadaka">Sadaka</option>
-            <option value="zaka">Zaka</option>
-          </select>
+       <!-- Filter Section -->
+<div class="filter-container">
+  <label for="type">Select Contribution Type:</label>
+  <select id="type-filter">
+    <option value="">All</option>
+    <option value="sadaka">Sadaka</option>
+    <option value="zaka">Zaka</option>
+  </select>
 
-          <label for="month">Select Month:</label>
-          <select id="month">
-            <option value="">All</option>
-            <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
-            <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
-            <option value="08">August</option>
-            <option value="09">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
+  <label for="month">Select Month:</label>
+  <select id="month-filter">
+    <option value="">All</option>
+    <option value="1">January</option>
+    <option value="2">February</option>
+    <option value="3">March</option>
+    <option value="4">April</option>
+    <option value="5">May</option>
+    <option value="6">June</option>
+    <option value="7">July</option>
+    <option value="8">August</option>
+    <option value="9">September</option>
+    <option value="10">October</option>
+    <option value="11">November</option>
+    <option value="12">December</option>
+  </select>
 
-          <label for="year">Select Year:</label>
-          <select id="year">
-            <option value="">All</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-            <option value="2021">2021</option>
-          </select>
+  <label for="year-filter">Select Year:</label>
+  <label for="year-filter">Enter Year:</label>
+  <input type="number" id="year-filter" min="2020" max="2099" placeholder="e.g. 2024" />
+  
+  
 
-          <button id="filter-btn">Filter</button>
-        </div>
+  <button id="filter-btn">Filter</button>
+</div>
 
         <!-- Add Contribution Button -->
         <div style="text-align: center; margin-bottom: 20px">
@@ -290,7 +287,63 @@
           });
       }
 
-      window.addEventListener("DOMContentLoaded", loadContributions);
+      function populateYearOptions() {
+  const yearSelect = document.getElementById("year-filter");
+  const currentYear = new Date().getFullYear();
+  const startYear = 2020;
+
+  for (let year = currentYear; year >= startYear; year--) {
+    const option = document.createElement("option");
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  }
+}
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  populateYearOptions();
+  loadContributions();
+});
+
+      //FILTERING CONTRIBUTIONS
+      document.getElementById("filter-btn").addEventListener("click", () => {
+  const type = document.getElementById("type-filter").value;
+  const month = document.getElementById("month-filter").value;
+  const year = document.getElementById("year-filter").value;
+
+  const params = new URLSearchParams();
+  if (type) params.append("type", type);
+  if (month) params.append("month", month);
+  if (year) params.append("year", year);
+
+  fetch(`http://localhost:8080/contributions/filter?${params.toString()}`)
+    .then((res) => res.json())
+    .then((data) => {
+      const tableBody = document.getElementById("contribution-table-body");
+      tableBody.innerHTML = "";
+
+      data.forEach((contribution, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${contribution.type}</td>
+          <td>${contribution.description}</td>
+          <td>${contribution.amount}</td>
+          <td>${contribution.date}</td>
+          <td>
+            <button class="edit-btn" onclick="editContribution(${contribution.id})">Edit</button>
+            <button class="delete-btn" onclick="deleteContribution(${contribution.id})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    })
+    .catch((err) => {
+      console.error("Error filtering contributions:", err);
+    });
+});
+
     </script>
 
     <script src="../GENERAL/script.js"></script>

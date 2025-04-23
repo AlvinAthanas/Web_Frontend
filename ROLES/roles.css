@@ -60,3 +60,57 @@ button {
 button:hover {
     opacity: .7;
 }
+
+
+/* alvin added from here */
+.suggestions-list {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 10;
+  }
+  
+  .suggestions-list div {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .suggestions-list div:hover {
+    background-color: #f0f0f0;
+  }
+  #suggestion-box {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    position: absolute;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%; /* Match input width */
+    z-index: 1000;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    background-color: #fff;
+    color: #333;
+  }
+
+  .suggestion-item:hover {
+    background-color: #79b3f1 !important;
+    color: #fff !important;
+  }
+
+  .suggestion-item:not(:last-child) {
+    border-bottom: 1px solid #eee;
+  }
+
+  .form {
+    position: relative;
+  }
