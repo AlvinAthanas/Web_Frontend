@@ -107,33 +107,34 @@
 
       // Loading and Displaying all events
       function loadEvents() {
-        fetch("http://localhost:8080/events")
-          .then((res) => res.json())
-          .then((data) => {
-            // const tableBody = document.getElementById("eventList");
-            eventList.innerHTML = "";
+  fetch("http://localhost:8080/events")
+    .then((res) => res.json())
+    .then((data) => {
+      eventList.innerHTML = "";
 
-            data.forEach((event) => {
-              const li = document.createElement("li");
-              li.innerHTML = `
-            <strong style = "color:#79b3f1">${event.name}</strong><br>     
-            <b>Time:</b>  ${String(event.dateTime).replace("T", " ")}<br>
-           <b> Location: </b>${event.location}<br>
-           <b>Description:</b>  ${event.description}<br>
-            <button onclick="editEvent(${
-              event.id
-            })" class = "edit">Edit</button>
-            <button onclick="deleteEvent(${
-              event.id
-            })" class = "delete">Delete</button>
-          `;
-              eventList.appendChild(li);
-            });
-          })
-          .catch((err) => {
-            responseBox.innerText = "Failed to load events: " + err.message;
-          });
-      }
+      // Filter out events where description is exactly "mass" (case-insensitive)
+      const filteredEvents = data.filter(
+        (event) => event.description?.toLowerCase() !== "mass"
+      );
+
+      filteredEvents.forEach((event) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong style="color:#79b3f1">${event.name}</strong><br>
+          <b>Time:</b>  ${String(event.dateTime).replace("T", " ")}<br>
+          <b>Location:</b> ${event.location}<br>
+          <b>Description:</b> ${event.description}<br>
+          <button onclick="editEvent(${event.id})" class="edit">Edit</button>
+          <button onclick="deleteEvent(${event.id})" class="delete">Delete</button>
+        `;
+        eventList.appendChild(li);
+      });
+    })
+    .catch((err) => {
+      responseBox.innerText = "Failed to load events: " + err.message;
+    });
+}
+
 
       // Creating a new event
       function handleCreate(event) {

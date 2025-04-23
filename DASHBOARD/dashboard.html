@@ -20,7 +20,7 @@
     />
 
     <!-- External CSS -->
-    <link rel="stylesheet" href="../DASHBOARD/dashboard.css">
+    <link rel="stylesheet" href="../DASHBOARD/dashboard.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
   </head>
   <body>
@@ -46,12 +46,10 @@
             <h1>250000</h1>
           </div>
 
-                   <div class="card">
+          <div class="card">
             <div class="card-inner">
               <h3>COMMUNITIES</h3>
-              <span class="material-icons-outlined">
-                groups
-              </span>
+              <span class="material-icons-outlined"> groups </span>
             </div>
             <h1>34</h1>
           </div>
@@ -59,9 +57,8 @@
           <div class="card">
             <div class="card-inner">
               <h3>ONGOING PROJECTS</h3>
-              <span class="material-icons-outlined">
-                rowing
-                </span>      </div>
+              <span class="material-icons-outlined"> rowing </span>
+            </div>
             <h1>2</h1>
           </div>
         </div>
@@ -77,7 +74,6 @@
             <div id="area-chart"></div>
           </div>
         </div> -->
-
       </main>
     </div>
 
@@ -126,43 +122,57 @@
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem("authToken"); // adjust key if named differently
-    
+
         if (!token) {
           console.error("No auth token found.");
           return;
         }
-    
+
         // Fetch registered users count
         fetch("http://localhost:8080/user/count", {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         })
-          .then(res => res.json())
-          .then(userCount => {
-            document.querySelector(".card:nth-child(1) h1").textContent = userCount;
+          .then((res) => res.json())
+          .then((userCount) => {
+            document.querySelector(".card:nth-child(1) h1").textContent =
+              userCount;
           })
-          .catch(error => {
+          .catch((error) => {
             console.error("Failed to fetch user count:", error);
           });
-    
+
+        // Fetch total contribution amount
+        fetch("http://localhost:8080/contributions/totalAmount", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((total) => {
+            document.querySelector(".card:nth-child(2) h1").textContent =
+              total.toLocaleString();
+          })
+          .catch((error) => {
+            console.error("Failed to fetch total contributions:", error);
+          });
+
         // Fetch group count with description=community
         fetch("http://localhost:8080/group/count?description=community", {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         })
-          .then(res => res.json())
-          .then(groupCount => {
-            document.querySelector(".card:nth-child(3) h1").textContent = groupCount;
+          .then((res) => res.json())
+          .then((groupCount) => {
+            document.querySelector(".card:nth-child(3) h1").textContent =
+              groupCount;
           })
-          .catch(error => {
+          .catch((error) => {
             console.error("Failed to fetch group count:", error);
           });
       });
     </script>
-    
-    
-
   </body>
 </html>

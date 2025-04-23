@@ -2,132 +2,180 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Event</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Management</title>
 
-    <!-- Montserrat Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet" />
+  <!-- Fonts and Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
 
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
-
-    <link rel="stylesheet" href="../GENERAL/style.css" />
-<link rel="stylesheet" href="community.css">
-   
+  <!-- Styles -->
+  <link rel="stylesheet" href="../GENERAL/style.css" />
+  <link rel="stylesheet" href="community.css" />
 </head>
 
 <body>
-    <div class="grid-container" id="containerId">
-        <main class="main-container">
-            <div class="container">
-                <h2>Community List</h2>
-                <input type="text" id="communityInput" placeholder="Enter community name" required>
-                <button class="add-btn" onclick="addCommunity()">Add</button>
-                <ul class="community-list" id="communityList"></ul>
-            </div>
+  <div class="grid-container" id="containerId">
+    <main class="main-container">
+      <div class="container">
+        <h2>Community List</h2>
+        <input type="text" id="communityInput" placeholder="Enter community name" required>
+        <button class="add-btn" onclick="addCommunity()">Add</button>
+        <ul class="community-list" id="communityList"></ul>
+      </div>
+    </main>
+  </div>
 
-            <script>
-                function addCommunity() {
-                    let communityInput = document.getElementById('communityInput');
-                    let communityName = communityInput.value.trim();
-                    if (communityName === '') return;
+  <script>
+    const apiUrl = "http://localhost:8080"; // adjust if needed
 
-                    let list = document.getElementById('communityList');
-                    let li = document.createElement('li');
-                    let link = document.createElement('a');
-                    let delButton = document.createElement('button');
-                    let editButton = document.createElement('button');
+    // Fetch and display all communities
+    async function fetchCommunities() {
+      try {
+        const response = await fetch(`${apiUrl}/groups/communities`);
+        const communities = await response.json();
+        renderCommunityList(communities);
+      } catch (error) {
+        console.error("Error fetching communities:", error);
+      }
+    }
 
-                    link.href = '#'; // Change this to a valid URL if needed
-                    link.textContent = communityName;
+    // Render list items
+    function renderCommunityList(communities) {
+      const list = document.getElementById("communityList");
+      list.innerHTML = "";
 
-                    delButton.textContent = 'Delete';
-                    delButton.classList.add('delete-btn');
-                    delButton.onclick = function () {
-                        list.removeChild(li);
-                    };
+      communities.forEach((community) => {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = "#";
+        link.textContent = community.name;
 
-                    editButton.textContent = 'Edit';
-                    editButton.classList.add('edit-btn');
-                    editButton.onclick = function () {
-                        // Create an input field with the current name
-                        let inputField = document.createElement('input');
-                        inputField.type = 'text';
-                        inputField.value = link.textContent;
-                        inputField.classList.add('edit-input');
+        const delButton = document.createElement("button");
+        delButton.textContent = "Delete";
+        delButton.classList.add("delete-btn");
+        delButton.onclick = () => deleteCommunity(community.id, li);
 
-                        // Create Save button
-                        let saveButton = document.createElement('button');
-                        saveButton.textContent = 'Save';
-                        saveButton.classList.add('save-btn');
+        const editButton = document.createElement("button");
+        editButton.textContent = "Edit";
+        editButton.classList.add("edit-btn");
+        editButton.onclick = () => enableEditing(li, link, community.id);
 
-                        // Create Cancel button
-                        let cancelButton = document.createElement('button');
-                        cancelButton.textContent = 'Cancel';
-                        cancelButton.classList.add('cancel-btn');
+        li.appendChild(link);
+        li.appendChild(editButton);
+        li.appendChild(delButton);
+        list.appendChild(li);
+      });
+    }
 
-                        // Store original name in case of cancel
-                        let originalName = link.textContent;
+    // Add new community
+    async function addCommunity() {
+      const input = document.getElementById("communityInput");
+      const name = input.value.trim();
+      if (!name) return;
 
-                        // Replace text with input field
-                        li.replaceChild(inputField, link);
-                        li.replaceChild(saveButton, editButton);
-                        li.appendChild(cancelButton);
+      try {
+        const response = await fetch(`${apiUrl}/group/community`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
 
-                        // Hide the delete button
-                        delButton.style.display = 'none';
+        if (!response.ok) throw new Error("Failed to add community");
 
-                        // Save on Enter key
-                        inputField.addEventListener('keypress', function (event) {
-                            if (event.key === 'Enter') {
-                                saveButton.click();
-                            }
-                        });
+        input.value = "";
+        fetchCommunities();
+      } catch (error) {
+        console.error("Error adding community:", error);
+      }
+    }
 
-                        // Save functionality
-                        saveButton.onclick = function () {
-                            let newName = inputField.value.trim();
-                            if (newName !== '') {
-                                link.textContent = newName;
-                            }
-                            resetView();
-                        };
+    // Delete community (optional backend call if you have delete support)
+    async function deleteCommunity(id, li) {
+      if (!confirm("Delete this community?")) return;
+      try {
+        const response = await fetch(`${apiUrl}/group/${id}`, {
+          method: "DELETE",
+        });
 
-                        // Cancel functionality
-                        cancelButton.onclick = function () {
-                            link.textContent = originalName;
-                            resetView();
-                        };
+        if (!response.ok) throw new Error("Failed to delete community");
 
-                        // Reset view function
-                        function resetView() {
-                            li.replaceChild(link, inputField);
-                            li.replaceChild(editButton, saveButton);
-                            li.removeChild(cancelButton);
-                            delButton.style.display = 'inline-block';
-                        }
+        li.remove();
+      } catch (error) {
+        console.error("Error deleting community:", error);
+      }
+    }
 
-                        // Auto-focus on input field
-                        inputField.focus();
-                    };
+    // Edit community name
+    function enableEditing(li, link, id) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = link.textContent;
+      input.classList.add("edit-input");
 
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save";
+      saveBtn.classList.add("save-btn");
 
-                    li.appendChild(link);
-                    li.appendChild(editButton);
-                    li.appendChild(delButton);
-                    list.appendChild(li);
-                    li.appendChild(buttonGroup);
+      const cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "Cancel";
+      cancelBtn.classList.add("cancel-btn");
 
-                    companyInput.value = '';
-                }
-            </script>
-        </main>
-    </div>
-    <script src="../GENERAL/script.js"></script>
+      const originalName = link.textContent;
+
+      li.replaceChild(input, link);
+      li.replaceChild(saveBtn, li.children[1]); // edit button
+      li.appendChild(cancelBtn);
+      li.children[2].style.display = "none"; // hide delete
+
+      saveBtn.onclick = async () => {
+        const newName = input.value.trim();
+        if (newName === "") return;
+
+        try {
+          const response = await fetch(`${apiUrl}/group/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, name: newName, description: "community" })
+          });
+
+          if (!response.ok) throw new Error("Failed to update");
+
+          link.textContent = newName;
+          reset();
+        } catch (error) {
+          console.error("Update error:", error);
+        }
+      };
+
+      cancelBtn.onclick = reset;
+
+      function reset() {
+        li.replaceChild(link, input);
+        li.replaceChild(createEditButton(link, id), saveBtn);
+        li.removeChild(cancelBtn);
+        li.children[2].style.display = "inline-block";
+      }
+
+      function createEditButton(link, id) {
+        const button = document.createElement("button");
+        button.textContent = "Edit";
+        button.classList.add("edit-btn");
+        button.onclick = () => enableEditing(li, link, id);
+        return button;
+      }
+
+      input.focus();
+    }
+
+    // Initial load
+    fetchCommunities();
+  </script>
+
+  <script src="../GENERAL/script.js"></script>
 </body>
 
 </html>
