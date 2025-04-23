@@ -38,9 +38,10 @@
       const nameInput = document.getElementById("name");
       const timeInput = document.getElementById("dateTime");
       const tableBody = document.getElementById("scheduleTableBody");
-
+    
       let editingId = null;
-
+      let editingEvent = null;
+    
       // Fetch and display all schedules
       async function fetchSchedules() {
         try {
@@ -51,7 +52,16 @@
           console.error("Failed to fetch schedules:", error);
         }
       }
-
+    
+      function formatTime(dateTimeString) {
+        const date = new Date(dateTimeString);
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+        return `${displayHour}:${minutes} ${period}`;
+      }
+    
       // Render table
       function renderTable(schedules) {
         tableBody.innerHTML = "";
@@ -60,69 +70,97 @@
           row.innerHTML = `
             <td>${index + 1}</td>
             <td>${schedule.name}</td>
-            <td>${schedule.dateTime}</td>
+            <td>${formatTime(schedule.dateTime)}</td>
             <td>
-              <button class="edit-btn" onclick="editSchedule(${schedule.id}, '${
-            schedule.name
-          }', '${schedule.dateTime}')">Edit</button>
-              <button class="delete-btn" onclick="deleteSchedule(${
-                schedule.id
-              })">Delete</button>
+              <button class="edit-btn" onclick="editSchedule(${schedule.id})">Edit</button>
+              <button class="delete-btn" onclick="deleteSchedule(${schedule.id})">Delete</button>
             </td>
           `;
           tableBody.appendChild(row);
         });
       }
-
+    
       // Handle form submission (add or update)
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = nameInput.value.trim();
         const time = timeInput.value;
-
+    
         if (!name || !time) return;
-
-        const scheduleData = { name, time };
-
+    
+        const timeParts = time.split(":");
+        const now = new Date();
+        const nextSunday = new Date();
+        nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7)); // find next Sunday
+        nextSunday.setHours(timeParts[0]);
+        nextSunday.setMinutes(timeParts[1]);
+        nextSunday.setSeconds(0);
+    
+        const localDateTime = `${nextSunday.getFullYear()}-${String(nextSunday.getMonth() + 1).padStart(2, '0')}-${String(nextSunday.getDate()).padStart(2, '0')}T${String(nextSunday.getHours()).padStart(2, '0')}:${String(nextSunday.getMinutes()).padStart(2, '0')}:00`;
+    
         try {
           if (editingId) {
-            // PUT request to update
+            // Update the fetched event object
+            editingEvent.name = name;
+            editingEvent.dateTime = localDateTime;
+    
             const response = await fetch(`${apiUrl}/event/${editingId}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(scheduleData),
+              body: JSON.stringify(editingEvent),
             });
-
+    
             if (!response.ok) throw new Error("Failed to update schedule");
-
+    
             editingId = null;
+            editingEvent = null;
             form.querySelector("button").textContent = "Add Schedule";
           } else {
-            // POST request to add
-            const response = await fetch(`${apiUrl}/event`, {
+            // New schedule creation
+            const scheduleData = {
+              name,
+              dateTime: localDateTime
+            };
+    
+            const response = await fetch(`${apiUrl}/event/schedule`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(scheduleData),
             });
-
+    
             if (!response.ok) throw new Error("Failed to add schedule");
           }
-
+    
           form.reset();
           fetchSchedules();
         } catch (error) {
           console.error("Submit error:", error);
         }
       });
-
+    
       // Prepare form for editing
-      function editSchedule(id, name, time) {
-        nameInput.value = name;
-        timeInput.value = e.dateTime;
-        editingId = id;
-        form.querySelector("button").textContent = "Update Schedule";
+      async function editSchedule(id) {
+        try {
+          const response = await fetch(`${apiUrl}/event/${id}`);
+          if (!response.ok) throw new Error("Failed to fetch event for editing");
+          const event = await response.json();
+    
+          nameInput.value = event.name;
+    
+          const dateObj = new Date(event.dateTime);
+          const hours = String(dateObj.getHours()).padStart(2, "0");
+          const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+          timeInput.value = `${hours}:${minutes}`;
+    
+          editingId = id;
+          editingEvent = event;
+    
+          form.querySelector("button").textContent = "Update Schedule";
+        } catch (error) {
+          console.error("Edit fetch error:", error);
+        }
       }
-
+    
       // Delete with confirmation
       async function deleteSchedule(id) {
         if (confirm("Are you sure you want to delete this schedule?")) {
@@ -130,7 +168,7 @@
             const response = await fetch(`${apiUrl}/event/${id}`, {
               method: "DELETE",
             });
-
+    
             if (!response.ok) throw new Error("Failed to delete schedule");
             fetchSchedules();
           } catch (error) {
@@ -138,11 +176,11 @@
           }
         }
       }
-
+    
       // Initial fetch
       fetchSchedules();
     </script>
-
+    
     <script src="../GENERAL/script.js"></script>
   </body>
 </html>
