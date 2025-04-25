@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Members</title>
 
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Material Icons -->
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
@@ -14,6 +22,11 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../MEMBERS/members.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   </head>
   <body>
     <div class="grid-container" id="containerId">
@@ -85,34 +98,63 @@
       <!-- End Main -->
     </div>
 
-    <div id="responseBox"></div>
-
     <script>
-      const openDialogBtn = document.getElementById("openDialogBtn");
-      const submitBtn = document.getElementById("submit");
-      const cancelBtn = document.getElementById("cancelBtn");
-      const formDialog = document.getElementById("formDialog");
-      const formEl = document.getElementById("addMemberForm");
-
-      // Opening and closing the form dialog
-      openDialogBtn.onclick = () => {
-        formEl.reset();
-        submitBtn.innerText = "Save";
-        editingId = null;
-        responseBox.innerText = "";
-
-        formDialog.style.display = "flex";
-      };
-
-      cancelBtn.onclick = () => {
-        formDialog.style.display = "none";
-      };
-
-      // Loading and Displaying Members
+      document.addEventListener("DOMContentLoaded", () => {
+        const openDialogBtn = document.getElementById("openDialogBtn");
+        const submitBtn = document.getElementById("submit");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const formDialog = document.getElementById("formDialog");
+        const formEl = document.getElementById("addMemberForm");
+    
+        openDialogBtn.onclick = () => {
+          formEl.reset();
+          formDialog.style.display = "flex";
+        };
+    
+        cancelBtn.onclick = () => {
+          formDialog.style.display = "none";
+        };
+    
+        formEl.addEventListener("submit", function (e) {
+          e.preventDefault();
+    
+          const name = document.getElementById("name").value;
+          const email = document.getElementById("email").value;
+          const address = document.getElementById("address").value;
+          const phone = document.getElementById("phone").value;
+          const gender = document.querySelector("input[name='gender']:checked")?.id;
+    
+          const newUser = { name, email, address, phone, gender };
+          const token = localStorage.getItem("authToken");
+    
+          fetch("http://localhost:8080/user", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newUser),
+          })
+            .then((res) => {
+              if (!res.ok) throw new Error("Failed to add user");
+              return res.json();
+            })
+            .then((data) => {
+              formDialog.style.display = "none";
+              loadMembers(); // Refresh table
+              document.getElementById("member-message").textContent = "Member added successfully!";
+            })
+            .catch((error) => {
+              console.error("Error adding user:", error.message);
+            });
+        });
+      });
+    
+      // Function to load members from the database
       function loadMembers() {
-        const token = localStorage.getItem("authToken"); // Same as your contribution page
-
-        fetch("http://localhost:8080/user/${id}", {
+        const token = localStorage.getItem("authToken");
+    
+        fetch("http://localhost:8080/users", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -126,17 +168,17 @@
           .then((data) => {
             const tableBody = document.getElementById("member-table-body");
             tableBody.innerHTML = "";
-
+    
             data.forEach((user, index) => {
               const row = document.createElement("tr");
               row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${user.name}</td>
-          <td>${user.email}</td>
-          <td>${user.phone}</td>
-          <td>${user.address}</td>
-          <td>${user.gender}</td>
-        `;
+                <td>${index + 1}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.phone}</td>
+                <td>${user.address}</td>
+                <td>${user.gender}</td>
+              `;
               tableBody.appendChild(row);
             });
           })
@@ -144,56 +186,42 @@
             console.error("Error loading members:", error.message);
           });
       }
-
+    
       loadMembers();
+    </script>
 
+<script>
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-      // Creating new members
-      formEl.addEventListener("submit", function (e) {
-        e.preventDefault();
+    doc.text("Registered Members List", 14, 10);
 
-        const token = localStorage.getItem("authToken");
+    const rows = [];
+    const table = document.getElementById("member-table");
+    const tbody = table.querySelector("tbody");
+    const trs = tbody.querySelectorAll("tr");
 
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const address = document.getElementById("address").value;
-        const phone = document.getElementById("phone").value;
-        const gender = document.querySelector(
-          'input[name="gender"]:checked'
-        ).id;
+    trs.forEach((tr) => {
+      const row = [];
+      tr.querySelectorAll("td").forEach((td) => row.push(td.innerText));
+      rows.push(row);
+    });
 
-        const memberData = {
-          name,
-          email,
-          address,
-          phone,
-          gender,
-        };
+    doc.autoTable({
+      head: [["S/N", "Full Name", "Email", "Phone", "Address", "Gender"]],
+      body: rows,
+      startY: 20,
+    });
 
-        fetch("http://localhost:8080/user", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(memberData),
-        })
-          .then((res) => {
-            if (!res.ok) throw new Error("Failed to add member");
-            return res.json();
-          })
-          .then((data) => {
-            document.getElementById("responseBox").innerText =
-              "Member added successfully!";
-            formDialog.style.display = "none";
-            loadMembers(); // refresh the table
-          })
-          .catch((error) => {
-            console.error("Error adding member:", error.message);
-            document.getElementById("responseBox").innerText =
-              "Failed to add member.";
-          });
-      });
+    doc.save("members-list.pdf");
+  });
+</script>
+
+    
+
+    <script>
+      loadMembers();
     </script>
 
     <script src="../GENERAL/script.js"></script>

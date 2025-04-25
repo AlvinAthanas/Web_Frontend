@@ -19,9 +19,16 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="../GENERAL/style.css" />
 
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
     <link rel="stylesheet" href="events.css" />
+
+    <!-- External Javascript -->
+    <!-- html2canvas to capture HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF for creating the PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
     <div class="grid-container" id="containerId">
@@ -64,14 +71,22 @@
           </div>
         </div>
 
-        <!-- Event List -->
-        <div class="event-list">
-          <ol id="eventList"></ol>
+        <div class="top">
+          <div class="import">
+            <button id="importBtn">Import</button>
+            <!-- <button id="exportBtn">Export</button> -->
+            <button id="exportPdfBtn">Export PDF</button>
+          </div>
+
+          <div>
+            <!-- Add Event Button -->
+            <button id="openDialogBtn" class="add-btn">+ Add Event</button>
+          </div>
         </div>
 
-        <!-- Add Event Button -->
-        <div style="text-align: center; margin-bottom: 20px">
-          <button id="openDialogBtn" class="add-btn">+ Add Event</button>
+        <!-- Event List -->
+        <div class="event-list">
+          <ol id="eventList" class="pdf-target"></ol>
         </div>
       </main>
     </div>
@@ -107,34 +122,35 @@
 
       // Loading and Displaying all events
       function loadEvents() {
-  fetch("http://localhost:8080/events")
-    .then((res) => res.json())
-    .then((data) => {
-      eventList.innerHTML = "";
+        fetch("http://localhost:8080/events")
+          .then((res) => res.json())
+          .then((data) => {
+            eventList.innerHTML = "";
 
-      // Filter out events where description is exactly "mass" (case-insensitive)
-      const filteredEvents = data.filter(
-        (event) => event.description?.toLowerCase() !== "mass"
-      );
+            // Filter out events where description is exactly "mass" (case-insensitive)
+            const filteredEvents = data.filter(
+              (event) => event.description?.toLowerCase() !== "mass"
+            );
 
-      filteredEvents.forEach((event) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
+            filteredEvents.forEach((event) => {
+              const li = document.createElement("li");
+              li.innerHTML = `
           <strong style="color:#79b3f1">${event.name}</strong><br>
           <b>Time:</b>  ${String(event.dateTime).replace("T", " ")}<br>
           <b>Location:</b> ${event.location}<br>
-          <b>Description:</b> ${event.description}<br>
+          <b>NB:</b> ${event.description}<br>
           <button onclick="editEvent(${event.id})" class="edit">Edit</button>
-          <button onclick="deleteEvent(${event.id})" class="delete">Delete</button>
+          <button onclick="deleteEvent(${
+            event.id
+          })" class="delete">Delete</button>
         `;
-        eventList.appendChild(li);
-      });
-    })
-    .catch((err) => {
-      responseBox.innerText = "Failed to load events: " + err.message;
-    });
-}
-
+              eventList.appendChild(li);
+            });
+          })
+          .catch((err) => {
+            responseBox.innerText = "Failed to load events: " + err.message;
+          });
+      }
 
       // Creating a new event
       function handleCreate(event) {
@@ -253,6 +269,43 @@
       }
 
       window.addEventListener("DOMContentLoaded", loadEvents);
+    </script>
+
+<!------Exporting to PDF------->
+    <script>
+      document.getElementById("exportPdfBtn").addEventListener("click", () => {
+        const { jsPDF } = window.jspdf;
+        const target = document.querySelector(".pdf-target");
+
+        // Hide buttons temporarily
+        const buttons = target.querySelectorAll("button");
+        buttons.forEach((btn) => (btn.style.display = "none"));
+
+        html2canvas(target, {
+          scale: 2,
+          useCORS: true,
+        }).then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
+
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pageWidth - 20; // some margin
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+          // Add heading
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(18);
+          pdf.text("Church Events", pageWidth / 2, 15, { align: "center" });
+
+          // Add image of event list below the title
+          pdf.addImage(imgData, "PNG", 10, 25, pdfWidth, pdfHeight);
+          pdf.save("church-events.pdf");
+
+          // Show buttons again
+          buttons.forEach((btn) => (btn.style.display = "inline-block"));
+        });
+      });
     </script>
 
     <script src="../GENERAL/script.js"></script>

@@ -22,6 +22,8 @@
           />
           <input type="time" id="dateTime" name="dateTime" required />
           <button type="submit">Add Schedule</button>
+          <button id="downloadPDF">Download PDF</button>
+
         </form>
 
         <table id="tableBody">
@@ -190,6 +192,43 @@ async function fetchSchedules() {
             // Initial fetch
             fetchSchedules();
     </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  document.getElementById("downloadPDF").addEventListener("click", () => {
+    const table = document.getElementById("tableBody");
+    const cloneTable = table.cloneNode(true);
+
+    // Remove all <td> from the last column
+    cloneTable.querySelectorAll("tr").forEach(row => {
+      const cells = row.querySelectorAll("td, th");
+      if (cells.length > 3) {
+        cells[cells.length - 1].remove(); // Remove last column (Actions)
+      }
+    });
+
+    // Wrap table in a new element with a title
+    const wrapper = document.createElement("div");
+
+    const title = document.createElement("h2");
+    title.textContent = "Mass Schedules";
+    title.style.textAlign = "center";
+    wrapper.appendChild(title);
+
+    wrapper.appendChild(cloneTable);
+
+    // Generate PDF
+    html2pdf().from(wrapper).set({
+      margin: 0.5,
+      filename: 'Mass-Schedules.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    }).save();
+  });
+</script>
+
 
     <script src="../GENERAL/script.js"></script>
   </body>

@@ -22,6 +22,34 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
     <link rel="stylesheet" href="contribution.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        .top {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  background-color: #79b3f1;
+  color: white;
+  border: none;
+  padding: 7px 15px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  opacity: 0.7;
+}
+
+ .add-btn {
+  background-color: #4caf50;
+}
+    </style>
+
   </head>
 
   <body>
@@ -60,16 +88,29 @@
 
   <label for="year-filter">Enter Year:</label>
   <input type="number" id="year-filter" min="2020" max="2099" placeholder="e.g. 2024" />
-  
-  
 
   <button id="filter-btn">Filter</button>
 </div>
 
+<div class="top">
+    <div class="import">
+      <button id="importBtn">Import</button>
+      <button id="exportBtn">Export Excel</button>
+      <button id="exportPdfBtn">Export PDF</button>
+
+    </div>
+
+    <div>
+                <!-- Add Contribution Button -->
+      <button id="openDialogBtn" class="add-btn">+ Add Contribution</button>
+    </div>
+  </div>
+
+
         <!-- Add Contribution Button -->
-        <div style="text-align: center; margin-bottom: 20px">
+        <!-- <div style="text-align: center; margin-bottom: 20px">
           <button id="openDialogBtn" class="add-btn">+ Add Contribution</button>
-        </div>
+        </div> -->
 
         <!-- Contribution Table -->
         <table id="table" class="table">
@@ -344,6 +385,68 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
     </script>
+    
+    <!-- Exporting the contributions in form of excel document -->
+    <script>
+        document.getElementById("exportBtn").addEventListener("click", () => {
+          const table = document.getElementById("table");
+      
+          if (!table) {
+            console.error("Contribution table not found!");
+            return;
+          }
+      
+          // Convert the HTML table to a worksheet
+          const worksheet = XLSX.utils.table_to_sheet(table);
+      
+          // Create a new workbook and append the worksheet
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Contributions");
+      
+          // Trigger Excel file download
+          XLSX.writeFile(workbook, "contributions_report.xlsx");
+        });
+      </script>
+
+
+<!-- Exporting the contributions in form of pdf document -->
+<script>
+    document.getElementById("exportPdfBtn").addEventListener("click", () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+  
+      const table = document.getElementById("table");
+  
+      // Extract headers and rows
+      const headers = [["S/N", "Contribution Type", "Description", "Amount", "Date"]];
+      const rows = [];
+  
+      const tableBody = table.querySelector("tbody");
+      tableBody.querySelectorAll("tr").forEach((tr) => {
+        const cols = tr.querySelectorAll("td");
+        const row = [
+          cols[0].innerText,
+          cols[1].innerText,
+          cols[2].innerText,
+          cols[3].innerText,
+          cols[4].innerText,
+        ];
+        rows.push(row);
+      });
+  
+      doc.autoTable({
+        head: headers,
+        body: rows,
+        startY: 20,
+        theme: "striped",
+      });
+  
+      doc.text("Contribution Report", 14, 15);
+      doc.save("contributions_report.pdf");
+    });
+  </script>
+  
+      
 
     <script src="../GENERAL/script.js"></script>
   </body>
