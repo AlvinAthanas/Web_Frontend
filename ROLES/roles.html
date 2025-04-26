@@ -137,26 +137,30 @@
                 selectedUserId = user.id;
                 suggestionBox.innerHTML = "";
 
-                 // Fetch and mark the user's existing roles
-  fetch(`http://localhost:8080/user/${selectedUserId}/roles`)
-    .then(res => res.json())
-    .then(roles => {
-      // First, uncheck all checkboxes
-      document.querySelectorAll(".roles input[type='checkbox']").forEach(cb => {
-        cb.checked = false;
-      });
+                // Fetch and mark the user's existing roles
+                fetch(`http://localhost:8080/user/${selectedUserId}/roles`)
+                  .then((res) => res.json())
+                  .then((roles) => {
+                    // First, uncheck all checkboxes
+                    document
+                      .querySelectorAll(".roles input[type='checkbox']")
+                      .forEach((cb) => {
+                        cb.checked = false;
+                      });
 
-      // Then, check the boxes for the roles the user already has
-      roles.forEach(role => {
-        const checkbox = document.querySelector(`.roles input[type='checkbox'][value="${role}"]`);
-        if (checkbox) {
-          checkbox.checked = true;
-        }
-      });
-    })
-    .catch(err => {
-      console.error("Error fetching user roles:", err);
-    });
+                    // Then, check the boxes for the roles the user already has
+                    roles.forEach((role) => {
+                      const checkbox = document.querySelector(
+                        `.roles input[type='checkbox'][value="${role}"]`
+                      );
+                      if (checkbox) {
+                        checkbox.checked = true;
+                      }
+                    });
+                  })
+                  .catch((err) => {
+                    console.error("Error fetching user roles:", err);
+                  });
               });
 
               suggestionBox.appendChild(div);

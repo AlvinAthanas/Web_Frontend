@@ -22,6 +22,15 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
     <link rel="stylesheet" href="contribution.css" />
+
+    <!-- SheetJS for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+   
   </head>
 
   <body>
@@ -32,45 +41,59 @@
           <h2>CONTRIBUTION RECORDS</h2>
         </div>
 
-       <!-- Filter Section -->
-<div class="filter-container">
-  <label for="type">Select Contribution Type:</label>
-  <select id="type-filter">
-    <option value="">All</option>
-    <option value="sadaka">Sadaka</option>
-    <option value="zaka">Zaka</option>
-  </select>
+        <!-- Filter Section -->
+        <div class="filter-container">
+          <label for="type">Select Contribution Type:</label>
+          <select id="type-filter">
+            <option value="">All</option>
+            <option value="sadaka">Sadaka</option>
+            <option value="zaka">Zaka</option>
+          </select>
 
-  <label for="month">Select Month:</label>
-  <select id="month-filter">
-    <option value="">All</option>
-    <option value="1">January</option>
-    <option value="2">February</option>
-    <option value="3">March</option>
-    <option value="4">April</option>
-    <option value="5">May</option>
-    <option value="6">June</option>
-    <option value="7">July</option>
-    <option value="8">August</option>
-    <option value="9">September</option>
-    <option value="10">October</option>
-    <option value="11">November</option>
-    <option value="12">December</option>
-  </select>
+          <label for="month">Select Month:</label>
+          <select id="month-filter">
+            <option value="">All</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
 
-  <label for="year-filter">Enter Year:</label>
-  <input type="number" id="year-filter" min="2020" max="2099" placeholder="e.g. 2024" />
-  
-  
+          <label for="year-filter">Enter Year:</label>
+          <input
+            type="number"
+            id="year-filter"
+            min="2020"
+            max="2099"
+            placeholder="e.g. 2024"
+          />
 
-  <button id="filter-btn">Filter</button>
-</div>
-
-        <!-- Add Contribution Button -->
-        <div style="text-align: center; margin-bottom: 20px">
-          <button id="openDialogBtn" class="add-btn">+ Add Contribution</button>
+          <button id="filter-btn">Filter</button>
         </div>
 
+        <div class="top">
+          <div class="import">
+            <button id="importBtn">Import</button>
+            <button id="exportExcelBtn">Export Excel</button>
+            <button id="exportPdfBtn">Export PDF</button>
+          </div>
+
+          <div>
+            <!-- Add Contribution Button -->
+            <button id="openDialogBtn" class="add-btn">
+              + Add Contribution
+            </button>
+          </div>
+        </div>
+       
         <!-- Contribution Table -->
         <table id="table" class="table">
           <thead>
@@ -287,62 +310,144 @@
       }
 
       function populateYearOptions() {
-  const yearSelect = document.getElementById("year-filter");
-  const currentYear = new Date().getFullYear();
-  const startYear = 2020;
+        const yearSelect = document.getElementById("year-filter");
+        const currentYear = new Date().getFullYear();
+        const startYear = 2020;
 
-  for (let year = currentYear; year >= startYear; year--) {
-    const option = document.createElement("option");
-    option.value = year;
-    option.textContent = year;
-    yearSelect.appendChild(option);
-  }
-}
+        for (let year = currentYear; year >= startYear; year--) {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year;
+          yearSelect.appendChild(option);
+        }
+      }
 
-
-window.addEventListener("DOMContentLoaded", () => {
-  populateYearOptions();
-  loadContributions();
-});
+      window.addEventListener("DOMContentLoaded", () => {
+        populateYearOptions();
+        loadContributions();
+      });
 
       //FILTERING CONTRIBUTIONS
       document.getElementById("filter-btn").addEventListener("click", () => {
-  const type = document.getElementById("type-filter").value;
-  const month = document.getElementById("month-filter").value;
-  const year = document.getElementById("year-filter").value;
+        const type = document.getElementById("type-filter").value;
+        const month = document.getElementById("month-filter").value;
+        const year = document.getElementById("year-filter").value;
 
-  const params = new URLSearchParams();
-  if (type) params.append("type", type);
-  if (month) params.append("month", month);
-  if (year) params.append("year", year);
+        const params = new URLSearchParams();
+        if (type) params.append("type", type);
+        if (month) params.append("month", month);
+        if (year) params.append("year", year);
 
-  fetch(`http://localhost:8080/contributions/filter?${params.toString()}`)
-    .then((res) => res.json())
-    .then((data) => {
-      const tableBody = document.getElementById("contribution-table-body");
-      tableBody.innerHTML = "";
+        fetch(`http://localhost:8080/contributions/filter?${params.toString()}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const tableBody = document.getElementById(
+              "contribution-table-body"
+            );
+            tableBody.innerHTML = "";
 
-      data.forEach((contribution, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
+            data.forEach((contribution, index) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
           <td>${index + 1}</td>
           <td>${contribution.type}</td>
           <td>${contribution.description}</td>
           <td>${contribution.amount}</td>
           <td>${contribution.date}</td>
           <td>
-            <button class="edit-btn" onclick="editContribution(${contribution.id})">Edit</button>
-            <button class="delete-btn" onclick="deleteContribution(${contribution.id})">Delete</button>
+            <button class="edit-btn" onclick="editContribution(${
+              contribution.id
+            })">Edit</button>
+            <button class="delete-btn" onclick="deleteContribution(${
+              contribution.id
+            })">Delete</button>
           </td>
         `;
-        tableBody.appendChild(row);
+              tableBody.appendChild(row);
+            });
+          })
+          .catch((err) => {
+            console.error("Error filtering contributions:", err);
+          });
       });
-    })
-    .catch((err) => {
-      console.error("Error filtering contributions:", err);
-    });
-});
+    </script>
 
+
+    <!-- Exporting the contributions in form of excel document -->
+    <script>
+      document.getElementById("exportExcelBtn").addEventListener("click", () => {
+        const table = document.getElementById("table");
+    
+        if (!table) {
+          console.error("Contribution table not found!");
+          return;
+        }
+    
+        const wb = XLSX.utils.book_new();
+        const ws_data = [];
+    
+        // Add headers manually (excluding Action column)
+        ws_data.push(["S/N", "Contribution Type", "Description", "Amount", "Date"]);
+    
+        // Add table rows
+        const tbody = table.querySelector("tbody");
+        tbody.querySelectorAll("tr").forEach((tr) => {
+          const cells = tr.querySelectorAll("td");
+          ws_data.push([
+            cells[0].innerText, // S/N
+            cells[1].innerText, // Type
+            cells[2].innerText, // Description
+            cells[3].innerText, // Amount
+            cells[4].innerText, // Date
+            // Skipping cells[5] (Action column)
+          ]);
+        });
+    
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, "Contributions");
+    
+        XLSX.writeFile(wb, "contributions_report.xlsx");
+      });
+    </script>
+    
+
+    <!-- Exporting the contributions in form of pdf document -->
+    <script>
+      document.getElementById("exportPdfBtn").addEventListener("click", () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const table = document.getElementById("table");
+
+        // Extract headers and rows
+        const headers = [
+          ["S/N", "Contribution Type", "Description", "Amount", "Date"],
+        ];
+        const rows = [];
+
+        const tableBody = table.querySelector("tbody");
+        tableBody.querySelectorAll("tr").forEach((tr) => {
+          const cols = tr.querySelectorAll("td");
+          const row = [
+            cols[0].innerText,
+            cols[1].innerText,
+            cols[2].innerText,
+            cols[3].innerText,
+            cols[4].innerText,
+          ];
+          rows.push(row);
+        });
+
+        doc.autoTable({
+          head: headers,
+          body: rows,
+          startY: 20,
+          theme: "striped",
+        });
+
+        doc.text("Contribution Report", 14, 15);
+        doc.save("contributions_report.pdf");
+      });
     </script>
 
     <script src="../GENERAL/script.js"></script>
