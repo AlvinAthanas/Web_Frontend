@@ -37,15 +37,15 @@
   z-index: 1; 
 }
 
-.card:first-child {
+.card.one {
     background-color: #2962ff;
 }
 
-.card:nth-child(2)  {
+.card.two  {
     background-color: #ff6d00;
 }
 
-.card:nth-child(3) {
+.card.three{
     background-color: #2e7d32;
 }
 

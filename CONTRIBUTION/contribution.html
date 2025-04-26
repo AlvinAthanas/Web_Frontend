@@ -29,8 +29,6 @@
 
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-   
   </head>
 
   <body>
@@ -93,7 +91,7 @@
             </button>
           </div>
         </div>
-       
+
         <!-- Contribution Table -->
         <table id="table" class="table">
           <thead>
@@ -372,44 +370,52 @@
       });
     </script>
 
-
     <!-- Exporting the contributions in form of excel document -->
     <script>
-      document.getElementById("exportExcelBtn").addEventListener("click", () => {
-        const table = document.getElementById("table");
-    
-        if (!table) {
-          console.error("Contribution table not found!");
-          return;
-        }
-    
-        const wb = XLSX.utils.book_new();
-        const ws_data = [];
-    
-        // Add headers manually (excluding Action column)
-        ws_data.push(["S/N", "Contribution Type", "Description", "Amount", "Date"]);
-    
-        // Add table rows
-        const tbody = table.querySelector("tbody");
-        tbody.querySelectorAll("tr").forEach((tr) => {
-          const cells = tr.querySelectorAll("td");
+      document
+        .getElementById("exportExcelBtn")
+        .addEventListener("click", () => {
+          const table = document.getElementById("table");
+
+          if (!table) {
+            console.error("Contribution table not found!");
+            return;
+          }
+
+          const wb = XLSX.utils.book_new();
+          const ws_data = [];
+
+          // Add headers manually
           ws_data.push([
-            cells[0].innerText, // S/N
-            cells[1].innerText, // Type
-            cells[2].innerText, // Description
-            cells[3].innerText, // Amount
-            cells[4].innerText, // Date
-            // Skipping cells[5] (Action column)
+            "S/N",
+            "Contribution Type",
+            "Description",
+            "Amount",
+            "Date",
           ]);
+
+          const tbody = table.querySelector("tbody");
+          tbody.querySelectorAll("tr").forEach((tr) => {
+            const cells = tr.querySelectorAll("td");
+            ws_data.push([
+              cells[0].innerText,
+              cells[1].innerText,
+              cells[2].innerText,
+              cells[3].innerText,
+              cells[4].innerText,
+            ]);
+          });
+
+          const ws = XLSX.utils.aoa_to_sheet(ws_data);
+          XLSX.utils.book_append_sheet(wb, ws, "Contributions");
+
+          const fileName = `contributions_report.xlsx`;
+          XLSX.writeFile(wb, fileName);
+
+          addReportToStorage(fileName); // <<< Add this line
         });
-    
-        const ws = XLSX.utils.aoa_to_sheet(ws_data);
-        XLSX.utils.book_append_sheet(wb, ws, "Contributions");
-    
-        XLSX.writeFile(wb, "contributions_report.xlsx");
-      });
     </script>
-    
+
 
     <!-- Exporting the contributions in form of pdf document -->
     <script>
@@ -419,7 +425,6 @@
 
         const table = document.getElementById("table");
 
-        // Extract headers and rows
         const headers = [
           ["S/N", "Contribution Type", "Description", "Amount", "Date"],
         ];
@@ -446,8 +451,23 @@
         });
 
         doc.text("Contribution Report", 14, 15);
-        doc.save("contributions_report.pdf");
+
+        const fileName = `contributions_report_${Date.now()}.pdf`;
+        doc.save(fileName);
+
+        addReportToStorage(fileName); // <<< Add this line
       });
+    </script>
+
+    <script>
+      function addReportToStorage(fileName) {
+        let reports = JSON.parse(localStorage.getItem("reports")) || [];
+        reports.push({
+          fileName: fileName,
+          timestamp: new Date().toISOString(),
+        });
+        localStorage.setItem("reports", JSON.stringify(reports));
+      }
     </script>
 
     <script src="../GENERAL/script.js"></script>
