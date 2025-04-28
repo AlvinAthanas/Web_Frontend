@@ -30,8 +30,8 @@
           <h2>DASHBOARD</h2>
         </div>
         <div class="main-cards">
-          <a href="../MEMBERS/members.html">
-            <div class="card one">
+          <a href="../MEMBERS/member.html">
+            <div class="card one" id="member-card">
               <div class="card-inner">
                 <h3>MEMBERS</h3>
                 <span class="material-icons-outlined"> people </span>
@@ -41,7 +41,7 @@
           </a>
 
           <a href="../CONTRIBUTION/contribution.html">
-            <div class="card two">
+            <div class="card two" id="contribution-card">
               <div class="card-inner">
                 <h3>CONTRIBUTION</h3>
                 <span class="material-icons-outlined"> payments </span>
@@ -51,7 +51,7 @@
           </a>
 
           <a href="../COMMUNITY/community.html">
-            <div class="card three">
+            <div class="card three" id="community-card">
               <div class="card-inner">
                 <h3>COMMUNITIES</h3>
                 <span class="material-icons-outlined"> groups </span>
@@ -101,8 +101,8 @@
         })
           .then((res) => res.json())
           .then((userCount) => {
-            document.querySelector(".card:nth-child(1) h1").textContent =
-              userCount;
+            document.querySelector("#member-card h1").textContent = userCount;
+
           })
           .catch((error) => {
             console.error("Failed to fetch user count:", error);
@@ -116,8 +116,8 @@
         })
           .then((res) => res.json())
           .then((total) => {
-            document.querySelector(".card:nth-child(2) h1").textContent =
-              total.toLocaleString();
+            document.querySelector("#contribution-card h1").textContent = total.toLocaleString();
+
           })
           .catch((error) => {
             console.error("Failed to fetch total contributions:", error);
@@ -131,8 +131,8 @@
         })
           .then((res) => res.json())
           .then((groupCount) => {
-            document.querySelector(".card:nth-child(3) h1").textContent =
-              groupCount;
+            document.querySelector("#community-card h1").textContent = groupCount;
+            groupCount;
           })
           .catch((error) => {
             console.error("Failed to fetch group count:", error);

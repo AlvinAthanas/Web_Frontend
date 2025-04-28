@@ -29,14 +29,12 @@
 
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-   
   </head>
   <body>
     <div class="grid-container" id="containerId">
       <main class="main-container">
         <div class="table-title">
-          <h2>REGISTERED MEMBERS LIST</h2>
+          <h2>LIST OF REGISTERED MEMBERS</h2>
         </div>
 
         <div class="top">
@@ -45,16 +43,19 @@
             <button id="exportExcelBtn">Export Excel</button>
             <button id="exportPdfBtn">Export PDF</button>
           </div>
-        </div>
 
-          <div class="top">
-              <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search members...">
-              </div>
-              <div>
-                <button id="openDialogBtn" class="add-btn">+ Add Member</button>
-              </div>
+          <div class="search-container">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search members..."
+            />
           </div>
+
+          <div>
+            <button id="openDialogBtn" class="add-btn">+ Add Member</button>
+          </div>
+        </div>
 
         <!-- Form Dialog -->
         <div id="formDialog" class="dialog-overlay">
@@ -76,14 +77,37 @@
               <!-- Adding password field as it appears to be required by the backend -->
               <label for="password">Password (Optional)</label>
               <div class="password-field">
-                <input type="password" name="password" id="password" placeholder="Leave blank to use email as password" />
-                <button type="button" class="password-toggle" id="passwordToggle">Show</button>
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="Leave blank to use email as password"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  id="passwordToggle"
+                >
+                  Show
+                </button>
               </div>
 
               <label for="gender">Gender</label>
               <div class="gender">
-                <input type="radio" name="gender" id="Male" value="Male" required />Male
-                <input type="radio" name="gender" id="Female" value="Female" required />Female
+                <input
+                  type="radio"
+                  name="gender"
+                  id="Male"
+                  value="Male"
+                  required
+                />Male
+                <input
+                  type="radio"
+                  name="gender"
+                  id="Female"
+                  value="Female"
+                  required
+                />Female
               </div>
 
               <div class="dialog-buttons">
@@ -116,13 +140,17 @@
               <!-- Rows will be populated dynamically -->
             </tbody>
           </table>
-          <div id="no-data" class="no-data" style="display: none;">No members found</div>
+          <div id="no-data" class="no-data" style="display: none">
+            No members found
+          </div>
         </div>
 
         <div class="pagination-info">
-          Showing <span id="showing-start">0</span> to <span id="showing-end">0</span> of <span id="total-items">0</span> members
+          Showing <span id="showing-start">0</span> to
+          <span id="showing-end">0</span> of
+          <span id="total-items">0</span> members
         </div>
-        
+
         <div class="pagination" id="pagination">
           <!-- Pagination buttons will be added here -->
         </div>
@@ -145,7 +173,7 @@
         const passwordField = document.getElementById("password");
 
         // Toggle password visibility
-        passwordToggle.addEventListener("click", function() {
+        passwordToggle.addEventListener("click", function () {
           if (passwordField.type === "password") {
             passwordField.type = "text";
             this.textContent = "Hide";
@@ -194,17 +222,17 @@
           ).value;
 
           // Create user object with all necessary fields
-          const newUser = { 
-            name, 
-            email, 
-            address, 
-            phone, 
+          const newUser = {
+            name,
+            email,
+            address,
+            phone,
             gender,
-            password: password || email // Use email as default password if not provided
+            password: password || email, // Use email as default password if not provided
           };
 
           console.log("Sending user data:", newUser);
-          
+
           const token = localStorage.getItem("authToken");
 
           // Show loading state for form submission
@@ -223,12 +251,16 @@
           })
             .then((res) => {
               console.log("Response status:", res.status);
-              
+
               if (!res.ok) {
                 // Try to get error message from response
-                return res.text().then(text => {
+                return res.text().then((text) => {
                   console.error("Error response:", text);
-                  throw new Error(`Failed to add user: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
+                  throw new Error(
+                    `Failed to add user: ${res.status} ${res.statusText}${
+                      text ? ` - ${text}` : ""
+                    }`
+                  );
                 });
               }
               return res.json();
@@ -237,7 +269,7 @@
               console.log("Success response:", data);
               formDialog.style.display = "none";
               showMessage("Member added successfully!", "success");
-              
+
               // Add the new member to our local data and refresh the table
               if (data) {
                 allMembers.push(data);
@@ -266,28 +298,34 @@
           messageEl.textContent = message;
           messageEl.style.color = type === "success" ? "green" : "red";
           messageEl.style.opacity = 1;
-          
+
           setTimeout(() => {
             messageEl.style.opacity = 0;
           }, 3000);
         }
 
         // Search functionality
-        searchInput.addEventListener("input", function() {
+        searchInput.addEventListener("input", function () {
           const searchTerm = this.value.toLowerCase();
-          
+
           if (searchTerm) {
-            filteredMembers = allMembers.filter(member => 
-              (member.name && member.name.toLowerCase().includes(searchTerm)) ||
-              (member.email && member.email.toLowerCase().includes(searchTerm)) ||
-              (member.phone && member.phone.toString().includes(searchTerm)) ||
-              (member.address && member.address.toLowerCase().includes(searchTerm)) ||
-              (member.gender && member.gender.toLowerCase().includes(searchTerm))
+            filteredMembers = allMembers.filter(
+              (member) =>
+                (member.name &&
+                  member.name.toLowerCase().includes(searchTerm)) ||
+                (member.email &&
+                  member.email.toLowerCase().includes(searchTerm)) ||
+                (member.phone &&
+                  member.phone.toString().includes(searchTerm)) ||
+                (member.address &&
+                  member.address.toLowerCase().includes(searchTerm)) ||
+                (member.gender &&
+                  member.gender.toLowerCase().includes(searchTerm))
             );
           } else {
             filteredMembers = [...allMembers];
           }
-          
+
           currentPage = 1; // Reset to first page when searching
           renderTable();
           setupPagination();
@@ -299,15 +337,19 @@
           loadingEl.style.display = "flex";
           tableEl.style.display = "none";
           document.getElementById("no-data").style.display = "none";
-          
+
           const token = localStorage.getItem("authToken");
-          
+
           // Check if token exists
           if (!token) {
-            showMessage("Authentication token missing. Please log in again.", "error");
+            showMessage(
+              "Authentication token missing. Please log in again.",
+              "error"
+            );
             loadingEl.style.display = "none";
             document.getElementById("no-data").style.display = "block";
-            document.getElementById("no-data").textContent = "Authentication error. Please log in again.";
+            document.getElementById("no-data").textContent =
+              "Authentication error. Please log in again.";
             return;
           }
 
@@ -320,18 +362,20 @@
           })
             .then((res) => {
               if (!res.ok) {
-                throw new Error(`Failed to fetch users: ${res.status} ${res.statusText}`);
+                throw new Error(
+                  `Failed to fetch users: ${res.status} ${res.statusText}`
+                );
               }
               return res.json();
             })
             .then((data) => {
               // For debugging
               console.log("Received data:", data);
-              
+
               // Handle if data is not an array
               if (!Array.isArray(data)) {
                 console.error("Expected array but got:", typeof data);
-                if (data && typeof data === 'object') {
+                if (data && typeof data === "object") {
                   // If it's an object with a data property that's an array
                   if (Array.isArray(data.data)) {
                     data = data.data;
@@ -344,14 +388,14 @@
                   data = [];
                 }
               }
-              
+
               allMembers = data;
               filteredMembers = [...data];
-              
+
               // Show table, hide loading
               loadingEl.style.display = "none";
               tableEl.style.display = "table";
-              
+
               renderTable();
               setupPagination();
             })
@@ -359,7 +403,8 @@
               console.error("Error loading members:", error);
               loadingEl.style.display = "none";
               document.getElementById("no-data").style.display = "block";
-              document.getElementById("no-data").textContent = "Error loading members. Please try again later.";
+              document.getElementById("no-data").textContent =
+                "Error loading members. Please try again later.";
               showMessage("Error loading members: " + error.message, "error");
             });
         }
@@ -381,28 +426,33 @@
 
           tableEl.style.display = "table";
           noDataEl.style.display = "none";
-          
+
           // Calculate start and end indices for current page
           const startIndex = (currentPage - 1) * itemsPerPage;
-          const endIndex = Math.min(startIndex + itemsPerPage, filteredMembers.length);
-          
+          const endIndex = Math.min(
+            startIndex + itemsPerPage,
+            filteredMembers.length
+          );
+
           // Update pagination info
-          document.getElementById("showing-start").textContent = filteredMembers.length > 0 ? startIndex + 1 : 0;
+          document.getElementById("showing-start").textContent =
+            filteredMembers.length > 0 ? startIndex + 1 : 0;
           document.getElementById("showing-end").textContent = endIndex;
-          document.getElementById("total-items").textContent = filteredMembers.length;
+          document.getElementById("total-items").textContent =
+            filteredMembers.length;
 
           // Display data for current page
           for (let i = startIndex; i < endIndex; i++) {
             const user = filteredMembers[i];
             const row = document.createElement("tr");
-            
+
             // Safely get properties with fallbacks
-            const name = user.name || 'N/A';
-            const email = user.email || 'N/A';
-            const phone = user.phone || 'N/A';
-            const address = user.address || 'N/A';
-            const gender = user.gender || 'N/A';
-            
+            const name = user.name || "N/A";
+            const email = user.email || "N/A";
+            const phone = user.phone || "N/A";
+            const address = user.address || "N/A";
+            const gender = user.gender || "N/A";
+
             row.innerHTML = `
               <td>${i + 1}</td>
               <td>${name}</td>
@@ -419,9 +469,9 @@
         function setupPagination() {
           const paginationEl = document.getElementById("pagination");
           paginationEl.innerHTML = "";
-          
+
           const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
-          
+
           if (totalPages <= 1) {
             return; // Don't show pagination for single page
           }
@@ -442,17 +492,17 @@
           // Show limited page numbers for better UI
           let startPage = Math.max(1, currentPage - 2);
           let endPage = Math.min(totalPages, startPage + 4);
-          
+
           // Adjust if we're near the end
           if (endPage - startPage < 4) {
             startPage = Math.max(1, endPage - 4);
           }
-          
+
           // First page and ellipsis
           if (startPage > 1) {
             const firstButton = createPageButton(1);
             paginationEl.appendChild(firstButton);
-            
+
             if (startPage > 2) {
               const ellipsis = document.createElement("span");
               ellipsis.textContent = "...";
@@ -460,13 +510,13 @@
               paginationEl.appendChild(ellipsis);
             }
           }
-          
+
           // Page numbers
           for (let i = startPage; i <= endPage; i++) {
             const pageButton = createPageButton(i);
             paginationEl.appendChild(pageButton);
           }
-          
+
           // Last page and ellipsis
           if (endPage < totalPages) {
             if (endPage < totalPages - 1) {
@@ -475,7 +525,7 @@
               ellipsis.style.margin = "0 8px";
               paginationEl.appendChild(ellipsis);
             }
-            
+
             const lastButton = createPageButton(totalPages);
             paginationEl.appendChild(lastButton);
           }
@@ -491,7 +541,7 @@
             }
           });
           paginationEl.appendChild(nextButton);
-          
+
           updateActiveButton();
         }
 
@@ -510,7 +560,7 @@
         // Update active button highlight
         function updateActiveButton() {
           const buttons = document.querySelectorAll("#pagination button");
-          buttons.forEach(button => {
+          buttons.forEach((button) => {
             if (button.textContent == currentPage) {
               button.classList.add("active");
             } else {
@@ -526,73 +576,75 @@
 
     <!-- Exporting the members in form of excel document -->
     <script>
-      document.getElementById("exportExcelBtn").addEventListener("click", () => {
-        const table = document.getElementById("member-table");
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.table_to_sheet(table);
-        
-        XLSX.utils.book_append_sheet(wb, ws, "Members");
-    
-        const filename = "members-list.xlsx";
-        XLSX.writeFile(wb, filename);
-    
-        saveReportRecord(filename, "Excel");
-        showMessage("Excel export successful!", "success");
-      });
+      document
+        .getElementById("exportExcelBtn")
+        .addEventListener("click", () => {
+          const table = document.getElementById("member-table");
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.table_to_sheet(table);
+
+          XLSX.utils.book_append_sheet(wb, ws, "Members");
+
+          const filename = "members-list.xlsx";
+          XLSX.writeFile(wb, filename);
+
+          saveReportRecord(filename, "Excel");
+          showMessage("Excel export successful!", "success");
+        });
 
       function showMessage(message, type) {
         const messageEl = document.getElementById("member-message");
         messageEl.textContent = message;
         messageEl.style.color = type === "success" ? "green" : "red";
         messageEl.style.opacity = 1;
-        
+
         setTimeout(() => {
           messageEl.style.opacity = 0;
         }, 3000);
       }
     </script>
-    
+
     <!-- Exporting the members in form of pdf document -->
     <script>
       document.getElementById("exportPdfBtn").addEventListener("click", () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-    
+
         doc.text("Registered Members List", 14, 10);
-    
+
         const rows = [];
         const table = document.getElementById("member-table");
         const tbody = table.querySelector("tbody");
         const trs = tbody.querySelectorAll("tr");
-    
+
         trs.forEach((tr) => {
           const row = [];
           tr.querySelectorAll("td").forEach((td) => row.push(td.innerText));
           rows.push(row);
         });
-    
+
         doc.autoTable({
           head: [["S/N", "Full Name", "Email", "Phone", "Address", "Gender"]],
           body: rows,
           startY: 20,
         });
-    
+
         const filename = "members-list.pdf";
         doc.save(filename);
-    
+
         saveReportRecord(filename, "PDF");
         showMessage("PDF export successful!", "success");
       });
-    
+
       function saveReportRecord(filename, type) {
         const reports = JSON.parse(localStorage.getItem("reports") || "[]");
-    
+
         reports.push({
           filename,
           type,
           date: new Date().toLocaleString(),
         });
-    
+
         localStorage.setItem("reports", JSON.stringify(reports));
       }
     </script>

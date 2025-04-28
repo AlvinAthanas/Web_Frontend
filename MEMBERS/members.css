@@ -37,8 +37,8 @@
   background-color: #3498db;
   color: white;
   border: none;
-  padding: 10px 10px;
-  border-radius: 5px;
+  padding: 8px;
+  border-radius: 3px;
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.3s;
@@ -55,6 +55,11 @@
 #exportExcelBtn {
   background-color: #4caf50;
 }
+
+#exportPdfBtn {
+  background-color:rgb(245, 75, 75);
+}
+
 
 .add-btn:hover {
   background-color: #219653;
