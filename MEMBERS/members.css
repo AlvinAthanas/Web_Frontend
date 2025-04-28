@@ -1,144 +1,279 @@
-/* ------General Styling---------- */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
+/* Enhanced Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead {
+  background-color: #3498db;
+  color: white;
+}
+
+.table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.table tbody tr:hover {
+  background-color: #f5f9ff;
+}
+
+.table tbody tr:nth-child(even) {
   background-color: #f9f9f9;
-  color: #333;
 }
 
-.top {
-  display: flex;
-  justify-content: space-between;
-}
-
-.gender {
-  display: flex;
-  margin: 5px 0;
-  text-align: center;
-}
-
-/* --------Button Styling---------- */
-button {
-  background-color: #79b3f1;
+/* Top Button Styling */
+.import button, .add-btn {
+  background-color: #3498db;
   color: white;
   border: none;
-  padding: 7px 15px;
-  border-radius: 3px;
-  margin-bottom: 10px;
+  padding: 10px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
 }
 
-button:hover {
-  opacity: 0.7;
+.import button:hover, .add-btn:hover {
+  background-color: #2980b9;
 }
 
-#add-btn {
-  background-color: #79b3f1;
+.add-btn {
+  background-color: #27ae60;
 }
 
 #exportExcelBtn {
   background-color: #4caf50;
 }
 
-#exportPdfBtn {
-  background-color: rgb(252, 53, 53);
+.add-btn:hover {
+  background-color: #219653;
 }
 
-
-
-/* ------Table Styling-------- */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
-  margin-top: 20px;
-  /* display: block; */
-}
-
-.table-title {
-  text-align: center;
-}
-
-.table thead {
-  background-color: #79b3f1;
-  color: white;
-}
-
-.table th,
-.table td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-.table th {
-  background-color: #79b3f1;
-  color: white;
-}
-
-
-/* ------- Dialog Styling ------- */
+/* Form Dialog Styling */
 .dialog-overlay {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0,0,0,0.5);
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
 .dialog-box {
-  background: white;
+  background-color: white;
   padding: 25px;
   border-radius: 8px;
-  width: 350px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
+
 .dialog-box h3 {
   margin-top: 0;
-  text-align: center;
+  color: #333;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
 }
+
 .dialog-box form {
   display: flex;
   flex-direction: column;
 }
-.dialog-box input,
-.dialog-box select {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+
+.dialog-box label {
+  margin-top: 12px;
+  font-weight: 500;
+  color: #555;
 }
+
+.dialog-box input[type="text"],
+.dialog-box input[type="email"],
+.dialog-box input[type="number"],
+.dialog-box input[type="password"] {
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 .dialog-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.dialog-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.dialog-buttons button[type="submit"] {
+  background-color: #27ae60;
+  color: white;
+}
+
+.dialog-buttons button[type="button"] {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.pagination button.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.pagination button:hover:not(.active) {
+  background-color: #f1f1f1;
+}
+
+.pagination-info {
+  text-align: center;
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Table container for horizontal scroll on mobile */
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+/* Responsive styling */
+@media screen and (max-width: 768px) {
+  .top {
+    /* flex-direction: column; */
+    gap: 15px;
+  }
+
+  .import {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .table th, .table td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
+
+/* Top section for search and buttons */
+.top {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
-.dialog-buttons button {
-  padding: 8px 14px;
+
+/* Search bar styling */
+.search-container {
+  display: flex;
+  gap: 10px;
+}
+
+.search-container input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 250px;
+}
+
+/* No data message */
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Message styling */
+#member-message {
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: opacity 0.5s;
+}
+
+/* Loading indicator */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #333;
+}
+
+.spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #3498db;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Password toggle */
+.password-field {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-}
-.dialog-buttons button[type="submit"] {
-  background-color: #79b3f1;
-  color: white;
-}
-.dialog-buttons #cancelBtn {
-  background-color: #aaa;
-  color: white;
-}
-
-
-/* Responsive Table */
-@media screen and (max-width: 550px) {
-  .table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+  color: #555;
 }

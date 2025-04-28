@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Members</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../MEMBERS/members.css" />
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+
+    <!-- SheetJS for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+   
+  </head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="table-title">
+          <h2>REGISTERED MEMBERS LIST</h2>
+        </div>
+
+        <div class="top">
+          <div class="import">
+            <button id="importBtn">Import</button>
+            <button id="exportExcelBtn">Export Excel</button>
+            <button id="exportPdfBtn">Export PDF</button>
+          </div>
+        </div>
+
+          <div class="top">
+              <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search members...">
+              </div>
+              <div>
+                <button id="openDialogBtn" class="add-btn">+ Add Member</button>
+              </div>
+          </div>
+
+        <!-- Form Dialog -->
+        <div id="formDialog" class="dialog-overlay">
+          <div class="dialog-box">
+            <h3>Register new member here!</h3>
+            <form id="addMemberForm">
+              <label for="fullname">FullName</label>
+              <input type="text" name="name" id="name" required />
+
+              <label for="email">Email</label>
+              <input type="email" name="email" id="email" required />
+
+              <label for="address">Address</label>
+              <input type="text" name="address" id="address" required />
+
+              <label for="phone">Phone number</label>
+              <input type="number" name="phone" id="phone" required />
+
+              <!-- Adding password field as it appears to be required by the backend -->
+              <label for="password">Password (Optional)</label>
+              <div class="password-field">
+                <input type="password" name="password" id="password" placeholder="Leave blank to use email as password" />
+                <button type="button" class="password-toggle" id="passwordToggle">Show</button>
+              </div>
+
+              <label for="gender">Gender</label>
+              <div class="gender">
+                <input type="radio" name="gender" id="Male" value="Male" required />Male
+                <input type="radio" name="gender" id="Female" value="Female" required />Female
+              </div>
+
+              <div class="dialog-buttons">
+                <button type="submit" id="submit">Save</button>
+                <button type="button" id="cancelBtn">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loading" class="loading">
+          <div class="spinner"></div>
+          <span>Loading members...</span>
+        </div>
+
+        <div class="table-container">
+          <table id="member-table" class="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Gender</th>
+              </tr>
+            </thead>
+            <tbody id="member-table-body">
+              <!-- Rows will be populated dynamically -->
+            </tbody>
+          </table>
+          <div id="no-data" class="no-data" style="display: none;">No members found</div>
+        </div>
+
+        <div class="pagination-info">
+          Showing <span id="showing-start">0</span> to <span id="showing-end">0</span> of <span id="total-items">0</span> members
+        </div>
+        
+        <div class="pagination" id="pagination">
+          <!-- Pagination buttons will be added here -->
+        </div>
+
+        <div id="member-message" style="margin-top: 10px; color: green"></div>
+      </main>
+      <!-- End Main -->
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const openDialogBtn = document.getElementById("openDialogBtn");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const formDialog = document.getElementById("formDialog");
+        const formEl = document.getElementById("addMemberForm");
+        const searchInput = document.getElementById("searchInput");
+        const loadingEl = document.getElementById("loading");
+        const tableEl = document.getElementById("member-table");
+        const passwordToggle = document.getElementById("passwordToggle");
+        const passwordField = document.getElementById("password");
+
+        // Toggle password visibility
+        passwordToggle.addEventListener("click", function() {
+          if (passwordField.type === "password") {
+            passwordField.type = "text";
+            this.textContent = "Hide";
+          } else {
+            passwordField.type = "password";
+            this.textContent = "Show";
+          }
+        });
+
+        // Global variables for pagination
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let allMembers = [];
+        let filteredMembers = [];
+
+        // Initially hide the table and show loading
+        tableEl.style.display = "none";
+
+        openDialogBtn.onclick = () => {
+          formEl.reset();
+          formDialog.style.display = "flex";
+        };
+
+        cancelBtn.onclick = () => {
+          formDialog.style.display = "none";
+        };
+
+        // Close dialog when clicking outside of it
+        formDialog.addEventListener("click", (e) => {
+          if (e.target === formDialog) {
+            formDialog.style.display = "none";
+          }
+        });
+
+        // Add member form submission
+        formEl.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value;
+          const email = document.getElementById("email").value;
+          const address = document.getElementById("address").value;
+          const phone = document.getElementById("phone").value;
+          const password = document.getElementById("password").value;
+          const gender = document.querySelector(
+            "input[name='gender']:checked"
+          ).value;
+
+          // Create user object with all necessary fields
+          const newUser = { 
+            name, 
+            email, 
+            address, 
+            phone, 
+            gender,
+            password: password || email // Use email as default password if not provided
+          };
+
+          console.log("Sending user data:", newUser);
+          
+          const token = localStorage.getItem("authToken");
+
+          // Show loading state for form submission
+          const submitBtn = document.getElementById("submit");
+          const originalText = submitBtn.textContent;
+          submitBtn.textContent = "Saving...";
+          submitBtn.disabled = true;
+
+          fetch("http://localhost:8080/user", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newUser),
+          })
+            .then((res) => {
+              console.log("Response status:", res.status);
+              
+              if (!res.ok) {
+                // Try to get error message from response
+                return res.text().then(text => {
+                  console.error("Error response:", text);
+                  throw new Error(`Failed to add user: ${res.status} ${res.statusText}${text ? ` - ${text}` : ''}`);
+                });
+              }
+              return res.json();
+            })
+            .then((data) => {
+              console.log("Success response:", data);
+              formDialog.style.display = "none";
+              showMessage("Member added successfully!", "success");
+              
+              // Add the new member to our local data and refresh the table
+              if (data) {
+                allMembers.push(data);
+                filteredMembers = [...allMembers];
+                renderTable();
+                setupPagination();
+              } else {
+                // If no data returned, just reload all members
+                loadMembers();
+              }
+            })
+            .catch((error) => {
+              console.error("Error adding user:", error);
+              showMessage("Failed to add member: " + error.message, "error");
+            })
+            .finally(() => {
+              // Reset button state
+              submitBtn.textContent = originalText;
+              submitBtn.disabled = false;
+            });
+        });
+
+        // Show message function
+        function showMessage(message, type) {
+          const messageEl = document.getElementById("member-message");
+          messageEl.textContent = message;
+          messageEl.style.color = type === "success" ? "green" : "red";
+          messageEl.style.opacity = 1;
+          
+          setTimeout(() => {
+            messageEl.style.opacity = 0;
+          }, 3000);
+        }
+
+        // Search functionality
+        searchInput.addEventListener("input", function() {
+          const searchTerm = this.value.toLowerCase();
+          
+          if (searchTerm) {
+            filteredMembers = allMembers.filter(member => 
+              (member.name && member.name.toLowerCase().includes(searchTerm)) ||
+              (member.email && member.email.toLowerCase().includes(searchTerm)) ||
+              (member.phone && member.phone.toString().includes(searchTerm)) ||
+              (member.address && member.address.toLowerCase().includes(searchTerm)) ||
+              (member.gender && member.gender.toLowerCase().includes(searchTerm))
+            );
+          } else {
+            filteredMembers = [...allMembers];
+          }
+          
+          currentPage = 1; // Reset to first page when searching
+          renderTable();
+          setupPagination();
+        });
+
+        // Function to load members from the database
+        function loadMembers() {
+          // Show loading, hide table
+          loadingEl.style.display = "flex";
+          tableEl.style.display = "none";
+          document.getElementById("no-data").style.display = "none";
+          
+          const token = localStorage.getItem("authToken");
+          
+          // Check if token exists
+          if (!token) {
+            showMessage("Authentication token missing. Please log in again.", "error");
+            loadingEl.style.display = "none";
+            document.getElementById("no-data").style.display = "block";
+            document.getElementById("no-data").textContent = "Authentication error. Please log in again.";
+            return;
+          }
+
+          fetch("http://localhost:8080/users", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`Failed to fetch users: ${res.status} ${res.statusText}`);
+              }
+              return res.json();
+            })
+            .then((data) => {
+              // For debugging
+              console.log("Received data:", data);
+              
+              // Handle if data is not an array
+              if (!Array.isArray(data)) {
+                console.error("Expected array but got:", typeof data);
+                if (data && typeof data === 'object') {
+                  // If it's an object with a data property that's an array
+                  if (Array.isArray(data.data)) {
+                    data = data.data;
+                  } else {
+                    // Convert object to array if possible
+                    data = Object.values(data);
+                  }
+                } else {
+                  // Create empty array if data is invalid
+                  data = [];
+                }
+              }
+              
+              allMembers = data;
+              filteredMembers = [...data];
+              
+              // Show table, hide loading
+              loadingEl.style.display = "none";
+              tableEl.style.display = "table";
+              
+              renderTable();
+              setupPagination();
+            })
+            .catch((error) => {
+              console.error("Error loading members:", error);
+              loadingEl.style.display = "none";
+              document.getElementById("no-data").style.display = "block";
+              document.getElementById("no-data").textContent = "Error loading members. Please try again later.";
+              showMessage("Error loading members: " + error.message, "error");
+            });
+        }
+
+        // Function to render the table with current page data
+        function renderTable() {
+          const tableBody = document.getElementById("member-table-body");
+          const noDataEl = document.getElementById("no-data");
+          tableBody.innerHTML = "";
+
+          if (!filteredMembers || filteredMembers.length === 0) {
+            tableEl.style.display = "none";
+            noDataEl.style.display = "block";
+            document.getElementById("showing-start").textContent = 0;
+            document.getElementById("showing-end").textContent = 0;
+            document.getElementById("total-items").textContent = 0;
+            return;
+          }
+
+          tableEl.style.display = "table";
+          noDataEl.style.display = "none";
+          
+          // Calculate start and end indices for current page
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const endIndex = Math.min(startIndex + itemsPerPage, filteredMembers.length);
+          
+          // Update pagination info
+          document.getElementById("showing-start").textContent = filteredMembers.length > 0 ? startIndex + 1 : 0;
+          document.getElementById("showing-end").textContent = endIndex;
+          document.getElementById("total-items").textContent = filteredMembers.length;
+
+          // Display data for current page
+          for (let i = startIndex; i < endIndex; i++) {
+            const user = filteredMembers[i];
+            const row = document.createElement("tr");
+            
+            // Safely get properties with fallbacks
+            const name = user.name || 'N/A';
+            const email = user.email || 'N/A';
+            const phone = user.phone || 'N/A';
+            const address = user.address || 'N/A';
+            const gender = user.gender || 'N/A';
+            
+            row.innerHTML = `
+              <td>${i + 1}</td>
+              <td>${name}</td>
+              <td>${email}</td>
+              <td>${phone}</td>
+              <td>${address}</td>
+              <td>${gender}</td>
+            `;
+            tableBody.appendChild(row);
+          }
+        }
+
+        // Function to create pagination buttons
+        function setupPagination() {
+          const paginationEl = document.getElementById("pagination");
+          paginationEl.innerHTML = "";
+          
+          const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
+          
+          if (totalPages <= 1) {
+            return; // Don't show pagination for single page
+          }
+
+          // Previous button
+          const prevButton = document.createElement("button");
+          prevButton.innerHTML = "&laquo;";
+          prevButton.addEventListener("click", () => {
+            if (currentPage > 1) {
+              currentPage--;
+              renderTable();
+              updateActiveButton();
+            }
+          });
+          paginationEl.appendChild(prevButton);
+
+          // Page number buttons
+          // Show limited page numbers for better UI
+          let startPage = Math.max(1, currentPage - 2);
+          let endPage = Math.min(totalPages, startPage + 4);
+          
+          // Adjust if we're near the end
+          if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+          }
+          
+          // First page and ellipsis
+          if (startPage > 1) {
+            const firstButton = createPageButton(1);
+            paginationEl.appendChild(firstButton);
+            
+            if (startPage > 2) {
+              const ellipsis = document.createElement("span");
+              ellipsis.textContent = "...";
+              ellipsis.style.margin = "0 8px";
+              paginationEl.appendChild(ellipsis);
+            }
+          }
+          
+          // Page numbers
+          for (let i = startPage; i <= endPage; i++) {
+            const pageButton = createPageButton(i);
+            paginationEl.appendChild(pageButton);
+          }
+          
+          // Last page and ellipsis
+          if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+              const ellipsis = document.createElement("span");
+              ellipsis.textContent = "...";
+              ellipsis.style.margin = "0 8px";
+              paginationEl.appendChild(ellipsis);
+            }
+            
+            const lastButton = createPageButton(totalPages);
+            paginationEl.appendChild(lastButton);
+          }
+
+          // Next button
+          const nextButton = document.createElement("button");
+          nextButton.innerHTML = "&raquo;";
+          nextButton.addEventListener("click", () => {
+            if (currentPage < totalPages) {
+              currentPage++;
+              renderTable();
+              updateActiveButton();
+            }
+          });
+          paginationEl.appendChild(nextButton);
+          
+          updateActiveButton();
+        }
+
+        // Helper to create page buttons
+        function createPageButton(pageNum) {
+          const button = document.createElement("button");
+          button.textContent = pageNum;
+          button.addEventListener("click", () => {
+            currentPage = pageNum;
+            renderTable();
+            updateActiveButton();
+          });
+          return button;
+        }
+
+        // Update active button highlight
+        function updateActiveButton() {
+          const buttons = document.querySelectorAll("#pagination button");
+          buttons.forEach(button => {
+            if (button.textContent == currentPage) {
+              button.classList.add("active");
+            } else {
+              button.classList.remove("active");
+            }
+          });
+        }
+
+        // Initialize the page
+        loadMembers();
+      });
+    </script>
+
+    <!-- Exporting the members in form of excel document -->
+    <script>
+      document.getElementById("exportExcelBtn").addEventListener("click", () => {
+        const table = document.getElementById("member-table");
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.table_to_sheet(table);
+        
+        XLSX.utils.book_append_sheet(wb, ws, "Members");
+    
+        const filename = "members-list.xlsx";
+        XLSX.writeFile(wb, filename);
+    
+        saveReportRecord(filename, "Excel");
+        showMessage("Excel export successful!", "success");
+      });
+
+      function showMessage(message, type) {
+        const messageEl = document.getElementById("member-message");
+        messageEl.textContent = message;
+        messageEl.style.color = type === "success" ? "green" : "red";
+        messageEl.style.opacity = 1;
+        
+        setTimeout(() => {
+          messageEl.style.opacity = 0;
+        }, 3000);
+      }
+    </script>
+    
+    <!-- Exporting the members in form of pdf document -->
+    <script>
+      document.getElementById("exportPdfBtn").addEventListener("click", () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+    
+        doc.text("Registered Members List", 14, 10);
+    
+        const rows = [];
+        const table = document.getElementById("member-table");
+        const tbody = table.querySelector("tbody");
+        const trs = tbody.querySelectorAll("tr");
+    
+        trs.forEach((tr) => {
+          const row = [];
+          tr.querySelectorAll("td").forEach((td) => row.push(td.innerText));
+          rows.push(row);
+        });
+    
+        doc.autoTable({
+          head: [["S/N", "Full Name", "Email", "Phone", "Address", "Gender"]],
+          body: rows,
+          startY: 20,
+        });
+    
+        const filename = "members-list.pdf";
+        doc.save(filename);
+    
+        saveReportRecord(filename, "PDF");
+        showMessage("PDF export successful!", "success");
+      });
+    
+      function saveReportRecord(filename, type) {
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+    
+        reports.push({
+          filename,
+          type,
+          date: new Date().toLocaleString(),
+        });
+    
+        localStorage.setItem("reports", JSON.stringify(reports));
+      }
+    </script>
+
+    <script src="../GENERAL/script.js"></script>
+  </body>
+</html>
