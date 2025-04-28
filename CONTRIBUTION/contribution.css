@@ -8,16 +8,7 @@ body {
 }
 
 /*Table Title */
-.table-title {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.table-title h2 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2b2b2b;
-  margin-bottom: 10px;
-}
+
 
 /* Filter Section */
 .filter-container {
@@ -71,6 +62,17 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
   /* display: block; */
+}
+
+.table-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.table-title h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2b2b2b;
+  margin-bottom: 10px;
 }
 
 .table thead {

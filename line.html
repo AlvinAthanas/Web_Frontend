@@ -1,93 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Profile</title>
+    <meta charset="UTF-8">
+    <title>Dashboard - Control Panel</title>
+    <link rel="stylesheet" href="style.css">
 
-  <!-- Font + Icons -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-  <link rel="stylesheet" href="profile.css" />
-
-  <style>
-    body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f7f7f7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+    <style>
+      body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f7fa;
 }
 
-.profile-container {
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+header {
+    background: #fff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ccc;
 }
 
-.image-upload {
-  margin-top: 20px;
-  position: relative;
-  cursor: pointer;
+header h1 {
+    margin: 0;
+    font-size: 24px;
 }
 
-.image-upload input[type="file"] {
-  display: none;
+header h1 span {
+    font-size: 14px;
+    color: gray;
+    margin-left: 10px;
 }
 
-#profilePic {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #79b3f1;
-  transition: transform 0.2s;
+.breadcrumb {
+    margin: 10px 20px;
+    font-size: 14px;
 }
 
-#profilePic:hover {
-  transform: scale(1.05);
+.breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
 }
 
-  </style>
+.breadcrumb span {
+    color: gray;
+}
+
+.content {
+    background: #fff;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttons button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.export-btn {
+    background-color: #00aaff;
+    color: white;
+}
+
+.import-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.add-user-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.table-controls label,
+.table-controls input {
+    font-size: 14px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background: #f1f1f1;
+}
+
+.actions {
+    white-space: nowrap;
+}
+
+.actions span {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+    </style>
 
 </head>
 <body>
-  <div class="profile-container">
-    <h2>User Profile</h2>
 
-    <!-- Profile Image Upload -->
-    <div class="image-upload">
-      <label for="fileInput">
-        <img id="profilePic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile Picture" />
-        <input type="file" id="fileInput" accept="image/*" />
-      </label>
-      <p>Click on the icon to upload a profile picture</p>
+<header>
+    <h1>Dashboard <span>Control panel</span></h1>
+</header>
+
+<nav class="breadcrumb">
+    <a href="#">Home</a> > <span>Dashboard</span>
+</nav>
+
+<section class="content">
+    <div class="content-header">
+        <h2>List of Registered Users</h2>
+        <div class="buttons">
+            <button class="export-btn">Export</button>
+            <button class="import-btn">Import</button>
+            <button class="add-user-btn">Add User</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const fileInput = document.getElementById("fileInput");
-    const profilePic = document.getElementById("profilePic");
+    <div class="table-controls">
+        <label>Show 
+            <select>
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+            </select>
+            entries
+        </label>
+        <div class="search">
+            <label>Search:
+                <input type="text" placeholder="Search">
+            </label>
+        </div>
+    </div>
 
-    // Load stored image on page load
-    const storedImage = localStorage.getItem("profileImage");
-    if (storedImage) {
-      profilePic.src = storedImage;
-    }
+    <table>
+        <thead>
+            <tr>
+                <th>User No</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Spouse Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2</td>
+                <td>Piper</td>
+                <td>Heaney</td>
+                <td>yost.stephania@example.com</td>
+                <td>Raul Carroll</td>
+                <td class="actions">👁️ 🖊️ 🗑️</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Jarret</td>
+                <td>Pacocha</td>
+                <td>cstreich@example.org</td>
+                <td>Mr. Gillian Dibbert</td>
+                <td class="actions">👁️ 🖊️ 🗑️</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Leonardo</td>
+                <td>Walter</td>
+                <td>aking@example.net</td>
+                <td>Brenda Mertz MD</td>
+                <td class="actions">👁️ 🖊️ 🗑️</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Elena</td>
+                <td>Hartmann</td>
+                <td>uschultz@example.com</td>
+                <td>Maurine Toy</td>
+                <td class="actions">👁️ 🖊️ 🗑️</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Brando</td>
+                <td>Boyle</td>
+                <td>okey37@example.com</td>
+                <td>Chaya Orn DDS</td>
+                <td class="actions">👁️ 🖊️ 🗑️</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Brando</td>
+              <td>Boyle</td>
+              <td>okey37@example.com</td>
+              <td>Chaya Orn DDS</td>
+              <td class="actions">👁️ 🖊️ 🗑️</td>
+          </tr> <tr>
+            <td>6</td>
+            <td>Brando</td>
+            <td>Boyle</td>
+            <td>okey37@example.com</td>
+            <td>Chaya Orn DDS</td>
+            <td class="actions">👁️ 🖊️ 🗑️</td>
+        </tr> <tr>
+          <td>6</td>
+          <td>Brando</td>
+          <td>Boyle</td>
+          <td>okey37@example.com</td>
+          <td>Chaya Orn DDS</td>
+          <td class="actions">👁️ 🖊️ 🗑️</td>
+      </tr>
+        </tbody>
+    </table>
 
-    fileInput.addEventListener("change", function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          profilePic.src = e.target.result;
-          localStorage.setItem("profileImage", e.target.result); // Save in localStorage
-        };
-        reader.readAsDataURL(file);
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const selectEntries = document.querySelector('select');
+      const tableRows = document.querySelectorAll('tbody tr');
+  
+      function updateTable() {
+          const limit = parseInt(selectEntries.value);
+          tableRows.forEach((row, index) => {
+              if (index < limit) {
+                  row.style.display = '';
+              } else {
+                  row.style.display = 'none';
+              }
+          });
       }
-    });
+  
+      selectEntries.addEventListener('change', updateTable);
+  
+      // Initialize on page load
+      updateTable();
+  });
   </script>
+  
+
 </body>
 </html>

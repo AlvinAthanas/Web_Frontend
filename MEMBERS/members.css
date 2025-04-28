@@ -53,7 +53,7 @@ button:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
   margin-top: 20px;
-  display: block;
+  /* display: block; */
 }
 
 .table-title {
@@ -131,4 +131,14 @@ button:hover {
 .dialog-buttons #cancelBtn {
   background-color: #aaa;
   color: white;
+}
+
+
+/* Responsive Table */
+@media screen and (max-width: 550px) {
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
