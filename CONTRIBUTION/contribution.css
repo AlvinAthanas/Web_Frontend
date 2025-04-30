@@ -7,8 +7,6 @@ body {
   color: #333;
 }
 
-/*Table Title */
-
 
 /* Filter Section */
 .filter-container {
@@ -90,6 +88,9 @@ body {
 .table tbody tr:hover {
   background-color: #f1f7ff;
 }
+
+
+
 
 
 /* ------- Dialog Styling ------- */
@@ -197,6 +198,51 @@ button:hover {
 
 #exportPdfBtn {
   background-color: rgb(252, 53, 53);
+}
+
+
+
+ /* Pagination Styles */
+ .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 15px 0;
+}
+
+.pagination button {
+  background-color: #2962ff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination button:hover {
+  background-color: #0039cb;
+}
+
+.pagination button:disabled {
+  background-color: #55596e;
+  cursor: not-allowed;
+}
+
+.pagination select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #55596e;
+  background-color: #1b2635;
+  color: #f5f7ff;
+  margin: 0 10px;
+}
+
+.pagination span {
+  margin: 0 10px;
+  color: #f5f7ff;
 }
 
 

@@ -26,43 +26,43 @@
   border-radius: 5px;
   color: #ffff;
   transition: all 0.5s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
-  transform-origin: center;}
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transform-origin: center;
+}
 
 /* Hover effect to make cards "pop up" */
 .card:hover {
-  transform: scale(1.1); 
+  transform: scale(1.1);
   box-shadow: 0 15px 15px rgba(0, 0, 0, 0.3);
-  cursor: pointer; 
-  z-index: 1; 
+  cursor: pointer;
+  z-index: 1;
 }
 
 .card.one {
-    background-color: #2962ff;
+  background-color: #2962ff;
 }
 
-.card.two  {
-    background-color: #ff6d00;
+.card.two {
+  background-color: #ff6d00;
 }
 
-.card.three{
-    background-color: #2e7d32;
+.card.three {
+  background-color: #2e7d32;
 }
 
 .card:nth-child(4) {
-    background-color: #d50000;
+  background-color: #d50000;
 }
 
 .card-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .card-inner > .material-icons-outlined {
-    font-size: 45px;
+  font-size: 45px;
 }
-
 
 .charts {
   display: grid;
@@ -72,7 +72,7 @@
 }
 
 .charts-card {
-  background-color: #263043;
+  background-color: #f9f9f9;
   margin-bottom: 20px;
   padding: 25px;
   box-sizing: border-box;
@@ -87,6 +87,101 @@
   justify-content: center;
 }
 
+/* Calendar Styles */
+#calendar-container {
+  background: #1b2635;
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+#calendar {
+  background: #1b2635;
+}
+
+.fc-toolbar-title {
+  color: #f5f7ff !important;
+}
+
+.fc-col-header-cell-cushion {
+  color: #f5f7ff !important;
+}
+
+.fc-daygrid-day-number {
+  color: #f5f7ff !important;
+}
+
+.fc-daygrid-day.fc-day-today {
+  background-color: rgba(41, 98, 255, 0.2) !important;
+}
+
+.fc-daygrid-day.fc-day-selected {
+  background-color: rgba(41, 98, 255, 0.5) !important;
+}
+
+.fc-daygrid-day.fc-day-has-contributions {
+  background-color: rgba(46, 125, 50, 0.3) !important;
+}
+
+.fc-button {
+  background-color: #2962ff !important;
+  border: none !important;
+}
+
+.fc-button:hover {
+  background-color: #0039cb !important;
+}
+
+.filter-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background-color: #2962ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  background-color: #0039cb;
+}
+
+#reset-filter {
+  background-color: #d50000;
+}
+
+#reset-filter:hover {
+  background-color: #9b0000;
+}
+
+.month-summary {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(41, 98, 255, 0.1);
+  border-radius: 4px;
+}
+
+.month-summary h4 {
+  margin: 0 0 10px 0;
+  color: #f5f7ff;
+}
+
+.month-summary p {
+  margin: 5px 0;
+  color: #f5f7ff;
+}
+
 @media screen and (max-width: 768px) {
   .main-cards {
     grid-template-columns: 1fr;
@@ -99,11 +194,9 @@
   }
 }
 
-
 /* Extra Small <= 576px */
 @media screen and (max-width: 576px) {
   .header-left {
     display: none;
   }
 }
-

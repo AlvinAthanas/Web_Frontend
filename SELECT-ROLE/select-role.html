@@ -43,8 +43,8 @@
         margin: 15px 0;
         cursor: pointer;
       }
-      .student,
-      .staff {
+      .member,
+      .admin {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -55,18 +55,18 @@
         height: 80px;
         margin: 0 auto;
       }
-      .student {
+      .member {
         background-color: #2196f3;
         color: white;
       }
-      .student:hover {
+      .member:hover {
         opacity: 0.5;
       }
-      .staff {
+      .admin {
         background-color: #e0e0e0;
         color: black;
       }
-      .staff:hover {
+      .admin:hover {
         opacity: 0.5;
       }
       .or-text {
@@ -82,6 +82,11 @@
         text-decoration: none;
         color: black;
       }
+      .text {
+        color: #999;
+font-weight: 600;
+margin-top: 10px;
+      }
     </style>
   </head>
   <body>
@@ -95,16 +100,16 @@
 
       <a href="../DASHBOARD/dashboard.html">
         <div class="option">
-          <span class="material-icons-outlined staff"> manage_accounts </span>
-          <div>ADMIN</div>
+          <span class="material-icons-outlined admin"> manage_accounts </span>
+          <div class="text">ADMIN</div>
         </div>
       </a>
 
       <div class="or-text">OR</div>
 
       <div class="option">
-        <span class="material-icons-outlined student"> group </span>
-        <div>CHURCH MEMBER</div>
+        <span class="material-icons-outlined member"> group </span>
+        <div class="text">CHURCH MEMBER</div>
       </div>
     </div>
   </body>

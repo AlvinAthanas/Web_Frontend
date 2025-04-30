@@ -7,6 +7,89 @@
 
     <link rel="stylesheet" href="../SCHEDULES/Schedules.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <style>
+      /* Enhance table styling */
+      #tableBody {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #tableBody th,
+      #tableBody td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      #tableBody th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+        color: #333;
+      }
+
+      #tableBody tr:hover {
+        background-color: #f9f9f9;
+      }
+
+      /* Style for action icons */
+      .action-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 5px;
+        transition: color 0.3s ease;
+      }
+
+      .edit-icon {
+        color: #4CAF50;
+      }
+
+      .edit-icon:hover {
+        color: #45a049;
+      }
+
+      .delete-icon {
+        color: #f44336;
+      }
+
+      .delete-icon:hover {
+        color: #da190b;
+      }
+
+      /* Form button styling for consistency */
+      #scheduleForm button {
+        padding: 8px 16px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+      }
+
+      #scheduleForm button[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+      }
+
+      #scheduleForm button[type="submit"]:hover {
+        background-color: #45a049;
+      }
+
+      #downloadPDF {
+        background-color: #2196F3;
+        color: white;
+      }
+
+      #downloadPDF:hover {
+        background-color: #1976D2;
+      }
+    </style>
   </head>
   <body>
     <div class="grid-container" id="containerId">
@@ -23,7 +106,6 @@
           <input type="time" id="dateTime" name="dateTime" required />
           <button type="submit">Add Schedule</button>
           <button id="downloadPDF">Download PDF</button>
-
         </form>
 
         <table id="tableBody">
@@ -42,193 +124,194 @@
     <div id="response"></div>
 
     <script>
+      const apiUrl = "http://localhost:8080"; // change if needed
+      const form = document.getElementById("scheduleForm");
+      const nameInput = document.getElementById("name");
+      const timeInput = document.getElementById("dateTime");
+      const tableBody = document.getElementById("scheduleTableBody");
 
-            const apiUrl = "http://localhost:8080"; // change if needed
-            const form = document.getElementById("scheduleForm");
-            const nameInput = document.getElementById("name");
-            const timeInput = document.getElementById("dateTime");
-            const tableBody = document.getElementById("scheduleTableBody");
+      let editingId = null;
+      let editingEvent = null;
 
-            let editingId = null;
-            let editingEvent = null;
+      // Fetch and display Mass schedules
+      async function fetchSchedules() {
+        try {
+          const response = await fetch(`${apiUrl}/event/schedules?description=Mass`);
+          const schedules = await response.json();
+          renderTable(schedules);
+        } catch (error) {
+          console.error("Failed to fetch schedules:", error);
+        }
+      }
 
-            // Fetch and display all schedules
-   // Fetch and display Mass schedules
-async function fetchSchedules() {
-  try {
-    const response = await fetch(`${apiUrl}/event/schedules?description=Mass`);
-    const schedules = await response.json();
-    renderTable(schedules);
-  } catch (error) {
-    console.error("Failed to fetch schedules:", error);
-  }
-}
+      function formatTime(dateTimeString) {
+        const date = new Date(dateTimeString);
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+        return `${displayHour}:${minutes} ${period}`;
+      }
 
+      // Render table
+      function renderTable(schedules) {
+        tableBody.innerHTML = "";
+        schedules.forEach((schedule, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${schedule.name}</td>
+            <td>${formatTime(schedule.dateTime)}</td>
+            <td>
+              <button class="action-icon edit-icon" onclick="editSchedule(${schedule.id})" title="Edit">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button class="action-icon delete-icon" onclick="deleteSchedule(${schedule.id})" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
 
-            function formatTime(dateTimeString) {
-              const date = new Date(dateTimeString);
-              const hours = date.getHours();
-              const minutes = String(date.getMinutes()).padStart(2, '0');
-              const period = hours >= 12 ? 'PM' : 'AM';
-              const displayHour = hours % 12 === 0 ? 12 : hours % 12;
-              return `${displayHour}:${minutes} ${period}`;
-            }
+      // Handle form submission (add or update)
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = nameInput.value.trim();
+        const time = timeInput.value;
 
-            // Render table
-            function renderTable(schedules) {
-              tableBody.innerHTML = "";
-              schedules.forEach((schedule, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                  <td>${index + 1}</td>
-                  <td>${schedule.name}</td>
-                  <td>${formatTime(schedule.dateTime)}</td>
-                  <td>
-                    <button class="edit-btn" onclick="editSchedule(${schedule.id})">Edit</button>
-                    <button class="delete-btn" onclick="deleteSchedule(${schedule.id})">Delete</button>
-                  </td>
-                `;
-                tableBody.appendChild(row);
-              });
-            }
+        if (!name || !time) return;
 
-            // Handle form submission (add or update)
-            form.addEventListener("submit", async (e) => {
-              e.preventDefault();
-              const name = nameInput.value.trim();
-              const time = timeInput.value;
+        const timeParts = time.split(":");
+        const now = new Date();
+        const nextSunday = new Date();
+        nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7)); // find next Sunday
+        nextSunday.setHours(timeParts[0]);
+        nextSunday.setMinutes(timeParts[1]);
+        nextSunday.setSeconds(0);
 
-              if (!name || !time) return;
+        const localDateTime = `${nextSunday.getFullYear()}-${String(nextSunday.getMonth() + 1).padStart(2, '0')}-${String(nextSunday.getDate()).padStart(2, '0')}T${String(nextSunday.getHours()).padStart(2, '0')}:${String(nextSunday.getMinutes()).padStart(2, '0')}:00`;
 
-              const timeParts = time.split(":");
-              const now = new Date();
-              const nextSunday = new Date();
-              nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7)); // find next Sunday
-              nextSunday.setHours(timeParts[0]);
-              nextSunday.setMinutes(timeParts[1]);
-              nextSunday.setSeconds(0);
+        try {
+          if (editingId) {
+            // Update the fetched event object
+            editingEvent.name = name;
+            editingEvent.dateTime = localDateTime;
 
-              const localDateTime = `${nextSunday.getFullYear()}-${String(nextSunday.getMonth() + 1).padStart(2, '0')}-${String(nextSunday.getDate()).padStart(2, '0')}T${String(nextSunday.getHours()).padStart(2, '0')}:${String(nextSunday.getMinutes()).padStart(2, '0')}:00`;
-
-              try {
-                if (editingId) {
-                  // Update the fetched event object
-                  editingEvent.name = name;
-                  editingEvent.dateTime = localDateTime;
-
-                  const response = await fetch(`${apiUrl}/event/${editingId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(editingEvent),
-                  });
-
-                  if (!response.ok) throw new Error("Failed to update schedule");
-
-                  editingId = null;
-                  editingEvent = null;
-                  form.querySelector("button").textContent = "Add Schedule";
-                } else {
-                  // New schedule creation
-                  const scheduleData = {
-                    name,
-                    dateTime: localDateTime
-                  };
-
-                  const response = await fetch(`${apiUrl}/event/schedule`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(scheduleData),
-                  });
-
-                  if (!response.ok) throw new Error("Failed to add schedule");
-                }
-
-                form.reset();
-                fetchSchedules();
-              } catch (error) {
-                console.error("Submit error:", error);
-              }
+            const response = await Fet
+ch(`${apiUrl}/event/${editingId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(editingEvent),
             });
 
-            // Prepare form for editing
-            async function editSchedule(id) {
-              try {
-                const response = await fetch(`${apiUrl}/event/${id}`);
-                if (!response.ok) throw new Error("Failed to fetch event for editing");
-                const event = await response.json();
+            if (!response.ok) throw new Error("Failed to update schedule");
 
-                nameInput.value = event.name;
+            editingId = null;
+            editingEvent = null;
+            form.querySelector("button").textContent = "Add Schedule";
+          } else {
+            // New schedule creation
+            const scheduleData = {
+              name,
+              dateTime: localDateTime
+            };
 
-                const dateObj = new Date(event.dateTime);
-                const hours = String(dateObj.getHours()).padStart(2, "0");
-                const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-                timeInput.value = `${hours}:${minutes}`;
+            const response = await fetch(`${apiUrl}/event/schedule`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(scheduleData),
+            });
 
-                editingId = id;
-                editingEvent = event;
+            if (!response.ok) throw new Error("Failed to add schedule");
+          }
 
-                form.querySelector("button").textContent = "Update Schedule";
-              } catch (error) {
-                console.error("Edit fetch error:", error);
-              }
-            }
+          form.reset();
+          fetchSchedules();
+        } catch (error) {
+          console.error("Submit error:", error);
+        }
+      });
 
-            // Delete with confirmation
-            async function deleteSchedule(id) {
-              if (confirm("Are you sure you want to delete this schedule?")) {
-                try {
-                  const response = await fetch(`${apiUrl}/event/${id}`, {
-                    method: "DELETE",
-                  });
+      // Prepare form for editing
+      async function editSchedule(id) {
+        try {
+          const response = await fetch(`${apiUrl}/event/${id}`);
+          if (!response.ok) throw new Error("Failed to fetch event for editing");
+          const event = await response.json();
 
-                  if (!response.ok) throw new Error("Failed to delete schedule");
-                  fetchSchedules();
-                } catch (error) {
-                  console.error("Delete error:", error);
-                }
-              }
-            }
+          nameInput.value = event.name;
 
-            // Initial fetch
+          const dateObj = new Date(event.dateTime);
+          const hours = String(dateObj.getHours()).padStart(2, "0");
+          const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+          timeInput.value = `${hours}:${minutes}`;
+
+          editingId = id;
+          editingEvent = event;
+
+          form.querySelector("button").textContent = "Update Schedule";
+        } catch (error) {
+          console.error("Edit fetch error:", error);
+        }
+      }
+
+      // Delete with confirmation
+      async function deleteSchedule(id) {
+        if (confirm("Are you sure you want to delete this schedule?")) {
+          try {
+            const response = await fetch(`${apiUrl}/event/${id}`, {
+              method: "DELETE",
+            });
+
+            if (!response.ok) throw new Error("Failed to delete schedule");
             fetchSchedules();
+          } catch (error) {
+            console.error("Delete error:", error);
+          }
+        }
+      }
+
+      // Initial fetch
+      fetchSchedules();
     </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<script>
-  document.getElementById("downloadPDF").addEventListener("click", () => {
-    const table = document.getElementById("tableBody");
-    const cloneTable = table.cloneNode(true);
+    <script>
+      document.getElementById("downloadPDF").addEventListener("click", () => {
+        const table = document.getElementById("tableBody");
+        const cloneTable = table.cloneNode(true);
 
-    // Remove all <td> from the last column
-    cloneTable.querySelectorAll("tr").forEach(row => {
-      const cells = row.querySelectorAll("td, th");
-      if (cells.length > 3) {
-        cells[cells.length - 1].remove(); // Remove last column (Actions)
-      }
-    });
+        // Remove all <td> from the last column
+        cloneTable.querySelectorAll("tr").forEach(row => {
+          const cells = row.querySelectorAll("td, th");
+          if (cells.length > 3) {
+            cells[cells.length - 1].remove(); // Remove last column (Actions)
+          }
+        });
 
-    // Wrap table in a new element with a title
-    const wrapper = document.createElement("div");
+        // Wrap table in a new element with a title
+        const wrapper = document.createElement("div");
 
-    const title = document.createElement("h2");
-    title.textContent = "Mass Schedules";
-    title.style.textAlign = "center";
-    wrapper.appendChild(title);
+        const title = document.createElement("h2");
+        title.textContent = "Mass Schedules";
+        title.style.textAlign = "center";
+        wrapper.appendChild(title);
 
-    wrapper.appendChild(cloneTable);
+        wrapper.appendChild(cloneTable);
 
-    // Generate PDF
-    html2pdf().from(wrapper).set({
-      margin: 0.5,
-      filename: 'Mass-Schedules.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    }).save();
-  });
-</script>
-
+        // Generate PDF
+        html2pdf().from(wrapper).set({
+          margin: 0.5,
+          filename: 'Mass-Schedules.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        }).save();
+      });
+    </script>
 
     <script src="../GENERAL/script.js"></script>
   </body>

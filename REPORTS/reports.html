@@ -22,6 +22,26 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
     <link rel="stylesheet" href="../REPORTS/reports.css" />
+    
+    <style>
+      .action-icons {
+        display: flex;
+        gap: 15px;
+      }
+      .action-icons span {
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .action-icons span:hover {
+        color: #4a6baf;
+      }
+      .download-icon {
+        color: #4CAF50;
+      }
+      .delete-icon {
+        color: #f44336;
+      }
+    </style>
   </head>
 
   <body>
@@ -37,13 +57,13 @@
               <th>Filename</th>
               <th>Type</th>
               <th>Date Downloaded</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="reports-table-body">
             <!-- Reports will be loaded here -->
           </tbody>
         </table>
-        
       </main>
     </div>
 
@@ -54,25 +74,78 @@
         const tableBody = document.getElementById("reports-table-body");
     
         if (reports.length === 0) {
-          tableBody.innerHTML = "<tr><td colspan='3'>No reports downloaded yet.</td></tr>";
+          tableBody.innerHTML = "<tr><td colspan='4'>No reports downloaded yet.</td></tr>";
         } else {
-          reports.forEach((report) => {
+          reports.forEach((report, index) => {
             const row = document.createElement("tr");
     
-            // Creating download link (if the file exists in user's downloads folder)
             row.innerHTML = `
-              <td><a href="../downloads/${report.filename}" target="_blank" class="report-link">${report.filename}</a></td>
+              <td>${report.filename}</td>
               <td>${report.type}</td>
               <td>${report.date}</td>
+              <td>
+                <div class="action-icons">
+                  <span class="material-icons-outlined download-icon" onclick="downloadReport('${report.filename}')">download</span>
+                  <span class="material-icons-outlined delete-icon" onclick="deleteReport(${index})">delete</span>
+                </div>
+              </td>
             `;
             tableBody.appendChild(row);
           });
         }
       });
+
+      function downloadReport(filename) {
+        // Create a temporary anchor element to trigger download
+        const link = document.createElement('a');
+        link.href = `../downloads/${filename}`;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Add to recent downloads if not already there
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+        const existingReport = reports.find(r => r.filename === filename);
+        
+        if (!existingReport) {
+          reports.push({
+            filename: filename,
+            type: filename.includes('members') ? 'Members' : filename.includes('contributions') ? 'Contributions' : 'Other',
+            date: new Date().toLocaleString()
+          });
+          localStorage.setItem("reports", JSON.stringify(reports));
+        }
+      }
+
+      function deleteReport(index) {
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+        if (index >= 0 && index < reports.length) {
+          reports.splice(index, 1);
+          localStorage.setItem("reports", JSON.stringify(reports));
+          // Refresh the table
+          location.reload();
+        }
+      }
+
+      // This function should be called whenever a new report is generated
+      function addNewReport(filename, type) {
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+        
+        // Check if report already exists
+        const exists = reports.some(report => report.filename === filename);
+        
+        if (!exists) {
+          reports.push({
+            filename: filename,
+            type: type || (filename.includes('members') ? 'Members' : filename.includes('contributions') ? 'Contributions' : 'Other'),
+            date: new Date().toLocaleString()
+          });
+          localStorage.setItem("reports", JSON.stringify(reports));
+        }
+      }
     </script>
     
-    
-
     <script src="../GENERAL/script.js"></script>
   </body>
 </html>

@@ -1,3 +1,11 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+  /* padding: 20px; */
+  color: #333;
+}
+
 /* Enhanced Table Styling */
 .table {
   width: 100%;
@@ -33,7 +41,8 @@
 }
 
 /* Top Button Styling */
-.import button, .add-btn {
+.import button,
+.add-btn {
   background-color: #3498db;
   color: white;
   border: none;
@@ -44,7 +53,8 @@
   transition: background-color 0.3s;
 }
 
-.import button:hover, .add-btn:hover {
+.import button:hover,
+.add-btn:hover {
   background-color: #2980b9;
 }
 
@@ -57,9 +67,8 @@
 }
 
 #exportPdfBtn {
-  background-color:rgb(245, 75, 75);
+  background-color: rgb(245, 75, 75);
 }
-
 
 .add-btn:hover {
   background-color: #219653;
@@ -195,7 +204,8 @@
     gap: 10px;
   }
 
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 10px 8px;
     font-size: 14px;
   }
@@ -264,7 +274,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Password toggle */

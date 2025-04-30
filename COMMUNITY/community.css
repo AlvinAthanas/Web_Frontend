@@ -1,76 +1,84 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+  /* padding: 20px; */
+  color: #333;
+}
+
 .container {
-    /* max-width: 600px; */
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  /* max-width: 600px; */
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 .community-list {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .community-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
 }
 
 .community-list li a {
-    text-decoration: none;
-    color: black;
-    flex-grow: 1;
+  text-decoration: none;
+  color: black;
+  flex-grow: 1;
 }
 
 .buttonGroup {
-    /* display: flex; */
-    gap: 15px;
+  /* display: flex; */
+  gap: 15px;
 }
 
 button {
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 18px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 18px;
 }
 
 input[type="text"] {
-    width: 80%;
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 18px;
+  width: 80%;
+  padding: 8px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 18px;
 }
 
 .add-btn {
-    background-color: #79b3f1;
+  background-color: #79b3f1;
 }
 
-.add-btn:hover{
-    opacity: 0.7;
+.add-btn:hover {
+  opacity: 0.7;
 }
 
 .edit-btn {
-    background-color: #f0ad4e;
+  background-color: #f0ad4e;
 }
 
 .delete-btn {
-    background-color: #d9534f;
-    margin-left: 5px;
+  background-color: #d9534f;
+  margin-left: 5px;
 }
 
 .cancel-btn {
-    background: #79b3f1;
-    margin-left: 5px;
+  background: #79b3f1;
+  margin-left: 5px;
 }
 
 .save-btn {
-    background: #f0ad4e;
+  background: #f0ad4e;
 }

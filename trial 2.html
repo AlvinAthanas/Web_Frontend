@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Details</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External Styles -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+
+    <!-- Internal Styles -->
+    <style>
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+      }
+
+      .details-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        margin: auto;
+      }
+
+      h2, p {
+        margin: 10px 0;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      ul li {
+        padding: 5px 0;
+      }
+
+      .attendance-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+      }
+
+      .attendance-table th, .attendance-table td {
+        padding: 10px;
+        border: 1px solid #ccc;
+        text-align: center;
+      }
+
+      .attendance-table th {
+        background-color: #f5f5f5;
+      }
+
+      .mark-btn {
+        padding: 5px 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .mark-btn:disabled {
+        background-color: #ccc;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="details-container">
+          <h2 id="communityName">Community Details</h2>
+          <p>Total Members: <span id="memberCount">Loading...</span></p>
+          <p>Total Contributions: <span id="totalContributions">Loading...</span></p>
+
+          <h3>Members</h3>
+          <ul id="memberList">Loading...</ul>
+
+          <h3>Attendance Tracking</h3>
+          <table class="attendance-table" id="attendanceTable">
+            <thead>
+              <tr>
+                <th>Member Name</th>
+                <th>Attendance (This Saturday)</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceBody">
+              <!-- Rows will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const apiUrl = "http://localhost:8080";
+      const params = new URLSearchParams(window.location.search);
+      const communityId = params.get("communityId");
+
+      async function loadCommunityDetails() {
+        try {
+          // Get community name
+          const communityRes = await fetch(`${apiUrl}/group/${communityId}`);
+          const community = await communityRes.json();
+          document.getElementById("communityName").textContent = `Community: ${community.name}`;
+
+          // Get members
+          const membersRes = await fetch(`${apiUrl}/group/${communityId}/members`);
+          const members = await membersRes.json();
+          document.getElementById("memberCount").textContent = members.length;
+
+          const memberList = document.getElementById("memberList");
+          memberList.innerHTML = "";
+
+          const attendanceBody = document.getElementById("attendanceBody");
+          attendanceBody.innerHTML = "";
+
+          if (!Array.isArray(members)) {
+            memberList.innerHTML = "<li>No members found</li>";
+            return;
+          }
+
+          members.forEach(member => {
+            const li = document.createElement("li");
+            li.textContent = member.name;
+            memberList.appendChild(li);
+
+            // Add to attendance table
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${member.name}</td>
+              <td><button class="mark-btn" onclick="markAttendance('${member.id}', this)">Mark Present</button></td>
+            `;
+            attendanceBody.appendChild(tr);
+          });
+
+          // Get total contributions
+          const contribRes = await fetch(`${apiUrl}/group/${communityId}/contributions/total`);
+          const total = await contribRes.json();
+          document.getElementById("totalContributions").textContent = `${total.amount} TZS`;
+
+        } catch (error) {
+          console.error("Error loading details:", error);
+          document.getElementById("communityName").textContent = "Error loading community";
+        }
+      }
+
+      async function markAttendance(memberId, button) {
+        try {
+          // Send POST request to mark attendance
+          const response = await fetch(`${apiUrl}/attendance/mark`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              memberId: memberId,
+              date: new Date().toISOString().split('T')[0]  // today's date
+            }),
+          });
+
+          if (response.ok) {
+            button.textContent = "Present";
+            button.disabled = true;
+          } else {
+            alert("Failed to mark attendance");
+          }
+        } catch (error) {
+          console.error("Error marking attendance:", error);
+          alert("Error marking attendance");
+        }
+      }
+
+      loadCommunityDetails();
+    </script>
+
+    <script src="../GENERAL/script.js"></script>
+  </body>
+</html>

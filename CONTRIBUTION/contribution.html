@@ -29,6 +29,111 @@
 
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+      .action-btn {
+        background: none;
+        border: none;
+        color: #f5f7ff;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .edit-btn {
+        color: #4caf50;
+        margin-right: 8px;
+      }
+
+      .edit-btn:hover {
+        background-color: rgba(76, 175, 80, 0.1);
+      }
+
+      .delete-btn {
+        color: #f44336;
+      }
+
+      .delete-btn:hover {
+        background-color: rgba(244, 67, 54, 0.1);
+      }
+
+      .action-btn .material-icons-outlined {
+        font-size: 20px;
+      }
+
+      /* Updated Pagination Styles */
+      .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding: 15px;
+        background: #1b2635;
+        border-radius: 8px;
+        color: #f5f7ff;
+      }
+
+      .page-numbers {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .pagination button {
+        background: none;
+        border: none;
+        color: #f5f7ff;
+        cursor: pointer;
+        padding: 5px 8px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .pagination button:hover:not(:disabled) {
+        background-color: rgba(41, 98, 255, 0.3);
+      }
+
+      .pagination button:disabled {
+        color: #55596e;
+        cursor: not-allowed;
+      }
+
+      .pagination #current-page {
+        padding: 5px 10px;
+        background-color: #2962ff;
+        border-radius: 4px;
+        margin: 0 5px;
+      }
+
+      .pagination span {
+        font-size: 14px;
+      }
+
+      .pagination .material-icons-outlined {
+        font-size: 18px;
+      }
+
+      .page-size-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 15px;
+      }
+
+      .page-size-selector select {
+        padding: 6px;
+        border-radius: 4px;
+        border: 1px solid #55596e;
+        /* background-color: #1b2635; */
+        color: #f5f7ff;
+      }
+    </style>
   </head>
 
   <body>
@@ -87,27 +192,64 @@
           <div>
             <!-- Add Contribution Button -->
             <button id="openDialogBtn" class="add-btn">
-              + Add Contribution
+              <span class="material-icons-outlined">add</span>
+              Add Contribution
             </button>
           </div>
         </div>
 
         <!-- Contribution Table -->
-        <table id="table" class="table">
-          <thead>
-            <tr>
-              <th>S/N</th>
-              <th>Contribution Type</th>
-              <th>Description</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="contribution-table-body">
-            <!-- Dynamic rows will be inserted here -->
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table id="table" class="table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Contribution Type</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="contribution-table-body">
+              <!-- Dynamic rows will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+          <span id="page-info"
+            >Showing <span id="start-record">1</span> to
+            <span id="end-record">10</span> of
+            <span id="total-records">0</span> contributions</span
+          >
+          <div class="page-numbers">
+            <button id="first-page" disabled>
+              <span class="material-icons-outlined">first_page</span>
+            </button>
+            <button id="prev-page" disabled>
+              <span class="material-icons-outlined">chevron_left</span>
+            </button>
+            <span id="current-page">1</span>
+            <button id="next-page" disabled>
+              <span class="material-icons-outlined">chevron_right</span>
+            </button>
+            <button id="last-page" disabled>
+              <span class="material-icons-outlined">last_page</span>
+            </button>
+          </div>
+          <div class="page-size-selector">
+            <span>Show:</span>
+            <select id="page-size">
+              <option value="20">20</option>
+              <option value="40">40</option>
+              <option value="60">60</option>
+              <option value="80">80</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
 
         <!-- Form Dialog -->
         <div id="formDialog" class="dialog-overlay">
@@ -158,7 +300,105 @@
       const cancelBtn = document.getElementById("cancelBtn");
       const responseBox = document.getElementById("response");
 
+      // Pagination variables
+      let currentPage = 1;
+      let pageSize = 20;
+      let totalRecords = 0;
+      let totalPages = 1;
+      let allContributions = [];
+      let filteredContributions = [];
       let editingId = null;
+
+      // DOM elements for pagination
+      const firstPageBtn = document.getElementById("first-page");
+      const prevPageBtn = document.getElementById("prev-page");
+      const nextPageBtn = document.getElementById("next-page");
+      const lastPageBtn = document.getElementById("last-page");
+      const pageSizeSelect = document.getElementById("page-size");
+      const pageInfo = document.getElementById("page-info");
+      const startRecord = document.getElementById("start-record");
+      const endRecord = document.getElementById("end-record");
+      const totalRecordsSpan = document.getElementById("total-records");
+      const currentPageSpan = document.getElementById("current-page");
+
+      // Initialize pagination controls
+      function initPaginationControls() {
+        firstPageBtn.addEventListener("click", () => goToPage(1));
+        prevPageBtn.addEventListener("click", () => goToPage(currentPage - 1));
+        nextPageBtn.addEventListener("click", () => goToPage(currentPage + 1));
+        lastPageBtn.addEventListener("click", () => goToPage(totalPages));
+        pageSizeSelect.addEventListener("change", (e) => {
+          pageSize = parseInt(e.target.value);
+          currentPage = 1;
+          updatePaginationUI();
+          renderTable();
+        });
+      }
+
+      // Go to specific page
+      function goToPage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        updatePaginationUI();
+        renderTable();
+      }
+
+      // Update pagination UI
+      function updatePaginationUI() {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(currentPage * pageSize, totalRecords);
+
+        startRecord.textContent = start;
+        endRecord.textContent = end;
+        totalRecordsSpan.textContent = totalRecords;
+        currentPageSpan.textContent = currentPage;
+
+        firstPageBtn.disabled = currentPage === 1;
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === totalPages;
+        lastPageBtn.disabled = currentPage === totalPages;
+      }
+
+      // Calculate pagination
+      function calculatePagination(data) {
+        totalRecords = data.length;
+        totalPages = Math.ceil(totalRecords / pageSize);
+        updatePaginationUI();
+      }
+
+      // Render table with paginated data
+      function renderTable() {
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedData = filteredContributions.slice(startIndex, endIndex);
+
+        const tableBody = document.getElementById("contribution-table-body");
+        tableBody.innerHTML = "";
+
+        paginatedData.forEach((contribution, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${startIndex + index + 1}</td>
+            <td>${contribution.type}</td>
+            <td>${contribution.description}</td>
+            <td>${contribution.amount}</td>
+            <td>${contribution.date}</td>
+            <td>
+              <button class="action-btn edit-btn" onclick="editContribution(${
+                contribution.id
+              })" title="Edit">
+                <span class="material-icons-outlined">edit</span>
+              </button>
+              <button class="action-btn delete-btn" onclick="deleteContribution(${
+                contribution.id
+              })" title="Delete">
+                <span class="material-icons-outlined">delete</span>
+              </button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
 
       // Opening and closing the form dialog
       openDialogBtn.onclick = () => {
@@ -182,30 +422,10 @@
         fetch("http://localhost:8080/contributions")
           .then((res) => res.json())
           .then((data) => {
-            const tableBody = document.getElementById(
-              "contribution-table-body"
-            );
-            tableBody.innerHTML = "";
-
-            data.forEach((contribution, index) => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${contribution.type}</td>
-                <td>${contribution.description}</td>
-                <td>${contribution.amount}</td>
-                <td>${contribution.date}</td>
-                <td>
-                  <button class="edit-btn" onclick="editContribution(${
-                    contribution.id
-                  })">Edit</button>
-                  <button class="delete-btn" onclick="deleteContribution(${
-                    contribution.id
-                  })">Delete</button>
-                </td>
-              `;
-              tableBody.appendChild(row);
-            });
+            allContributions = data;
+            filteredContributions = [...allContributions];
+            calculatePagination(filteredContributions);
+            renderTable();
           })
           .catch((error) => {
             console.error("Failed to load contributions:", error);
@@ -320,11 +540,6 @@
         }
       }
 
-      window.addEventListener("DOMContentLoaded", () => {
-        populateYearOptions();
-        loadContributions();
-      });
-
       //FILTERING CONTRIBUTIONS
       document.getElementById("filter-btn").addEventListener("click", () => {
         const type = document.getElementById("type-filter").value;
@@ -339,39 +554,23 @@
         fetch(`http://localhost:8080/contributions/filter?${params.toString()}`)
           .then((res) => res.json())
           .then((data) => {
-            const tableBody = document.getElementById(
-              "contribution-table-body"
-            );
-            tableBody.innerHTML = "";
-
-            data.forEach((contribution, index) => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${contribution.type}</td>
-          <td>${contribution.description}</td>
-          <td>${contribution.amount}</td>
-          <td>${contribution.date}</td>
-          <td>
-            <button class="edit-btn" onclick="editContribution(${
-              contribution.id
-            })">Edit</button>
-            <button class="delete-btn" onclick="deleteContribution(${
-              contribution.id
-            })">Delete</button>
-          </td>
-        `;
-              tableBody.appendChild(row);
-            });
+            filteredContributions = data;
+            currentPage = 1;
+            calculatePagination(filteredContributions);
+            renderTable();
           })
           .catch((err) => {
             console.error("Error filtering contributions:", err);
           });
       });
-    </script>
 
-    <!-- Exporting the contributions in form of excel document -->
-    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        initPaginationControls();
+        populateYearOptions();
+        loadContributions();
+      });
+
+      // Exporting the contributions in form of excel document
       document
         .getElementById("exportExcelBtn")
         .addEventListener("click", () => {
@@ -412,13 +611,10 @@
           const fileName = `contributions_report.xlsx`;
           XLSX.writeFile(wb, fileName);
 
-          addReportToStorage(fileName); // <<< Add this line
+          addReportToStorage(fileName);
         });
-    </script>
 
-
-    <!-- Exporting the contributions in form of pdf document -->
-    <script>
+      // Exporting the contributions in form of pdf document
       document.getElementById("exportPdfBtn").addEventListener("click", () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -452,21 +648,37 @@
 
         doc.text("Contribution Report", 14, 15);
 
-        const fileName = `contributions_report_${Date.now()}.pdf`;
+        const fileName = `contributions_report.pdf`;
         doc.save(fileName);
-
-        addReportToStorage(fileName); // <<< Add this line
+        addReportToStorage(fileName);
       });
-    </script>
 
-    <script>
+
       function addReportToStorage(fileName) {
+        // Get existing reports or initialize empty array
         let reports = JSON.parse(localStorage.getItem("reports")) || [];
-        reports.push({
-          fileName: fileName,
-          timestamp: new Date().toISOString(),
-        });
-        localStorage.setItem("reports", JSON.stringify(reports));
+
+        // Determine report type based on file extension
+        const type = fileName.endsWith(".xlsx")
+          ? "Excel"
+          : fileName.endsWith(".pdf")
+          ? "PDF"
+          : "Other";
+
+        // Check if report already exists to avoid duplicates
+        const exists = reports.some((report) => report.filename === fileName);
+
+        if (!exists) {
+          // Add new report
+          reports.push({
+            filename: fileName,
+            type: type,
+            date: new Date().toLocaleString(),
+          });
+
+          // Save back to localStorage
+          localStorage.setItem("reports", JSON.stringify(reports));
+        }
       }
     </script>
 
