@@ -20,11 +20,10 @@
     />
 
     <!-- External CSS -->
-    <link rel="stylesheet" href="../DASHBOARD/dashboard.css">
+    <link rel="stylesheet" href="../DASHBOARD/dashboard.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
 
     <style>
-      /* Profile specific styles */
       .profile-container {
         background-color: var(--sidebar-color, #fff);
         border-radius: 8px;
@@ -53,6 +52,13 @@
         margin-right: 20px;
         color: white;
         font-size: 40px;
+        overflow: hidden;
+      }
+
+      .profile-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
       .profile-name {
@@ -76,9 +82,9 @@
         margin-bottom: 20px;
       }
 
-      .edit-button {
-        background-color: var(--primary-color, #79b3f1);
-        color: white;
+      .edit-button,
+      .save-button,
+      .cancel-button {
         border: none;
         padding: 10px 20px;
         border-radius: 5px;
@@ -86,32 +92,22 @@
         display: flex;
         align-items: center;
         transition: background-color 0.3s ease;
+        margin-left: 10px;
+      }
+
+      .edit-button {
+        background-color: var(--primary-color, #79b3f1);
+        color: white;
       }
 
       .save-button {
         background-color: #4caf50;
         color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        transition: background-color 0.3s ease;
-        margin-left: 10px;
       }
 
       .cancel-button {
         background-color: #f44336;
         color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        transition: background-color 0.3s ease;
-        margin-left: 10px;
       }
 
       .edit-button:hover {
@@ -126,7 +122,9 @@
         background-color: #d32f2f;
       }
 
-      .edit-button span, .save-button span, .cancel-button span {
+      .edit-button span,
+      .save-button span,
+      .cancel-button span {
         margin-right: 5px;
       }
 
@@ -135,8 +133,7 @@
       }
 
       .profile-section h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
+        margin: 0 0 15px;
         color: var(--text-color, #0e0e0e);
         display: flex;
         align-items: center;
@@ -171,7 +168,8 @@
         color: var(--text-color, #0e0e0e);
       }
 
-      .info-item input, .info-item select {
+      .info-item input,
+      .info-item select {
         width: 100%;
         padding: 10px;
         border: 1px solid #ddd;
@@ -185,7 +183,26 @@
         display: none;
       }
 
-      /* Mobile responsiveness */
+      .upload-button {
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .upload-button:hover {
+        background-color: #1976d2;
+      }
+
+      .upload-button span {
+        margin-right: 5px;
+      }
+
       @media screen and (max-width: 768px) {
         .profile-info {
           grid-template-columns: 1fr;
@@ -197,8 +214,7 @@
         }
 
         .profile-image {
-          margin-right: 0;
-          margin-bottom: 15px;
+          margin: 0 auto 15px;
         }
 
         .profile-actions {
@@ -209,8 +225,6 @@
   </head>
   <body>
     <div class="grid-container">
-      <!-- Header and sidebar will be included from your previous code -->
-      <!-- Main Content -->
       <main class="main-container">
         <div class="main-title">
           <h2>MY PROFILE</h2>
@@ -218,12 +232,12 @@
 
         <div class="profile-container">
           <div class="profile-header">
-            <div class="profile-image">
+            <div class="profile-image" id="profile-image">
               <span class="material-icons-outlined">person</span>
             </div>
             <div class="profile-name">
-              <h2 id="user-full-name">John Doe</h2>
-              <p id="user-email">john.doe@example.com</p>
+              <h2 id="user-full-name">Loading...</h2>
+              <p id="user-email">Loading...</p>
             </div>
           </div>
 
@@ -248,112 +262,87 @@
               <span class="material-icons-outlined">person_outline</span>
               Personal Information
             </h3>
-            
+
             <!-- View Mode -->
             <div class="profile-info" id="view-mode">
               <div class="info-item">
-                <label>First Name</label>
-                <p id="view-first-name">John</p>
-              </div>
-              <div class="info-item">
-                <label>Last Name</label>
-                <p id="view-last-name">Doe</p>
+                <label>Full Name</label>
+                <p id="view-full-name">Loading...</p>
               </div>
               <div class="info-item">
                 <label>Email</label>
-                <p id="view-email">john.doe@example.com</p>
+                <p id="view-email">Loading...</p>
               </div>
               <div class="info-item">
-                <label>Phone</label>
-                <p id="view-phone">+1 234 567 8900</p>
+                <label>Phone Number</label>
+                <p id="view-phone">Loading...</p>
               </div>
               <div class="info-item">
-                <label>Role</label>
-                <p id="view-role">Member</p>
+                <label>Gender</label>
+                <p id="view-gender">Loading...</p>
               </div>
               <div class="info-item">
-                <label>Member Since</label>
-                <p id="view-join-date">January 15, 2022</p>
+                <label>Community Name</label>
+                <p id="view-community">Loading...</p>
               </div>
             </div>
 
             <!-- Edit Mode -->
             <div class="profile-info hidden" id="edit-mode">
               <div class="info-item">
-                <label for="edit-first-name">First Name</label>
-                <input type="text" id="edit-first-name" value="John">
-              </div>
-              <div class="info-item">
-                <label for="edit-last-name">Last Name</label>
-                <input type="text" id="edit-last-name" value="Doe">
+                <label for="edit-full-name">Full Name</label>
+                <input type="text" id="edit-full-name" />
               </div>
               <div class="info-item">
                 <label for="edit-email">Email</label>
-                <input type="email" id="edit-email" value="john.doe@example.com">
+                <input type="email" id="edit-email" />
               </div>
               <div class="info-item">
-                <label for="edit-phone">Phone</label>
-                <input type="tel" id="edit-phone" value="+1 234 567 8900">
+                <label for="edit-phone">Phone Number</label>
+                <input type="tel" id="edit-phone" />
               </div>
               <div class="info-item">
-                <label for="edit-role">Role</label>
-                <select id="edit-role">
-                  <option value="Member">Member</option>
-                  <option value="Administrator">Administrator</option>
-                  <option value="Moderator">Moderator</option>
+                <label for="edit-gender">Gender</label>
+                <select id="edit-gender">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div class="info-item">
-                <label>Member Since</label>
-                <p id="join-date">January 15, 2022</p>
+                <label for="edit-community">Community Name</label>
+                <input type="text" id="edit-community" />
+              </div>
+              <div class="info-item">
+                <label for="profile-picture">Profile Picture</label>
+                <input type="file" id="profile-picture" accept="image/*" />
+                <button class="upload-button" id="upload-picture-btn">
+                  <span class="material-icons-outlined">upload</span> Upload
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Additional Section for Address -->
+          <!-- Address Section -->
           <div class="profile-section">
             <h3>
               <span class="material-icons-outlined">location_on</span>
               Address
             </h3>
-            
+
             <!-- View Mode -->
             <div class="profile-info" id="view-address">
               <div class="info-item">
-                <label>Street</label>
-                <p id="view-street">123 Main St</p>
-              </div>
-              <div class="info-item">
-                <label>City</label>
-                <p id="view-city">Anytown</p>
-              </div>
-              <div class="info-item">
-                <label>State/Province</label>
-                <p id="view-state">State</p>
-              </div>
-              <div class="info-item">
-                <label>Zip/Postal Code</label>
-                <p id="view-zip">12345</p>
+                <label>Address</label>
+                <p id="view-address">Loading...</p>
               </div>
             </div>
 
             <!-- Edit Mode -->
             <div class="profile-info hidden" id="edit-address">
               <div class="info-item">
-                <label for="edit-street">Street</label>
-                <input type="text" id="edit-street" value="123 Main St">
-              </div>
-              <div class="info-item">
-                <label for="edit-city">City</label>
-                <input type="text" id="edit-city" value="Anytown">
-              </div>
-              <div class="info-item">
-                <label for="edit-state">State/Province</label>
-                <input type="text" id="edit-state" value="State">
-              </div>
-              <div class="info-item">
-                <label for="edit-zip">Zip/Postal Code</label>
-                <input type="text" id="edit-zip" value="12345">
+                <label for="edit-address">Address</label>
+                <input type="text" id="edit-address" />
               </div>
             </div>
           </div>
@@ -361,153 +350,185 @@
       </main>
     </div>
 
-    <!-- JavaScript for profile editing -->
     <script>
+      const baseUrl = 'http://localhost:8080'; // Replace with your backend URL
+
+      // Function to extract user ID from JWT token
+      function getUserIdFromToken() {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          throw new Error('No authentication token found. Please log in.');
+        }
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.sub || payload.id; // Adjust based on your JWT payload structure
+        } catch (error) {
+          throw new Error('Invalid token format.');
+        }
+      }
+
       // DOM elements
       const editProfileBtn = document.getElementById('edit-profile-btn');
       const saveProfileBtn = document.getElementById('save-profile-btn');
       const cancelEditBtn = document.getElementById('cancel-edit-btn');
+      const uploadPictureBtn = document.getElementById('upload-picture-btn');
       const editActions = document.getElementById('edit-actions');
       const saveActions = document.getElementById('save-actions');
       const viewMode = document.getElementById('view-mode');
       const editMode = document.getElementById('edit-mode');
       const viewAddress = document.getElementById('view-address');
       const editAddress = document.getElementById('edit-address');
+      const profileImage = document.getElementById('profile-image');
 
       // Event listeners
       editProfileBtn.addEventListener('click', enableEditMode);
       saveProfileBtn.addEventListener('click', saveChanges);
       cancelEditBtn.addEventListener('click', cancelEdit);
+      uploadPictureBtn.addEventListener('click', uploadProfilePicture);
+
+      // Function to fetch user profile
+      async function loadUserProfile() {
+        try {
+          const userId = getUserIdFromToken();
+          const response = await fetch(`${baseUrl}/user?email=${userId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (!response.ok) {
+            throw new Error(`Failed to fetch user profile: ${response.statusText}`);
+          }
+          const userData = await response.json();
+
+          // Populate view mode fields
+          document.getElementById('view-full-name').textContent = userData.name || 'N/A';
+          document.getElementById('view-email').textContent = userData.email || 'N/A';
+          document.getElementById('view-phone').textContent = userData.phone || 'N/A';
+          document.getElementById('view-gender').textContent = userData.gender || 'N/A';
+          document.getElementById('view-community').textContent = userData.communityName || 'N/A';
+          document.getElementById('view-address').textContent = userData.address || 'N/A';
+
+          // Populate header
+          document.getElementById('user-full-name').textContent = userData.name || 'N/A';
+          document.getElementById('user-email').textContent = userData.email || 'N/A';
+
+          // Display profile picture if available
+          if (userData.profilePicture) {
+            profileImage.innerHTML = `<img src="${userData.profilePicture}" alt="Profile Picture" />`;
+          } else {
+            profileImage.innerHTML = `<span class="material-icons-outlined">person</span>`;
+          }
+        } catch (error) {
+          console.error('Error loading profile:', error.message);
+          alert(`Failed to load profile: ${error.message}`);
+        }
+      }
 
       // Function to enable edit mode
       function enableEditMode() {
-        // Toggle action buttons
         editActions.classList.add('hidden');
         saveActions.classList.remove('hidden');
-        
-        // Toggle view/edit sections
         viewMode.classList.add('hidden');
         editMode.classList.remove('hidden');
         viewAddress.classList.add('hidden');
         editAddress.classList.remove('hidden');
-        
+
         // Transfer current values to edit fields
-        document.getElementById('edit-first-name').value = document.getElementById('view-first-name').textContent;
-        document.getElementById('edit-last-name').value = document.getElementById('view-last-name').textContent;
+        document.getElementById('edit-full-name').value = document.getElementById('view-full-name').textContent;
         document.getElementById('edit-email').value = document.getElementById('view-email').textContent;
         document.getElementById('edit-phone').value = document.getElementById('view-phone').textContent;
-        
-        document.getElementById('edit-street').value = document.getElementById('view-street').textContent;
-        document.getElementById('edit-city').value = document.getElementById('view-city').textContent;
-        document.getElementById('edit-state').value = document.getElementById('view-state').textContent;
-        document.getElementById('edit-zip').value = document.getElementById('view-zip').textContent;
-        
-        // Set role dropdown to current value
-        const roleSelect = document.getElementById('edit-role');
-        const currentRole = document.getElementById('view-role').textContent;
-        for (let i = 0; i < roleSelect.options.length; i++) {
-          if (roleSelect.options[i].value === currentRole) {
-            roleSelect.selectedIndex = i;
-            break;
-          }
-        }
+        document.getElementById('edit-address').value = document.getElementById('view-address').textContent;
+        document.getElementById('edit-community').value = document.getElementById('view-community').textContent;
+
+        // Set gender dropdown
+        const genderSelect = document.getElementById('edit-gender');
+        const currentGender = document.getElementById('view-gender').textContent;
+        genderSelect.value = ['Male', 'Female', 'Other'].includes(currentGender) ? currentGender : 'Other';
       }
 
       // Function to save changes
-      function saveChanges() {
-        // Get values from edit fields
-        const firstName = document.getElementById('edit-first-name').value;
-        const lastName = document.getElementById('edit-last-name').value;
-        const email = document.getElementById('edit-email').value;
-        const phone = document.getElementById('edit-phone').value;
-        const role = document.getElementById('edit-role').value;
-        
-        const street = document.getElementById('edit-street').value;
-        const city = document.getElementById('edit-city').value;
-        const state = document.getElementById('edit-state').value;
-        const zip = document.getElementById('edit-zip').value;
-        
-        // Update view mode with new values
-        document.getElementById('view-first-name').textContent = firstName;
-        document.getElementById('view-last-name').textContent = lastName;
-        document.getElementById('view-email').textContent = email;
-        document.getElementById('view-phone').textContent = phone;
-        document.getElementById('view-role').textContent = role;
-        
-        document.getElementById('view-street').textContent = street;
-        document.getElementById('view-city').textContent = city;
-        document.getElementById('view-state').textContent = state;
-        document.getElementById('view-zip').textContent = zip;
-        
-        // Update header name and email
-        document.getElementById('user-full-name').textContent = `${firstName} ${lastName}`;
-        document.getElementById('user-email').textContent = email;
-        
-        // Here you would typically send an AJAX request to update the user profile
-        // For demonstration, we'll just show an alert
-        alert('Profile updated successfully!');
-        
-        // Switch back to view mode
-        cancelEdit();
+      async function saveChanges() {
+        try {
+          const userId = getUserIdFromToken();
+          const updatedData = {
+            fullName: document.getElementById('edit-full-name').value,
+            email: document.getElementById('edit-email').value,
+            phoneNumber: document.getElementById('edit-phone').value,
+            gender: document.getElementById('edit-gender').value,
+            communityName: document.getElementById('edit-community').value,
+            address: document.getElementById('edit-address').value
+          };
+
+          const response = await fetch(`${baseUrl}/user/${userId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(updatedData)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to update profile: ${response.statusText}`);
+          }
+          alert('Profile updated successfully!');
+          await loadUserProfile(); // Refresh profile data
+          cancelEdit();
+        } catch (error) {
+          console.error('Error updating profile:', error.message);
+          alert(`Failed to update profile: ${error.message}`);
+        }
+      }
+
+      // Function to upload profile picture
+      async function uploadProfilePicture() {
+        try {
+          const fileInput = document.getElementById('profile-picture');
+          const file = fileInput.files[0];
+          if (!file) {
+            alert('Please select an image to upload.');
+            return;
+          }
+
+          const userId = getUserIdFromToken();
+          const formData = new FormData();
+          formData.append('profilePicture', file);
+
+          const response = await fetch(`${baseUrl}/user/${userId}/profile-picture`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: formData
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to upload profile picture: ${response.statusText}`);
+          }
+          alert('Profile picture uploaded successfully!');
+          await loadUserProfile(); // Refresh profile data
+        } catch (error) {
+          console.error('Error uploading profile picture:', error.message);
+          alert(`Failed to upload profile picture: ${error.message}`);
+        }
       }
 
       // Function to cancel editing
       function cancelEdit() {
-        // Toggle action buttons
         editActions.classList.remove('hidden');
         saveActions.classList.add('hidden');
-        
-        // Toggle view/edit sections
         viewMode.classList.remove('hidden');
         editMode.classList.add('hidden');
         viewAddress.classList.remove('hidden');
         editAddress.classList.add('hidden');
       }
 
-      // Load user profile data - this would typically come from your backend
-      function loadUserProfile() {
-        // This is where you would fetch user data from your API
-        // For now, we'll use hardcoded data
-        const userData = {
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@example.com",
-          phone: "+1 234 567 8900",
-          role: "Member",
-          joinDate: "January 15, 2022",
-          address: {
-            street: "123 Main St",
-            city: "Anytown",
-            state: "State",
-            zip: "12345"
-          }
-        };
-        
-        // Populate view mode fields
-        document.getElementById('view-first-name').textContent = userData.firstName;
-        document.getElementById('view-last-name').textContent = userData.lastName;
-        document.getElementById('view-email').textContent = userData.email;
-        document.getElementById('view-phone').textContent = userData.phone;
-        document.getElementById('view-role').textContent = userData.role;
-        document.getElementById('view-join-date').textContent = userData.joinDate;
-        
-        document.getElementById('view-street').textContent = userData.address.street;
-        document.getElementById('view-city').textContent = userData.address.city;
-        document.getElementById('view-state').textContent = userData.address.state;
-        document.getElementById('view-zip').textContent = userData.address.zip;
-        
-        // Populate header
-        document.getElementById('user-full-name').textContent = `${userData.firstName} ${userData.lastName}`;
-        document.getElementById('user-email').textContent = userData.email;
-      }
-
       // Initialize the page
-      document.addEventListener('DOMContentLoaded', function() {
-        loadUserProfile();
-      });
+      document.addEventListener('DOMContentLoaded', loadUserProfile);
     </script>
 
-    <!-- Include your external JS file -->
     <script src="../GENERAL/script.js"></script>
   </body>
 </html>
