@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Members</title>
+  
+  <!-- Montserrat Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+  <link rel="stylesheet" href="../GENERAL/style.css">
+
+  <style>
+    /* Base Styles */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .main-container {
+      width: 100%;
+      /* max-width: 1200px; */
+      margin: 0 auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Header Styles */
+    .members-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .members-header h1 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: none;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .btn-primary {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2980b9;
+    }
+
+    .btn-icon {
+      background: none;
+      padding: 5px;
+      color: #7f8c8d;
+    }
+
+    .btn-icon:hover {
+      color: #3498db;
+      background-color: #f0f7fc;
+    }
+
+    .btn-danger {
+      color: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      color: #c0392b;
+    }
+
+    .btn-edit {
+      color: #f39c12;
+    }
+
+    .btn-edit:hover {
+      color: #d35400;
+    }
+
+    .btn-view {
+      color: #2ecc71;
+    }
+
+    .btn-view:hover {
+      color: #27ae60;
+    }
+
+    /* Table Styles */
+    .members-table-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow-x: auto;
+    }
+
+    .members-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .members-table th {
+      background-color: #f8f9fa;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #2c3e50;
+      white-space: nowrap;
+    }
+
+    .members-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    .members-table tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .table-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Search Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: white;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      overflow: hidden;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 15px 20px;
+      background-color: #3498db;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .search-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1em;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .search-results {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .search-result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .search-result-info {
+      flex-grow: 1;
+    }
+
+    .search-result-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .search-result-email {
+      color: #7f8c8d;
+      font-size: 0.9em;
+    }
+
+    .empty-search-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8c8d;
+    }
+
+    .empty-search-state .material-icons-outlined {
+      font-size: 3em;
+      color: #bdc3c7;
+      margin-bottom: 15px;
+    }
+
+    /* Details Modal Styles */
+    .detail-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      width: 150px;
+      color: #2c3e50;
+    }
+
+    .detail-value {
+      flex-grow: 1;
+    }
+
+    .contribution-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 500;
+    }
+
+    .status-active {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-inactive {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .contributions-list {
+      margin-top: 20px;
+    }
+
+    .contribution-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8c8d;
+    }
+
+    .empty-state .material-icons-outlined {
+      font-size: 3em;
+      color: #bdc3c7;
+      margin-bottom: 15px;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 4px;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1100;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .notification-success {
+      background-color: #2ecc71;
+    }
+
+    .notification-error {
+      background-color: #e74c3c;
+    }
+
+    .notification-warning {
+      background-color: #f39c12;
+    }
+
+    .notification-info {
+      background-color: #3498db;
+    }
+
+    /* Confirmation Dialog */
+    .confirm-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1200;
+    }
+
+    .confirm-dialog.active {
+      display: flex;
+    }
+
+    .confirm-dialog-content {
+      background-color: white;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .confirm-dialog-message {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .confirm-dialog-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* Contribution Form Modal */
+    #contributionForm .form-group {
+      margin-bottom: 15px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .main-container {
+        width: 95%;
+        padding: 10px;
+      }
+      
+      .members-table th, 
+      .members-table td {
+        padding: 8px 10px;
+        font-size: 0.9em;
+      }
+      
+      .table-actions {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .btn {
+        padding: 5px;
+        justify-content: center;
+      }
+      
+      .search-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-container" id="containerId">
+    <div class="main-container">
+      <div class="members-header">
+        <div>
+          <button class="btn btn-icon" onclick="window.history.back()">
+            <span class="material-icons-outlined">arrow_back</span>
+          </button>
+          <h1 id="communityTitle">Community Members</h1>
+        </div>
+        <button id="addMemberBtn" class="btn btn-primary">
+          <span class="material-icons-outlined">add</span> Add Member
+        </button>
+      </div>
+      <div class="members-table-container">
+        <div id="membersList">
+          <!-- Members table will be inserted here -->
+          <div class="empty-state">
+            <span class="material-icons-outlined">groups</span>
+            <h3>No Members Found</h3>
+            <p>Click "Add Member" to add members to this community</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal" id="searchModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Search Members</h2>
+        <button class="close-btn" id="closeSearchBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="search-container">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by name...">
+          <button id="searchBtn" class="btn btn-primary">
+            <span class="material-icons-outlined">search</span> Search
+          </button>
+        </div>
+        <div class="search-results" id="searchResults">
+          <div class="empty-search-state">
+            <span class="material-icons-outlined">search</span>
+            <p>Enter a name to search for members</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Details Modal -->
+  <div class="modal" id="detailsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="detailsModalTitle">Member Details</h2>
+        <button class="close-btn" id="closeDetailsBtn">×</button>
+      </div>
+      <div class="modal-body" id="detailsModalBody">
+        <!-- Member details will be inserted here -->
+      </div>
+      <div class="modal-footer">
+        <button id="addContributionBtn" class="btn btn-primary">
+          <span class="material-icons-outlined">add</span> Add Contribution
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Contribution Modal -->
+  <div class="modal" id="contributionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="contributionModalTitle">Add Contribution</h2>
+        <button class="close-btn" id="closeContributionBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="contributionForm">
+          <input type="hidden" id="contributionMemberId">
+          <div class="form-group">
+            <label for="contributionType">Contribution Type</label>
+            <select id="contributionType" class="form-control" required>
+              <option value="">Select Type</option>
+              <option value="Tithe">Tithe</option>
+              <option value="Offering">Offering</option>
+              <option value="Building Fund">Building Fund</option>
+              <option value="Youth Fund">Youth Fund</option>
+              <option value="Missions">Missions</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contributionAmount">Amount (KSh)</label>
+            <input type="number" id="contributionAmount" class="form-control" required min="1">
+          </div>
+          <div class="form-group">
+            <label for="contributionDate">Date</label>
+            <input type="date" id="contributionDate" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="contributionNotes">Notes (Optional)</label>
+            <textarea id="contributionNotes" class="form-control" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelContributionBtn" class="btn">Cancel</button>
+        <button id="saveContributionBtn" class="btn btn-primary">Save Contribution</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div class="confirm-dialog" id="confirmationDialog">
+    <div class="confirm-dialog-content">
+      <div class="confirm-dialog-message" id="confirmationMessage">
+        Are you sure you want to perform this action?
+      </div>
+      <div class="confirm-dialog-actions">
+        <button id="cancelConfirmationBtn" class="btn">Cancel</button>
+        <button id="confirmActionBtn" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notificationContainer"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get community details from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const communityId = urlParams.get('communityId');
+      const communityName = urlParams.get('communityName');
+      
+      // Store community info globally
+      window.currentCommunity = {
+        id: communityId,
+        name: communityName ? decodeURIComponent(communityName) : 'Community'
+      };
+
+      // Update page title and header
+      document.title = `${window.currentCommunity.name} Members`;
+      document.getElementById('communityTitle').textContent = `${window.currentCommunity.name} Members`;
+
+      // DOM Elements
+      const membersList = document.getElementById("membersList");
+      const addMemberBtn = document.getElementById("addMemberBtn");
+      const searchModal = document.getElementById("searchModal");
+      const closeSearchBtn = document.getElementById("closeSearchBtn");
+      const searchBtn = document.getElementById("searchBtn");
+      const searchInput = document.getElementById("searchInput");
+      const searchResults = document.getElementById("searchResults");
+      const detailsModal = document.getElementById("detailsModal");
+      const closeDetailsBtn = document.getElementById("closeDetailsBtn");
+      const detailsModalTitle = document.getElementById("detailsModalTitle");
+      const detailsModalBody = document.getElementById("detailsModalBody");
+      const addContributionBtn = document.getElementById("addContributionBtn");
+      const contributionModal = document.getElementById("contributionModal");
+      const closeContributionBtn = document.getElementById("closeContributionBtn");
+      const contributionForm = document.getElementById("contributionForm");
+      const contributionMemberId = document.getElementById("contributionMemberId");
+      const saveContributionBtn = document.getElementById("saveContributionBtn");
+      const cancelContributionBtn = document.getElementById("cancelContributionBtn");
+      const confirmationDialog = document.getElementById("confirmationDialog");
+      const confirmationMessage = document.getElementById("confirmationMessage");
+      const cancelConfirmationBtn = document.getElementById("cancelConfirmationBtn");
+      const confirmActionBtn = document.getElementById("confirmActionBtn");
+      const contributionDate = document.getElementById("contributionDate");
+      
+      // Set default date to today
+      const today = new Date();
+      const formattedDate = today.toISOString().substr(0, 10);
+      contributionDate.value = formattedDate;
+
+      // Store the action callback for confirmation dialog
+      let confirmCallback = null;
+
+      // Event Listeners
+      addMemberBtn.addEventListener("click", () => {
+        searchInput.value = '';
+        searchResults.innerHTML = `
+          <div class="empty-search-state">
+            <span class="material-icons-outlined">search</span>
+            <p>Enter a name to search for members</p>
+          </div>
+        `;
+        searchModal.classList.add("active");
+      });
+      
+      closeSearchBtn.addEventListener("click", () => searchModal.classList.remove("active"));
+      searchBtn.addEventListener("click", performSearch);
+      searchInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") performSearch();
+      });
+      
+      closeDetailsBtn.addEventListener("click", () => detailsModal.classList.remove("active"));
+      addContributionBtn.addEventListener("click", () => {
+        const memberId = addContributionBtn.getAttribute('data-member-id');
+        openContributionForm(memberId);
+      });
+      
+      closeContributionBtn.addEventListener("click", () => contributionModal.classList.remove("active"));
+      cancelContributionBtn.addEventListener("click", () => contributionModal.classList.remove("active"));
+      saveContributionBtn.addEventListener("click", saveContribution);
+      
+      cancelConfirmationBtn.addEventListener("click", () => confirmationDialog.classList.remove("active"));
+      confirmActionBtn.addEventListener("click", () => {
+        if (confirmCallback) {
+          confirmCallback();
+          confirmCallback = null;
+        }
+        confirmationDialog.classList.remove("active");
+      });
+
+      // Initialize the page
+      fetchCommunityMembers();
+
+      // Notification System
+      function showNotification(message, type = 'info') {
+        const notificationContainer = document.getElementById('notificationContainer');
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+          <span class="material-icons-outlined">
+            ${type === 'success' ? 'check_circle' : 
+              type === 'error' ? 'error' : 
+              type === 'warning' ? 'warning' : 'info'}
+          </span>
+          <div>${message}</div>
+        `;
+        
+        notificationContainer.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+          notification.classList.add('show');
+        }, 10);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+          notification.classList.remove('show');
+          setTimeout(() => {
+            notificationContainer.removeChild(notification);
+          }, 300);
+        }, 3000);
+      }
+
+      // Confirmation Dialog
+      function showConfirmationDialog(message, callback) {
+        confirmationMessage.textContent = message;
+        confirmCallback = callback;
+        confirmationDialog.classList.add("active");
+      }
+
+      // Fetch members for this community
+      function fetchCommunityMembers() {
+        // Validate community name
+        if (!window.currentCommunity.name || window.currentCommunity.name === 'Community') {
+          console.warn("Community name is missing or defaulted to 'Community'. Check URL parameters.");
+          renderMembersTable([]);
+          showNotification("Community name is missing. Please provide a valid community.", "warning");
+          return;
+        }
+
+        const url = `http://localhost:8080/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
+        console.log("Fetching members from:", url);
+
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
+            }
+            return response.json().catch(err => {
+              throw new Error('Failed to parse JSON response');
+            });
+          })
+          .then(data => {
+            console.log("API response data:", data); // Log the response for debugging
+            // Ensure data is an array
+            const members = Array.isArray(data) ? data : data.members || [];
+            renderMembersTable(members);
+          })
+          .catch(error => {
+            console.error("Error fetching community members:", {
+              message: error.message,
+              stack: error.stack,
+              communityName: window.currentCommunity.name,
+              url: url
+            });
+            renderMembersTable([]);
+            showNotification("Unable to load community members. Please check your connection or try again later.", "error");
+          });
+
+        // Mock data for testing (uncomment to test rendering)
+        /*
+        const mockData = [
+          { id: "1", name: "John Doe", email: "john@example.com", phone: "1234567890" },
+          { id: "2", name: "Jane Smith", email: "jane@example.com", phone: "0987654321" }
+        ];
+        renderMembersTable(mockData);
+        */
+      }
+
+      // Render members in a table
+      function renderMembersTable(members) {
+        // Ensure members is an array and validate each member object
+        if (!Array.isArray(members) || members.length === 0) {
+          membersList.innerHTML = `
+            <div class="empty-state">
+              <span class="material-icons-outlined">groups</span>
+              <h3>No Members Found</h3>
+              <p>Click "Add Member" to add members to this community</p>
+            </div>
+          `;
+          return;
+        }
+
+        membersList.innerHTML = `
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th>S/N</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${members.map((member, index) => {
+                // Validate member properties
+                const memberId = member.id || `unknown-${index}`;
+                const memberName = member.name || 'Unknown';
+                const memberEmail = member.email || 'N/A';
+                const memberPhone = member.phone || 'N/A';
+                
+                return `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${memberName}</td>
+                    <td>${memberEmail}</td>
+                    <td>${memberPhone}</td>
+                    <td>
+                      <div class="table-actions">
+                        <button class="btn btn-icon btn-edit edit-btn" data-id="${memberId}" title="Edit">
+                          <span class="material-icons-outlined">edit</span>
+                        </button>
+                        <button class="btn btn-icon btn-danger delete-btn" data-id="${memberId}" title="Delete">
+                          <span class="material-icons-outlined">delete</span>
+                        </button>
+                        <button class="btn btn-icon btn-view view-btn" data-id="${memberId}" title="View Details">
+                          <span class="material-icons-outlined">visibility</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+
+        // Add event listeners to action buttons
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const memberId = btn.getAttribute('data-id');
+            editMember(memberId);
+          });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const memberId = btn.getAttribute('data-id');
+            const memberName = btn.closest('tr').querySelector('td:nth-child(2)').textContent;
+            confirmDeleteMember(memberId, memberName);
+          });
+        });
+
+        document.querySelectorAll('.view-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const memberId = btn.getAttribute('data-id');
+            viewMemberDetails(memberId);
+          });
+        });
+      }
+
+      // Perform search for members
+      function performSearch() {
+        const searchTerm = searchInput.value.trim();
+        if (!searchTerm) return;
+
+        searchResults.innerHTML = `
+          <div class="empty-search-state">
+            <span class="material-icons-outlined">hourglass_empty</span>
+            <p>Searching...</p>
+          </div>
+        `;
+
+        fetch(`http://localhost:8080/user/search?name=${encodeURIComponent(searchTerm)}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.length === 0) {
+              searchResults.innerHTML = `
+                <div class="empty-search-state">
+                  <span class="material-icons-outlined">search_off</span>
+                  <p>No members found matching "${searchTerm}"</p>
+                </div>
+              `;
+              return;
+            }
+
+            searchResults.innerHTML = '';
+            data.forEach(user => {
+              const userElement = document.createElement('div');
+              userElement.className = 'search-result-item';
+              userElement.innerHTML = `
+                <div class="search-result-info">
+                  <div class="search-result-name">${user.name}</div>
+                  <div class="search-result-email">${user.email || 'No email'}</div>
+                  <div class="search-result-phone">${user.phone || 'No phone'}</div>
+                </div>
+                <button class="btn btn-primary add-user-btn" data-id="${user.id}">
+                  <span class="material-icons-outlined">add</span> Add
+                </button>
+              `;
+              searchResults.appendChild(userElement);
+
+              // Add event listener to the add button
+              userElement.querySelector('.add-user-btn').addEventListener('click', () => {
+                addUserToCommunity(user.id, user.fullName);
+              });
+            });
+          })
+          .catch(error => {
+            console.error("Error searching members:", error);
+            searchResults.innerHTML = `
+              <div class="empty-search-state">
+                <span class="material-icons-outlined">error</span>
+                <p>Error searching for members</p>
+              </div>
+            `;
+            showNotification("Error searching for members. Please try again.", "error");
+          });
+      }
+
+      // Add user to community
+      function addUserToCommunity(userId, userName) {
+        const command = {
+          userId: userId,
+          groupId: window.currentCommunity.id
+        };
+
+        fetch('http://localhost:8080/group/assignMember', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(command)
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to add member');
+          return response.text();
+        })
+        .then(() => {
+          searchModal.classList.remove('active');
+          fetchCommunityMembers(); // Refresh the member list
+          showNotification(`${userName} added to community successfully!`, "success");
+        })
+        .catch(error => {
+          console.error("Error adding member:", error);
+          showNotification("Failed to add member to community", "error");
+        });
+      }
+
+      // Confirm delete member
+      function confirmDeleteMember(memberId, memberName) {
+        showConfirmationDialog(`Are you sure you want to remove ${memberName} from the community?`, () => {
+          deleteMember(memberId, memberName);
+        });
+      }
+
+      // Edit member
+      function editMember(memberId) {
+        console.log('Editing member with ID:', memberId);
+        // TODO: Replace with your actual edit endpoint
+        // For now, show a notification that this feature is coming soon
+        showNotification("Edit member feature coming soon", "info");
+      }
+
+      // Delete member
+      function deleteMember(memberId, memberName) {
+        // Replace with your actual delete endpoint
+        fetch(`http://localhost:8080/group/removeMember`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: memberId,
+            groupId: window.currentCommunity.id
+          })
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to remove member');
+          fetchCommunityMembers(); // Refresh the list
+          showNotification(`${memberName} has been removed from the community`, "success");
+        })
+        .catch(error => {
+          console.error('Error deleting member:', error);
+          showNotification("Failed to remove member from community", "error");
+        });
+      }
+
+      // View member details
+      function viewMemberDetails(memberId) {
+        fetch(`http://localhost:8080/user/${memberId}`)
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch member details');
+            return response.json();
+          })
+          .then(member => {
+            detailsModalTitle.textContent = `${member.name}'s Details`;
+            
+            // Set member ID for add contribution button
+            addContributionBtn.setAttribute('data-member-id', member.id);
+            
+            detailsModalBody.innerHTML = `
+              <div class="detail-row">
+                <div class="detail-label">Full Name:</div>
+                <div class="detail-value">${member.name || 'N/A'}</div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">Email:</div>
+                <div class="detail-value">${member.email || 'N/A'}</div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">Phone:</div>
+                <div class="detail-value">${member.phone || 'N/A'}</div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">Address:</div>
+                <div class="detail-value">${member.address || 'N/A'}</div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-label">Gender:</div>
+                <div class="detail-value">${member.gender || 'N/A'}</div>
+              </div>
+              <div class="contributions-list">
+                <h3>Contributions</h3>
+                <div id="memberContributions">
+                  <!-- Contributions will be loaded here -->
+                </div>
+              </div>
+            `;
+            
+            detailsModal.classList.add('active');
+            
+            // Fetch contributions for this member
+            fetchMemberContributions(memberId);
+          })
+          .catch(error => {
+            console.error("Error fetching member details:", error);
+            showNotification("Error loading member details", "error");
+          });
+      }
+      
+      // Fetch member contributions
+      function fetchMemberContributions(memberId) {
+        fetch(`http://localhost:8080/contributions?memberId=${memberId}`)
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch contributions');
+            return response.json();
+          })
+          .then(contributions => {
+            const contributionsContainer = document.getElementById('memberContributions');
+            if (contributions.length === 0) {
+              contributionsContainer.innerHTML = `
+                <div class="empty-state">
+                  <span class="material-icons-outlined">money_off</span>
+                  <p>No contributions recorded for this member.</p>
+                </div>
+              `;
+            } else {
+              contributionsContainer.innerHTML = `
+                <table class="members-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Amount (KSh)</th>
+                      <th>Date</th>
+                      <th>Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${contributions.map(contribution => `
+                      <tr>
+                        <td>${contribution.type || 'N/A'}</td>
+                        <td>${contribution.amount || 'N/A'}</td>
+                        <td>${contribution.date || 'N/A'}</td>
+                        <td>${contribution.notes || 'N/A'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `;
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching contributions:", error);
+            const contributionsContainer = document.getElementById('memberContributions');
+            contributionsContainer.innerHTML = `
+              <div class="empty-state">
+                <span class="material-icons-outlined">error</span>
+                <p>Error loading contributions</p>
+              </div>
+            `;
+            showNotification("Error loading contributions", "error");
+          });
+      }
+
+      // Open contribution form
+      function openContributionForm(memberId) {
+        contributionMemberId.value = memberId;
+        contributionForm.reset();
+        contributionDate.value = formattedDate; // Reset to today's date
+        contributionModal.classList.add("active");
+      }
+
+      // Save contribution
+      function saveContribution() {
+        const memberId = contributionMemberId.value;
+        const type = document.getElementById("contributionType").value;
+        const amount = document.getElementById("contributionAmount").value;
+        const date = document.getElementById("contributionDate").value;
+        const notes = document.getElementById("contributionNotes").value;
+        
+        // Form validation
+        if (!type || !amount || !date) {
+          showNotification("Please fill in all required fields", "warning");
+          return;
+        }
+        
+        // Create contribution object
+        const contribution = {
+          memberId: memberId,
+          type: type,
+          amount: parseFloat(amount),
+          date: date,
+          notes: notes
+        };
+        
+        // Send contribution to API
+        fetch('http://localhost:8080/contributions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contribution)
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to save contribution');
+          return response.json();
+        })
+        .then(() => {
+          contributionModal.classList.remove("active");
+          showNotification("Contribution saved successfully!", "success");
+          // Refresh the member details to show the new contribution
+          viewMemberDetails(memberId);
+        })
+        .catch(error => {
+          console.error("Error saving contribution:", error);
+          showNotification("Failed to save contribution", "error");
+        });
+      }
+    });
+  </script>
+
+  <script src="../GENERAL/script.js"></script>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93901d391f19b02f',t:'MTc0NjExMTI2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

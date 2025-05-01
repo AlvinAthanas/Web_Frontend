@@ -20,7 +20,7 @@
   />
 
   <!-- External styles -->
-<link rel="stylesheet" href="../GENERAL/style.css">
+  <link rel="stylesheet" href="../GENERAL/style.css">
   <!-- Internal Styles -->
   <style>
     :root {
@@ -34,7 +34,7 @@
       --success-color: #28a745;
       --danger-color: #dc3545;
       --warning-color: #ffc107;
-      --border-radius: px;
+      --border-radius: 8px; /* Fixed invalid value */
       --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       --transition: all 0.3s ease;
     }
@@ -51,19 +51,6 @@
       color: var(--dark-text);
       line-height: 1.6;
     }
-    
-    /* .grid-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    } */
     
     .details-container, .attendance-container {
       background-color: #fff;
@@ -162,7 +149,6 @@
       font-size: 18px;
     }
     
-    /* Table styling */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -243,7 +229,6 @@
       background-color: #e0a800;
     }
     
-    /* Modal dialog styling */
     .modal {
       display: none;
       position: fixed;
@@ -346,7 +331,6 @@
       background-color: #5a6268;
     }
     
-    /* Responsive design */
     @media (max-width: 768px) {
       .stats-row {
         flex-direction: column;
@@ -373,6 +357,40 @@
         overflow-x: auto;
       }
     }
+
+    .clickable-name {
+      cursor: pointer;
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+    
+    .clickable-name:hover {
+      color: var(--secondary-color);
+    }
+    
+    .clickable-stat {
+      cursor: pointer;
+    }
+    
+    .clickable-stat:hover {
+      background-color: #e9ecef;
+    }
+    
+    .contribution-table {
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .eye-icon {
+      cursor: pointer;
+      color: var(--primary-color);
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    
+    .eye-icon:hover {
+      color: var(--secondary-color);
+    }
   </style>
 </head>
 
@@ -397,7 +415,7 @@
             <h4>Total Members</h4>
             <p id="memberCount">0</p>
           </div>
-          <div class="stat-card">
+          <div class="stat-card clickable-stat" id="totalContributionsCard">
             <h4>Total Contributions</h4>
             <p id="totalContributions">0 TZS</p>
           </div>
@@ -423,12 +441,8 @@
         </div>
 
         <table id="membersTable">
-          <thead id="tableHeader">
-            <!-- Table header will be populated dynamically -->
-          </thead>
-          <tbody id="membersList">
-            <!-- Members will be populated here -->
-          </tbody>
+          <thead id="tableHeader"></thead>
+          <tbody id="membersList"></tbody>
         </table>
       </div>
     </main>
@@ -439,7 +453,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3><span class="material-icons-outlined">person_add</span> Add New Member</h3>
-        <span class="close">&times;</span>
+        <span class="close">×</span>
       </div>
       
       <div class="form-group">
@@ -469,7 +483,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3><span class="material-icons-outlined">edit</span> Edit Member</h3>
-        <span class="close">&times;</span>
+        <span class="close">×</span>
       </div>
       
       <input type="hidden" id="editMemberId">
@@ -495,174 +509,275 @@
     </div>
   </div>
 
+  <!-- User Details Modal -->
+  <div id="userDetailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span class="material-icons-outlined">person</span> Member Details</h3>
+        <span class="close">×</span>
+      </div>
+      
+      <div class="form-group">
+        <label>Name:</label>
+        <p id="userDetailName"></p>
+      </div>
+      <div class="form-group">
+        <label>Phone Number:</label>
+        <p id="userDetailPhone"></p>
+      </div>
+      <div class="form-group">
+        <label>Address:</label>
+        <p id="userDetailAddress"></p>
+      </div>
+      
+      <div class="form-group">
+        <label>Contributions:</label>
+        <table class="contribution-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userContributionsList"></tbody>
+        </table>
+        <button class="action-btn" id="addContributionBtn">
+          <span class="material-icons-outlined">add_circle</span> Add Contribution
+        </button>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="action-btn btn-secondary closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Contribution Modal -->
+  <div id="addContributionModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span class="material-icons-outlined">add_circle</span> Add Contribution</h3>
+        <span class="close">×</span>
+      </div>
+      
+      <input type="hidden" id="contributionMemberId">
+      <div class="form-group">
+        <label for="contributionDate">Date:</label>
+        <input type="date" id="contributionDate">
+      </div>
+      <div class="form-group">
+        <label for="contributionAmount">Amount (TZS):</label>
+        <input type="number" id="contributionAmount" placeholder="Enter amount">
+      </div>
+      
+      <div class="modal-footer">
+        <button class="action-btn btn-secondary closeModal">Cancel</button>
+        <button class="action-btn" id="saveContribution">
+          <span class="material-icons-outlined">save</span> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Contribution Modal -->
+  <div id="editContributionModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span class="material-icons-outlined">edit</span> Edit Contribution</h3>
+        <span class="close">×</span>
+      </div>
+      
+      <input type="hidden" id="editContributionId">
+      <input type="hidden" id="editContributionMemberId">
+      <div class="form-group">
+        <label for="editContributionDate">Date:</label>
+        <input type="date" id="editContributionDate">
+      </div>
+      <div class="form-group">
+        <label for="editContributionAmount">Amount (TZS):</label>
+        <input type="number" id="editContributionAmount" placeholder="Enter amount">
+      </div>
+      
+      <div class="modal-footer">
+        <button class="action-btn btn-secondary closeModal">Cancel</button>
+        <button class="action-btn" id="saveEditedContribution">
+          <span class="material-icons-outlined">save</span> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Contributions Modal -->
+  <div id="allContributionsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span class="material-icons-outlined">account_balance</span> Community Contributions</h3>
+        <span class="close">×</span>
+      </div>
+      
+      <div class="form-group">
+        <label>Total Contributions:</label>
+        <p id="totalContributionsSum"></p>
+      </div>
+      
+      <table class="contribution-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Total Amount</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="allContributionsList"></tbody>
+      </table>
+      
+      <div class="modal-footer">
+        <button class="action-btn btn-secondary closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const apiUrl = "http://localhost:8080";
-    
-    // Get URL parameters
     const params = new URLSearchParams(window.location.search);
-    const communityId = params.get("communityId");
-    
-    // Community data
-    let communityName = "Community Details";
+    const communityId = params.get("communityId") || "1"; // Fallback ID
+
+    let communityName = "Sample Community";
     let members = [];
-    let totalContributions = "0 TZS";
-    
-    // Attendance tracking
+    let contributions = [];
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     const attendance = {};
-    
-    // Initialize page
+
     async function loadCommunityDetails() {
+      console.log("Loading community details for ID:", communityId);
       try {
-        // Get community name
         const communityRes = await fetch(`${apiUrl}/group/${communityId}`);
         const community = await communityRes.json();
-        communityName = community.name;
+        communityName = community.name || "Sample Community";
         document.getElementById("communityName").textContent = `Community: ${communityName}`;
 
-        // Get members
         const membersRes = await fetch(`${apiUrl}/group/${communityId}/members`);
         const membersData = await membersRes.json();
-        
-        if (Array.isArray(membersData)) {
-          members = membersData.map((member, index) => ({
-            id: member.id || index + 1,
-            name: member.name || 'Unknown',
-            phone: member.phone || 'No phone',
-            address: member.address || 'No address'
-          }));
-          document.getElementById("memberCount").textContent = members.length;
-        } else {
-          document.getElementById("memberCount").textContent = '0';
-        }
+        members = Array.isArray(membersData) ? membersData.map((m, i) => ({
+          id: m.id || i + 1,
+          name: m.name || "Unknown",
+          phone: m.phone || "No phone",
+          address: m.address || "No address"
+        })) : [];
+        document.getElementById("memberCount").textContent = members.length;
+        console.log("Members loaded:", members);
 
-        // Get total contributions
-        const contribRes = await fetch(`${apiUrl}/group/${communityId}/contributions/total`);
-        const total = await contribRes.json();
-        totalContributions = `${total.amount} TZS`;
-        document.getElementById("totalContributions").textContent = totalContributions;
-        
-        // Initialize attendance data
+        // Use sample contributions for now
+        loadSampleContributions();
+        updateTotalContributions();
         initializeAttendance();
-        
         renderTable();
         updateStats();
-        
       } catch (error) {
-        console.error("Error loading details:", error);
-        document.getElementById("communityName").textContent = "Error loading community";
-        
-        // Load sample data if API call fails
+        console.error("Error loading community details:", error);
         loadSampleData();
       }
     }
-    
+
     function loadSampleData() {
+      console.log("Loading sample data due to API failure");
       communityName = "Sample Community";
       document.getElementById("communityName").textContent = `Community: ${communityName}`;
-      
       members = [
-        { id: 1, name: "John Doe", phone: "+255 712 345 678", address: "123 Main St, Dar es Salaam" },
-        { id: 2, name: "Jane Smith", phone: "+255 655 987 123", address: "456 Central Ave, Arusha" },
-        { id: 3, name: "Bob Johnson", phone: "+255 789 456 321", address: "789 Highland Rd, Mwanza" }
+        { id: 1, name: "John Doe", phone: "+255 712 345 678", address: "123 Main St" },
+        { id: 2, name: "Jane Smith", phone: "+255 655 987 123", address: "456 Central Ave" },
+        { id: 3, name: "Bob Johnson", phone: "+255 789 456 321", address: "789 Highland Rd" }
       ];
-      
+      loadSampleContributions();
       document.getElementById("memberCount").textContent = members.length;
-      document.getElementById("totalContributions").textContent = "50,000 TZS";
-      
-      // Initialize attendance data
+      updateTotalContributions();
       initializeAttendance();
-      
       renderTable();
       updateStats();
     }
-    
+
+    function loadSampleContributions() {
+      contributions = [
+        { id: 1, memberId: 1, date: "2025-04-01", amount: 10000 },
+        { id: 2, memberId: 1, date: "2025-04-15", amount: 15000 },
+        { id: 3, memberId: 2, date: "2025-04-10", amount: 20000 }
+      ];
+      console.log("Sample contributions loaded:", contributions);
+    }
+
+    function updateTotalContributions() {
+      const total = contributions.reduce((sum, c) => sum + c.amount, 0);
+      document.getElementById("totalContributions").textContent = `${total} TZS`;
+    }
+
     function initializeAttendance() {
       const monthKey = `${currentYear}-${currentMonth}`;
       if (!attendance[monthKey]) {
         attendance[monthKey] = {};
-        
-        // For each member initialize attendance for all Saturdays in the month
-        for (const member of members) {
+        members.forEach(member => {
           attendance[monthKey][member.id] = {};
-        }
+        });
       }
+      console.log("Attendance initialized for:", monthKey);
     }
-    
+
     function getSaturdaysInMonth(year, month) {
       const saturdays = [];
       const date = new Date(year, month, 1);
-      
-      // Find all Saturdays in the month
       while (date.getMonth() === month) {
-        if (date.getDay() === 6) { // 6 is Saturday
+        if (date.getDay() === 6) {
           saturdays.push(new Date(date));
         }
         date.setDate(date.getDate() + 1);
       }
-      
       return saturdays;
     }
-    
+
     function formatDate(date) {
       const options = { month: 'short', day: 'numeric' };
       return date.toLocaleDateString(undefined, options);
     }
-    
+
     function renderTable() {
-      // Generate table header with Saturdays
+      console.log("Rendering table for month:", currentMonth, currentYear);
       const saturdays = getSaturdaysInMonth(currentYear, currentMonth);
       const tableHeader = document.getElementById("tableHeader");
-      
       let headerHTML = `
         <tr>
           <th>Name</th>
           <th>Phone Number</th>
           <th>Address</th>
       `;
-      
       saturdays.forEach(saturday => {
         headerHTML += `<th>${formatDate(saturday)}</th>`;
       });
-      
       headerHTML += `<th>Actions</th></tr>`;
       tableHeader.innerHTML = headerHTML;
-      
-      // Generate table body with members and attendance
+
       const tableBody = document.getElementById("membersList");
       tableBody.innerHTML = '';
-      
       const monthKey = `${currentYear}-${currentMonth}`;
-      
       if (!attendance[monthKey]) {
         attendance[monthKey] = {};
       }
-      
+
       members.forEach(member => {
         const row = document.createElement('tr');
-        
-        // Add member info
         row.innerHTML = `
-          <td>${member.name}</td>
+          <td><span class="clickable-name" data-member-id="${member.id}">${member.name}</span></td>
           <td>${member.phone}</td>
           <td>${member.address}</td>
         `;
-        
-        // Initialize attendance for this member if not exists
         if (!attendance[monthKey][member.id]) {
           attendance[monthKey][member.id] = {};
         }
-        
-        // Add attendance cells for each Saturday
         saturdays.forEach(saturday => {
           const dateKey = saturday.toISOString().split('T')[0];
-          
-          // Initialize this date for the member if it doesn't exist
           if (attendance[monthKey][member.id][dateKey] === undefined) {
             attendance[monthKey][member.id][dateKey] = false;
           }
-          
           const isPresent = attendance[monthKey][member.id][dateKey];
           const cell = document.createElement('td');
           cell.className = isPresent ? 'present' : 'absent';
@@ -672,87 +787,75 @@
           cell.addEventListener('click', toggleAttendance);
           row.appendChild(cell);
         });
-        
-        // Add actions cell
         const actionsCell = document.createElement('td');
-        
-        // Add edit button
         const editBtn = document.createElement('button');
         editBtn.className = 'action-btn edit-btn';
         editBtn.innerHTML = '<span class="material-icons-outlined">edit</span>';
         editBtn.addEventListener('click', () => editMember(member.id));
         actionsCell.appendChild(editBtn);
-        
-        // Add delete button
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'action-btn delete-btn';
         deleteBtn.innerHTML = '<span class="material-icons-outlined">delete</span>';
         deleteBtn.addEventListener('click', () => deleteMember(member.id));
         actionsCell.appendChild(deleteBtn);
-        
         row.appendChild(actionsCell);
-        
         tableBody.appendChild(row);
       });
-      
-      // Update month display in the title
+
+      document.querySelectorAll('.clickable-name').forEach(name => {
+        name.addEventListener('click', () => showUserDetails(parseInt(name.dataset.memberId)));
+      });
+
       const monthNames = ["January", "February", "March", "April", "May", "June",
                           "July", "August", "September", "October", "November", "December"];
       const monthTitle = document.querySelector('.header-actions h3');
       monthTitle.textContent = `Saturday Attendance - ${monthNames[currentMonth]} ${currentYear}`;
     }
-    
+
     function toggleAttendance(event) {
       const memberId = parseInt(event.target.dataset.memberId);
       const dateKey = event.target.dataset.date;
       const monthKey = `${currentYear}-${currentMonth}`;
-      
-      // Toggle attendance
       attendance[monthKey][memberId][dateKey] = !attendance[monthKey][memberId][dateKey];
-      
-      // Update cell display
       const isPresent = attendance[monthKey][memberId][dateKey];
       event.target.className = isPresent ? 'present' : 'absent';
       event.target.textContent = isPresent ? 'Present' : 'Absent';
-      
       updateStats();
     }
-    
+
     function updateStats() {
-      // Update member count
       document.getElementById("memberCount").textContent = members.length;
-      
-      // Calculate overall attendance rate across all recorded Saturdays
       let totalPresent = 0;
-      let totalAttendanceRecords = 0;
-      
+      let totalRecords = 0;
       for (const monthKey in attendance) {
         for (const memberId in attendance[monthKey]) {
           for (const dateKey in attendance[monthKey][memberId]) {
-            totalAttendanceRecords++;
+            totalRecords++;
             if (attendance[monthKey][memberId][dateKey]) {
               totalPresent++;
             }
           }
         }
       }
-      
-      const attendanceRate = totalAttendanceRecords > 0 ? 
-        ((totalPresent / totalAttendanceRecords) * 100).toFixed(1) : 0;
+      const attendanceRate = totalRecords > 0 ? ((totalPresent / totalRecords) * 100).toFixed(1) : 0;
       document.getElementById("attendanceRate").textContent = `${attendanceRate}%`;
     }
-    
-    // Modal handling
+
     const addMemberModal = document.getElementById("addMemberModal");
     const editMemberModal = document.getElementById("editMemberModal");
-    
+    const userDetailsModal = document.getElementById("userDetailsModal");
+    const addContributionModal = document.getElementById("addContributionModal");
+    const editContributionModal = document.getElementById("editContributionModal");
+    const allContributionsModal = document.getElementById("allContributionsModal");
+
     document.getElementById("addMemberBtn").addEventListener("click", () => {
       document.getElementById("newName").value = '';
       document.getElementById("newPhone").value = '';
       document.getElementById("newAddress").value = '';
       addMemberModal.style.display = "block";
+      console.log("Add member modal opened");
     });
-    
+
     function editMember(id) {
       const member = members.find(m => m.id === id);
       if (member) {
@@ -761,109 +864,228 @@
         document.getElementById("editPhone").value = member.phone;
         document.getElementById("editAddress").value = member.address;
         editMemberModal.style.display = "block";
+        console.log("Edit member modal opened for ID:", id);
       }
     }
-    
-    // Close modals
+
+    function showUserDetails(id) {
+      const member = members.find(m => m.id === id);
+      if (member) {
+        document.getElementById("userDetailName").textContent = member.name;
+        document.getElementById("userDetailPhone").textContent = member.phone;
+        document.getElementById("userDetailAddress").textContent = member.address;
+        const memberContributions = contributions.filter(c => c.memberId === id);
+        const contributionsList = document.getElementById("userContributionsList");
+        contributionsList.innerHTML = '';
+        memberContributions.forEach(contrib => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${contrib.date}</td>
+            <td>${contrib.amount} TZS</td>
+            <td>
+              <button class="action-btn edit-btn" data-contrib-id="${contrib.id}">
+                <span class="material-icons-outlined">edit</span>
+              </button>
+              <button class="action-btn delete-btn" data-contrib-id="${contrib.id}">
+                <span class="material-icons-outlined">delete</span>
+              </button>
+            </td>
+          `;
+          contributionsList.appendChild(row);
+        });
+        contributionsList.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', () => editContribution(btn.dataset.contribId, id));
+        });
+        contributionsList.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', () => deleteContribution(btn.dataset.contribId, id));
+        });
+        document.getElementById("addContributionBtn").onclick = () => {
+          document.getElementById("contributionMemberId").value = id;
+          document.getElementById("contributionDate").value = '';
+          document.getElementById("contributionAmount").value = '';
+          addContributionModal.style.display = "block";
+          console.log("Add contribution modal opened for member ID:", id);
+        };
+        userDetailsModal.style.display = "block";
+        console.log("User details modal opened for ID:", id);
+      } else {
+        console.error("Member not found for ID:", id);
+      }
+    }
+
+    function showAllContributions() {
+      const contributionsList = document.getElementById("allContributionsList");
+      contributionsList.innerHTML = '';
+      const memberTotals = {};
+      members.forEach(member => {
+        memberTotals[member.id] = { name: member.name, total: 0, contributions: [] };
+      });
+      contributions.forEach(contrib => {
+        if (memberTotals[contrib.memberId]) {
+          memberTotals[contrib.memberId].total += contrib.amount;
+          memberTotals[contrib.memberId].contributions.push(contrib);
+        }
+      });
+      const totalSum = Object.values(memberTotals).reduce((sum, member) => sum + member.total, 0);
+      document.getElementById("totalContributionsSum").textContent = `${totalSum} TZS`;
+      Object.values(memberTotals).forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${member.name}</td>
+          <td>${member.total} TZS</td>
+          <td>
+            <span class="material-icons-outlined eye-icon" data-member-id="${member.id}">visibility</span>
+          </td>
+        `;
+        contributionsList.appendChild(row);
+      });
+      contributionsList.querySelectorAll('.eye-icon').forEach(icon => {
+        icon.addEventListener('click', () => showUserDetails(parseInt(icon.dataset.memberId)));
+      });
+      allContributionsModal.style.display = "block";
+      console.log("All contributions modal opened");
+    }
+
+    function editContribution(contribId, memberId) {
+      const contribution = contributions.find(c => c.id === parseInt(contribId));
+      if (contribution) {
+        document.getElementById("editContributionId").value = contribId;
+        document.getElementById("editContributionMemberId").value = memberId;
+        document.getElementById("editContributionDate").value = contribution.date;
+        document.getElementById("editContributionAmount").value = contribution.amount;
+        editContributionModal.style.display = "block";
+        console.log("Edit contribution modal opened for contrib ID:", contribId);
+      } else {
+        console.error("Contribution not found for ID:", contribId);
+      }
+    }
+
+    function deleteContribution(contribId, memberId) {
+      if (confirm('Are you sure you want to delete this contribution?')) {
+        contributions = contributions.filter(c => c.id !== parseInt(contribId));
+        showUserDetails(memberId);
+        updateTotalContributions();
+        console.log("Contribution deleted, ID:", contribId);
+      }
+    }
+
     document.querySelectorAll(".close, .closeModal").forEach(element => {
       element.addEventListener("click", () => {
         addMemberModal.style.display = "none";
         editMemberModal.style.display = "none";
+        userDetailsModal.style.display = "none";
+        addContributionModal.style.display = "none";
+        editContributionModal.style.display = "none";
+        allContributionsModal.style.display = "none";
+        console.log("Modal closed");
       });
     });
-    
-    // Close modal when clicking outside
+
     window.addEventListener("click", (event) => {
-      if (event.target === addMemberModal) {
-        addMemberModal.style.display = "none";
-      }
-      if (event.target === editMemberModal) {
-        editMemberModal.style.display = "none";
-      }
+      if (event.target === addMemberModal) addMemberModal.style.display = "none";
+      if (event.target === editMemberModal) editMemberModal.style.display = "none";
+      if (event.target === userDetailsModal) userDetailsModal.style.display = "none";
+      if (event.target === addContributionModal) addContributionModal.style.display = "none";
+      if (event.target === editContributionModal) editContributionModal.style.display = "none";
+      if (event.target === allContributionsModal) allContributionsModal.style.display = "none";
     });
-    
-    // Add member function
+
     document.getElementById("addMember").addEventListener("click", () => {
-      const nameInput = document.getElementById("newName");
-      const phoneInput = document.getElementById("newPhone");
-      const addressInput = document.getElementById("newAddress");
-      
-      const name = nameInput.value.trim();
-      const phone = phoneInput.value.trim();
-      const address = addressInput.value.trim();
-      
+      const name = document.getElementById("newName").value.trim();
+      const phone = document.getElementById("newPhone").value.trim();
+      const address = document.getElementById("newAddress").value.trim();
       if (name && phone) {
         const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
-        const newMember = { id: newId, name, phone, address };
-        members.push(newMember);
-        
-        // Initialize attendance for new member
+        members.push({ id: newId, name, phone, address });
         for (const monthKey in attendance) {
           attendance[monthKey][newId] = {};
         }
-        
-        // Close modal
         addMemberModal.style.display = "none";
-        
         renderTable();
         updateStats();
+        console.log("New member added:", name);
       } else {
-        alert('Please enter a name and phone number for the new member');
+        alert('Please enter a name and phone number');
       }
     });
-    
-    // Save edited member function
+
     document.getElementById("saveMember").addEventListener("click", () => {
       const id = parseInt(document.getElementById("editMemberId").value);
       const name = document.getElementById("editName").value.trim();
       const phone = document.getElementById("editPhone").value.trim();
       const address = document.getElementById("editAddress").value.trim();
-      
       if (name && phone) {
         const index = members.findIndex(m => m.id === id);
         if (index !== -1) {
           members[index] = { id, name, phone, address };
-          
-          // Close modal
           editMemberModal.style.display = "none";
-          
           renderTable();
+          console.log("Member updated:", name);
         }
       } else {
         alert('Please enter a name and phone number');
       }
     });
-    
+
+    document.getElementById("saveContribution").addEventListener("click", () => {
+      const memberId = parseInt(document.getElementById("contributionMemberId").value);
+      const date = document.getElementById("contributionDate").value;
+      const amount = parseInt(document.getElementById("contributionAmount").value);
+      if (date && amount > 0) {
+        const newId = contributions.length > 0 ? Math.max(...contributions.map(c => c.id)) + 1 : 1;
+        contributions.push({ id: newId, memberId, date, amount });
+        addContributionModal.style.display = "none";
+        showUserDetails(memberId);
+        updateTotalContributions();
+        console.log("New contribution added for member ID:", memberId);
+      } else {
+        alert('Please enter a valid date and amount');
+      }
+    });
+
+    document.getElementById("saveEditedContribution").addEventListener("click", () => {
+      const contribId = parseInt(document.getElementById("editContributionId").value);
+      const memberId = parseInt(document.getElementById("editContributionMemberId").value);
+      const date = document.getElementById("editContributionDate").value;
+      const amount = parseInt(document.getElementById("editContributionAmount").value);
+      if (date && amount > 0) {
+        const index = contributions.findIndex(c => c.id === contribId);
+        if (index !== -1) {
+          contributions[index] = { id: contribId, memberId, date, amount };
+          editContributionModal.style.display = "none";
+          showUserDetails(memberId);
+          updateTotalContributions();
+          console.log("Contribution updated, ID:", contribId);
+        }
+      } else {
+        alert('Please enter a valid date and amount');
+      }
+    });
+
     function deleteMember(id) {
       const index = members.findIndex(m => m.id === id);
-      if (index !== -1) {
-        if (confirm(`Are you sure you want to delete ${members[index].name}?`)) {
-          members.splice(index, 1);
-          
-          // Remove attendance data for deleted member
-          for (const monthKey in attendance) {
-            delete attendance[monthKey][id];
-          }
-          
-          renderTable();
-          updateStats();
+      if (index !== -1 && confirm(`Are you sure you want to delete ${members[index].name}?`)) {
+        members.splice(index, 1);
+        for (const monthKey in attendance) {
+          delete attendance[monthKey][id];
         }
+        renderTable();
+        updateStats();
+        console.log("Member deleted, ID:", id);
       }
     }
-    
+
     function changeCommunityName() {
       const newName = prompt('Enter new community name:', communityName);
-      if (newName && newName.trim() !== '') {
+      if (newName && newName.trim()) {
         communityName = newName.trim();
         document.getElementById("communityName").textContent = `Community: ${communityName}`;
+        console.log("Community name changed to:", communityName);
       }
     }
-    
+
     function changeMonth(delta) {
-      // Update month and year
       currentMonth += delta;
-      
-      // Handle year change
       if (currentMonth < 0) {
         currentMonth = 11;
         currentYear--;
@@ -871,37 +1093,23 @@
         currentMonth = 0;
         currentYear++;
       }
-      
-      // Initialize attendance data for new month if needed
       initializeAttendance();
-      
-      // Render the table for the new month
       renderTable();
+      console.log("Month changed to:", currentMonth, currentYear);
     }
-    
-    // Event listeners
+
     document.getElementById("editNameBtn").addEventListener("click", changeCommunityName);
-    
-    document.getElementById("prevMonth").addEventListener("click", () => {
-      changeMonth(-1);
-    });
-    
-    document.getElementById("nextMonth").addEventListener("click", () => {
-      changeMonth(1);
-    });
-    
+    document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
+    document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
     document.getElementById("currentMonth").addEventListener("click", () => {
       currentMonth = new Date().getMonth();
       currentYear = new Date().getFullYear();
       initializeAttendance();
       renderTable();
     });
-    
-    // Initialize page
+    document.getElementById("totalContributionsCard").addEventListener("click", showAllContributions);
+
     loadCommunityDetails();
   </script>
-
-<script src="../GENERAL/script.js"></script>
-
 </body>
 </html>

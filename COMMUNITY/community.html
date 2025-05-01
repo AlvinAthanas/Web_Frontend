@@ -51,8 +51,9 @@
       communities.forEach((community) => {
         const li = document.createElement("li");
         const link = document.createElement("a");
-        link.href = `trial.html?communityId=${community.id}`;
-        link.textContent = community.name;
+// Change this line in renderCommunityList():
+link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityName=${encodeURIComponent(community.name)}`;  
+      link.textContent = community.name;
 
         const delButton = document.createElement("button");
         delButton.textContent = "Delete";

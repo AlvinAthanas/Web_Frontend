@@ -24,34 +24,80 @@
     <link rel="stylesheet" href="../GENERAL/style.css" />
 
     <style>
+      :root {
+        --sidebar-color: #fff;
+        --primary-color: #79b3f1;
+        --primary-color-light: #f6f5ff;
+        --text-color: #0e0e0e;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .main-container {
+        flex: 1;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .main-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .back-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        color: var(--primary-color);
+        font-size: 16px;
+        transition: color 0.3s ease;
+      }
+
+      .back-button:hover {
+        color: #5a9ad8;
+      }
+
+      .back-button span {
+        margin-right: 5px;
+      }
+
       .profile-container {
-        background-color: var(--sidebar-color, #fff);
+        background-color: var(--sidebar-color);
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        max-width: 800px;
-        margin: 20px auto;
+        padding: 20px;
+        margin: 0 auto;
       }
 
       .profile-header {
         display: flex;
         align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       }
 
       .profile-image {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
-        background-color: #79b3f1;
+        background-color: var(--primary-color);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 20px;
+        margin-right: 15px;
         color: white;
-        font-size: 40px;
+        font-size: 32px;
         overflow: hidden;
       }
 
@@ -67,36 +113,38 @@
 
       .profile-name h2 {
         margin: 0 0 5px 0;
-        color: var(--text-color, #0e0e0e);
+        color: var(--text-color);
+        font-size: 1.5rem;
       }
 
       .profile-name p {
         margin: 0;
         color: #666;
-        font-size: 14px;
+        font-size: 0.875rem;
       }
 
       .profile-actions {
         display: flex;
         justify-content: flex-end;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
       }
 
       .edit-button,
       .save-button,
       .cancel-button {
         border: none;
-        padding: 10px 20px;
+        padding: 8px 16px;
         border-radius: 5px;
         cursor: pointer;
         display: flex;
         align-items: center;
         transition: background-color 0.3s ease;
-        margin-left: 10px;
+        margin-left: 8px;
+        font-size: 0.875rem;
       }
 
       .edit-button {
-        background-color: var(--primary-color, #79b3f1);
+        background-color: var(--primary-color);
         color: white;
       }
 
@@ -129,54 +177,57 @@
       }
 
       .profile-section {
-        margin-bottom: 30px;
+        margin-bottom: 20px;
       }
 
       .profile-section h3 {
-        margin: 0 0 15px;
-        color: var(--text-color, #0e0e0e);
+        margin: 0 0 10px;
+        color: var(--text-color);
         display: flex;
         align-items: center;
+        font-size: 1.25rem;
       }
 
       .profile-section h3 span {
-        margin-right: 10px;
+        margin-right: 8px;
       }
 
       .profile-info {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
       }
 
       .info-item {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
       }
 
       .info-item label {
         display: block;
         margin-bottom: 5px;
         color: #666;
-        font-size: 14px;
+        font-size: 0.875rem;
       }
 
       .info-item p {
         margin: 0;
-        padding: 10px;
-        background-color: var(--primary-color-light, #f6f5ff);
+        padding: 8px;
+        background-color: var(--primary-color-light);
         border-radius: 4px;
-        color: var(--text-color, #0e0e0e);
+        color: var(--text-color);
+        font-size: 0.875rem;
       }
 
       .info-item input,
       .info-item select {
         width: 100%;
-        padding: 10px;
+        padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
-        color: var(--text-color, #0e0e0e);
+        color: var(--text-color);
         font-family: 'Montserrat', sans-serif;
+        font-size: 0.875rem;
       }
 
       .hidden {
@@ -187,12 +238,13 @@
         background-color: #2196f3;
         color: white;
         border: none;
-        padding: 8px 16px;
+        padding: 6px 12px;
         border-radius: 4px;
         cursor: pointer;
-        margin-top: 10px;
+        margin-top: 8px;
         display: inline-flex;
         align-items: center;
+        font-size: 0.875rem;
       }
 
       .upload-button:hover {
@@ -204,8 +256,12 @@
       }
 
       @media screen and (max-width: 768px) {
-        .profile-info {
-          grid-template-columns: 1fr;
+        .main-container {
+          padding: 15px;
+        }
+
+        .profile-container {
+          padding: 15px;
         }
 
         .profile-header {
@@ -214,11 +270,59 @@
         }
 
         .profile-image {
-          margin: 0 auto 15px;
+          width: 60px;
+          height: 60px;
+          font-size: 24px;
+          margin: 0 auto 10px;
+        }
+
+        .profile-name h2 {
+          font-size: 1.25rem;
+        }
+
+        .profile-name p {
+          font-size: 0.75rem;
         }
 
         .profile-actions {
           justify-content: center;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .profile-section h3 {
+          font-size: 1.125rem;
+        }
+
+        .info-item label,
+        .info-item p,
+        .info-item input,
+        .info-item select {
+          font-size: 0.75rem;
+        }
+      }
+
+      @media screen and (max-width: 480px) {
+        .main-title {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .back-button {
+          font-size: 14px;
+        }
+
+        .edit-button,
+        .save-button,
+        .cancel-button {
+          padding: 6px 12px;
+          font-size: 0.75rem;
+        }
+
+        .upload-button {
+          padding: 5px 10px;
+          font-size: 0.75rem;
         }
       }
     </style>
@@ -227,6 +331,9 @@
     <div class="grid-container">
       <main class="main-container">
         <div class="main-title">
+          <button class="back-button" onclick="history.back()">
+            <span class="material-icons-outlined">arrow_back</span> Back
+          </button>
           <h2>MY PROFILE</h2>
         </div>
 
@@ -285,6 +392,10 @@
                 <label>Community Name</label>
                 <p id="view-community">Loading...</p>
               </div>
+              <div class="info-item">
+                <label for="view-password">Password</label>
+                <p id="view-password">Loading...</p>
+              </div>
             </div>
 
             <!-- Edit Mode -->
@@ -312,6 +423,10 @@
               <div class="info-item">
                 <label for="edit-community">Community Name</label>
                 <input type="text" id="edit-community" />
+              </div>
+              <div class="info-item">
+                <label for="edit-password">Password</label>
+                <input type="password" id="edit-password" />
               </div>
               <div class="info-item">
                 <label for="profile-picture">Profile Picture</label>
@@ -453,19 +568,20 @@
         try {
           const userId = getUserIdFromToken();
           const updatedData = {
-            fullName: document.getElementById('edit-full-name').value,
+            name: document.getElementById('edit-full-name').value,
             email: document.getElementById('edit-email').value,
-            phoneNumber: document.getElementById('edit-phone').value,
+            phone: document.getElementById('edit-phone').value,
             gender: document.getElementById('edit-gender').value,
             communityName: document.getElementById('edit-community').value,
-            address: document.getElementById('edit-address').value
+            address: document.getElementById('edit-address').value,
+            password: document.getElementById('edit-password').value // include password
           };
 
           const response = await fetch(`${baseUrl}/user/${userId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             },
             body: JSON.stringify(updatedData)
           });
@@ -474,13 +590,14 @@
             throw new Error(`Failed to update profile: ${response.statusText}`);
           }
           alert('Profile updated successfully!');
-          await loadUserProfile(); // Refresh profile data
+          await loadUserProfile();
           cancelEdit();
         } catch (error) {
           console.error('Error updating profile:', error.message);
           alert(`Failed to update profile: ${error.message}`);
         }
       }
+
 
       // Function to upload profile picture
       async function uploadProfilePicture() {
@@ -499,7 +616,7 @@
           const response = await fetch(`${baseUrl}/user/${userId}/profile-picture`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             },
             body: formData
           });
