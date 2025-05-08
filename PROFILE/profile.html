@@ -392,10 +392,7 @@
                 <label>Community Name</label>
                 <p id="view-community">Loading...</p>
               </div>
-              <div class="info-item">
-                <label for="view-password">Password</label>
-                <p id="view-password">Loading...</p>
-              </div>
+         
             </div>
 
             <!-- Edit Mode -->
@@ -417,17 +414,13 @@
                 <select id="edit-gender">
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
-                  <option value="Other">Other</option>
                 </select>
               </div>
               <div class="info-item">
                 <label for="edit-community">Community Name</label>
-                <input type="text" id="edit-community" />
+                <input type="text" id="edit-community" readonly />
               </div>
-              <div class="info-item">
-                <label for="edit-password">Password</label>
-                <input type="password" id="edit-password" />
-              </div>
+         
               <div class="info-item">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" id="profile-picture" accept="image/*" />
@@ -461,6 +454,33 @@
               </div>
             </div>
           </div>
+          <!-- Change Password Section -->
+<div class="profile-section">
+  <h3>
+    <span class="material-icons-outlined">lock</span>
+    Change Password
+  </h3>
+  <div class="profile-info">
+    <div class="info-item">
+      <label for="old-password">Old Password</label>
+      <input type="password" id="old-password" />
+    </div>
+    <div class="info-item">
+      <label for="new-password">New Password</label>
+      <input type="password" id="new-password" />
+    </div>
+    <div class="info-item">
+      <label for="confirm-password">Confirm New Password</label>
+      <input type="password" id="confirm-password" />
+    </div>
+    <div class="info-item">
+      <button class="save-button" onclick="changePassword()">
+        <span class="material-icons-outlined">vpn_key</span> Change Password
+      </button>
+    </div>
+  </div>
+</div>
+
         </div>
       </main>
     </div>
@@ -501,6 +521,8 @@
       cancelEditBtn.addEventListener('click', cancelEdit);
       uploadPictureBtn.addEventListener('click', uploadProfilePicture);
 
+      let currentUserId = null;
+
       // Function to fetch user profile
       async function loadUserProfile() {
         try {
@@ -518,15 +540,38 @@
           }
           
           const userData = await response.json();
+          currentUserId = userData.id; // ✅ Save for reuse
+
+          // Fetch community group
+try {
+  const communityResponse = await fetch(`${baseUrl}/user/${currentUserId}/community`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+    }
+  });
+
+  if (communityResponse.ok) {
+    const communityGroup = await communityResponse.json();
+    document.getElementById('view-community').textContent = communityGroup.name || 'N/A';
+    document.getElementById('edit-community').value = communityGroup.name || '';
+  } else {
+    document.getElementById('view-community').textContent = 'Not Assigned';
+    document.getElementById('edit-community').value = '';
+  }
+} catch (error) {
+  console.error('Error fetching community:', error.message);
+  document.getElementById('view-community').textContent = 'Error';
+}
+
+
 
           // Populate view mode fields
           document.getElementById('view-full-name').textContent = userData.name || 'N/A';
           document.getElementById('view-email').textContent = userData.email || 'N/A';
           document.getElementById('view-phone').textContent = userData.phone || 'N/A';
           document.getElementById('view-gender').textContent = userData.gender || 'N/A';
-          document.getElementById('view-community').textContent = userData.communityName || 'N/A';
           document.getElementById('view-address').textContent = userData.address || 'N/A';
-          document.getElementById('view-password').textContent = '••••••••'; // Masked password
 
           // Populate header
           document.getElementById('user-full-name').textContent = userData.name || 'N/A';
@@ -559,7 +604,7 @@
         document.getElementById('edit-phone').value = document.getElementById('view-phone').textContent;
         document.getElementById('edit-address').value = document.getElementById('view-address').textContent;
         document.getElementById('edit-community').value = document.getElementById('view-community').textContent;
-        document.getElementById('edit-password').value = ''; // Clear password field
+        document.getElementById('edit-address').value = document.getElementById('view-address').textContent;
 
         // Set gender dropdown
         const genderSelect = document.getElementById('edit-gender');
@@ -569,42 +614,43 @@
 
       // Function to save changes
       async function saveChanges() {
-        try {
-          const userId = getUserIdFromToken();
-          const updatedData = {
-            name: document.getElementById('edit-full-name').value,
-            email: document.getElementById('edit-email').value,
-            phone: document.getElementById('edit-phone').value,
-            gender: document.getElementById('edit-gender').value,
-            communityName: document.getElementById('edit-community').value,
-            address: document.getElementById('edit-address').value,
-            password: document.getElementById('edit-password').value || undefined // Only include if changed
-          };
+  if (!currentUserId) {
+    alert('User ID not loaded. Please reload the page.');
+    return;
+  }
 
-          // Remove undefined fields
-          Object.keys(updatedData).forEach(key => updatedData[key] === undefined && delete updatedData[key]);
+  const updatedData = {
+    name: document.getElementById('edit-full-name').value,
+    email: document.getElementById('edit-email').value,
+    phone: document.getElementById('edit-phone').value,
+    gender: document.getElementById('edit-gender').value,
+    address: document.getElementById('edit-address').value,
+    // If you want to fetch parishId based on community name, do that here.
+  };
 
-          const response = await fetch(`${baseUrl}/user/${userId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-            body: JSON.stringify(updatedData)
-          });
+  try {
+    const response = await fetch(`${baseUrl}/user/${currentUserId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      },
+      body: JSON.stringify(updatedData)
+    });
 
-          if (!response.ok) {
-            throw new Error(`Failed to update profile: ${response.statusText}`);
-          }
-          
-          alert('Profile updated successfully!');
-          await loadUserProfile();
-          cancelEdit();
-        } catch (error) {
-          console.error('Error updating profile:', error.message);
-          alert(`Failed to update profile: ${error.message}`);
-        }
-      }
+    if (!response.ok) {
+      throw new Error(`Failed to update profile: ${response.statusText}`);
+    }
+
+    alert('Profile updated successfully!');
+    await loadUserProfile();
+    cancelEdit();
+  } catch (error) {
+    console.error('Error updating profile:', error.message);
+    alert(`Failed to update profile: ${error.message}`);
+  }
+}
+
 
       // Function to upload profile picture
       async function uploadProfilePicture() {
@@ -648,6 +694,55 @@
         viewAddress.classList.remove('hidden');
         editAddress.classList.add('hidden');
       }
+
+      async function changePassword() {
+  if (!currentUserId) {
+    alert('User ID not loaded. Please reload the page.');
+    return;
+  }
+
+  const oldPassword = document.getElementById('old-password').value;
+  const newPassword = document.getElementById('new-password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    alert('Please fill in all password fields.');
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    alert('New password and confirmation do not match.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${baseUrl}/user/${currentUserId}/change-password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      },
+      body: JSON.stringify({
+        oldPassword: oldPassword,
+        newPassword: newPassword
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to change password: ${response.statusText}`);
+    }
+
+    alert('Password changed successfully!');
+    document.getElementById('old-password').value = '';
+    document.getElementById('new-password').value = '';
+    document.getElementById('confirm-password').value = '';
+  } catch (error) {
+    console.error('Error changing password:', error.message);
+    alert(`Error: ${error.message}`);
+  }
+}
+
+
 
       // Initialize the page
       document.addEventListener('DOMContentLoaded', loadUserProfile);
