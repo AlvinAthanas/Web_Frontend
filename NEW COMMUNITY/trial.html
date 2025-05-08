@@ -374,9 +374,9 @@ function updateCommunityHeader() {
         contributionsCard.addEventListener("click", () =>
           loadContent("Contributions")
         );
-        attendanceCard.addEventListener("click", () =>
-          loadContent("Attendance")
-        );
+        attendanceCard.addEventListener('click', () => {
+  window.location.href = `attendance.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+});
       // });
     </script>
 

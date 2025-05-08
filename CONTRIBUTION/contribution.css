@@ -1,21 +1,22 @@
 /* Font & Reset */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   background-color: #f9f9f9;
   /* padding: 20px; */
   color: #333;
 }
 
-
 /* Filter Section */
 .filter-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 25px;
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
+  background-color: #f4f5f6;
+  padding: 20px;
 }
 
 .filter-container label {
@@ -50,7 +51,6 @@ body {
   border-radius: 5px;
   outline: none;
 }
-
 
 /* Table Styling */
 .table {
@@ -89,10 +89,6 @@ body {
   background-color: #f1f7ff;
 }
 
-
-
-
-
 /* ------- Dialog Styling ------- */
 .dialog-overlay {
   display: none;
@@ -101,7 +97,7 @@ body {
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -112,7 +108,7 @@ body {
   padding: 25px;
   border-radius: 8px;
   width: 350px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 .dialog-box h3 {
   margin-top: 0;
@@ -147,7 +143,6 @@ body {
   background-color: #aaa;
   color: white;
 }
-
 
 /* Buttons Styling */
 .edit-btn,
@@ -200,52 +195,199 @@ button:hover {
   background-color: rgb(252, 53, 53);
 }
 
-
-
- /* Pagination Styles */
- .pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  padding: 15px 0;
+/*  Table Container Styles  */
+ .table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.pagination button {
-  background-color: #2962ff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  margin: 0 5px;
+.table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.edit-icon,
+.delete-icon {
+  cursor: pointer;
+  font-size: 20px;
+  transition: color 0.2s;
+}
+
+.edit-icon {
+  color: black;
+}
+
+.edit-icon:hover {
+  color: #0d8bf2;
+}
+
+.delete-icon {
+  color: black;
+}
+
+.delete-icon:hover {
+  color: #e53935;
+}
+
+/* Pagination Styles */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+  align-items: center;
+}
+
+.entries-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#entriesPerPage {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.pagination-buttons button {
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s;
 }
 
-.pagination button:hover {
-  background-color: #0039cb;
-}
-
-.pagination button:disabled {
-  background-color: #55596e;
+.pagination-buttons button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.pagination select {
+#pageInfo {
+  margin: 0 10px;
+}
+
+/* Delete Confirmation Modal */
+.delete-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-modal h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.delete-modal p {
+  margin: 15px 0;
+  color: #555;
+}
+
+.delete-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.delete-modal-buttons button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.delete-cancel {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+}
+
+.delete-confirm {
+  background-color: #e74c3c;
+  color: white;
+  border: 1px solid #c0392b;
+}
+
+/* Message Styles */
+#member-message {
+  margin-top: 10px;
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid #55596e;
-  background-color: #1b2635;
-  color: #f5f7ff;
-  margin: 0 10px;
+  text-align: center;
+  font-weight: bold;
 }
 
-.pagination span {
-  margin: 0 10px;
-  color: #f5f7ff;
+#member-message.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
-
+#member-message.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
 
 /* Responsive Table */
 @media screen and (max-width: 450px) {

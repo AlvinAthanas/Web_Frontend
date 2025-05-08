@@ -12,7 +12,7 @@
   vertical-align: middle;
   line-height: 1px;
   font-size: 23px;
-  opacity: 0.6;
+  opacity: 0.9;
 }
 .container {
   background: #f4f4f4;
@@ -73,8 +73,8 @@ img {
 .input-group input {
   width: 100%;
   padding: 12px 12px 12px 40px; 
-  font-size: 13px;
-  background: #f4f4f4;
+  font-size: 14px;
+  background: #e6eaea;
   border: none;
   border-radius: 5px;
   box-sizing: border-box;

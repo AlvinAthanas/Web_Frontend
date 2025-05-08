@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ongoing Projects</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+    
+    <style>
+        .main-title {
+            font-size: 30px;
+            font-weight: 600;
+        }
+      .projects-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      
+      .project-card {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        position: relative;
+      }
+      
+      .project-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .project-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+      
+      .project-info {
+        padding: 15px;
+      }
+      
+      .project-title {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #333;
+      }
+      
+      .project-description {
+        margin-top: 10px;
+        color: #666;
+        font-size: 0.9rem;
+      }
+      
+      .add-project-btn {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      
+      .add-project-btn:hover {
+        background-color: #45a049;
+      }
+      
+      /* Action buttons on card */
+      .project-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 5px;
+      }
+      
+      .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background-color: rgba(255,255,255,0.9);
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      .action-btn:hover {
+        background-color: white;
+      }
+      
+      .edit-btn {
+        color: #2196F3;
+      }
+      
+      .delete-btn {
+        color: #f44336;
+      }
+      
+      /* Dialog styles */
+      .dialog-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      
+      .dialog-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+      }
+      
+      .dialog-title {
+        margin-top: 0;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      
+      .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+      
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      
+      .dialog-btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      
+      .dialog-btn.cancel {
+        background-color: #f1f1f1;
+        border: 1px solid #ddd;
+      }
+      
+      .dialog-btn.submit {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+      }
+      
+      .dialog-btn.submit:hover {
+        background-color: #45a049;
+      }
+      
+      .image-preview {
+        max-width: 100%;
+        max-height: 150px;
+        margin-top: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="projects-header">
+          <div class="main-title">Ongoing Projects</div>
+          <button class="add-project-btn" id="addProjectBtn">
+            <span class="material-icons-outlined">add</span>
+            Add Project
+          </button>
+        </div>
+        
+        <div class="projects-grid" id="projectsContainer">
+          <!-- Project cards will be added here dynamically -->
+        </div>
+      </main>
+    </div>
+
+    <!-- Add/Edit Project Dialog -->
+    <div class="dialog-overlay" id="projectDialog">
+      <div class="dialog-content">
+        <h3 class="dialog-title" id="dialogTitle">Add New Project</h3>
+        <form id="projectForm">
+          <input type="hidden" id="projectId">
+          <div class="form-group">
+            <label for="projectName">Project Name</label>
+            <input type="text" id="projectName" required>
+          </div>
+          <div class="form-group">
+            <label for="projectDescription">Description</label>
+            <textarea id="projectDescription" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="projectImage">Project Image</label>
+            <input type="file" id="projectImage" accept="image/*">
+            <img id="imagePreview" class="image-preview" alt="Image preview">
+          </div>
+          <div class="dialog-actions">
+            <button type="button" class="dialog-btn cancel" id="cancelBtn">Cancel</button>
+            <button type="submit" class="dialog-btn submit" id="submitBtn">Add Project</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <div class="dialog-overlay" id="deleteDialog">
+      <div class="dialog-content" style="max-width: 400px;">
+        <h3 class="dialog-title">Confirm Deletion</h3>
+        <p>Are you sure you want to delete this project?</p>
+        <div class="dialog-actions">
+          <button type="button" class="dialog-btn cancel" id="cancelDeleteBtn">Cancel</button>
+          <button type="button" class="dialog-btn submit" id="confirmDeleteBtn" style="background-color: #f44336;">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../GENERAL/script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const addProjectBtn = document.getElementById('addProjectBtn');
+        const projectDialog = document.getElementById('projectDialog');
+        const deleteDialog = document.getElementById('deleteDialog');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const projectForm = document.getElementById('projectForm');
+        const projectsContainer = document.getElementById('projectsContainer');
+        const dialogTitle = document.getElementById('dialogTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const projectIdInput = document.getElementById('projectId');
+        const projectImageInput = document.getElementById('projectImage');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        // Sample projects data
+        let projects = [
+          {
+            id: 1,
+            name: "Church Renovation",
+            description: "Renovating the main church building to accommodate more worshippers.",
+            imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+          },
+          {
+            id: 2,
+            name: "Community Outreach",
+            description: "Weekly food distribution program for the needy in our community.",
+            imageUrl: "https://images.unsplash.com/photo-1581349485608-9469926a8e5e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+          }
+        ];
+        
+        let currentProjectId = null;
+        let deleteProjectId = null;
+        
+        // Image preview handler
+        projectImageInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              imagePreview.src = event.target.result;
+              imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+        
+        // Function to render projects
+        function renderProjects() {
+          projectsContainer.innerHTML = '';
+          projects.forEach(project => {
+            const projectCard = document.createElement('div');
+            projectCard.className = 'project-card';
+            projectCard.innerHTML = `
+              <img src="${project.imageUrl}" alt="${project.name}" class="project-image">
+              <div class="project-actions">
+                <button class="action-btn edit-btn" data-id="${project.id}">
+                  <span class="material-icons-outlined">edit</span>
+                </button>
+                <button class="action-btn delete-btn" data-id="${project.id}">
+                  <span class="material-icons-outlined">delete</span>
+                </button>
+              </div>
+              <div class="project-info">
+                <h3 class="project-title">${project.name}</h3>
+                <p class="project-description">${project.description}</p>
+              </div>
+            `;
+            projectsContainer.appendChild(projectCard);
+          });
+          
+          // Add event listeners to action buttons
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+              editProject(parseInt(this.getAttribute('data-id')));
+            });
+          });
+          
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+              showDeleteDialog(parseInt(this.getAttribute('data-id')));
+            });
+          });
+        }
+        
+        // Show add project dialog
+        function showAddDialog() {
+          dialogTitle.textContent = 'Add New Project';
+          submitBtn.textContent = 'Add Project';
+          projectIdInput.value = '';
+          projectForm.reset();
+          imagePreview.style.display = 'none';
+          currentProjectId = null;
+          projectDialog.style.display = 'flex';
+        }
+        
+        // Show edit project dialog
+        function editProject(id) {
+          const project = projects.find(p => p.id === id);
+          if (project) {
+            dialogTitle.textContent = 'Edit Project';
+            submitBtn.textContent = 'Update Project';
+            projectIdInput.value = project.id;
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectDescription').value = project.description;
+            
+            // For edit, we'll show the current image but not as a preview
+            imagePreview.src = project.imageUrl;
+            imagePreview.style.display = 'block';
+            
+            currentProjectId = id;
+            projectDialog.style.display = 'flex';
+          }
+        }
+        
+        // Show delete confirmation dialog
+        function showDeleteDialog(id) {
+          deleteProjectId = id;
+          deleteDialog.style.display = 'flex';
+        }
+        
+        // Hide dialog
+        function hideDialogs() {
+          projectDialog.style.display = 'none';
+          deleteDialog.style.display = 'none';
+          projectForm.reset();
+        }
+        
+        // Add/Edit project form submission
+        projectForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const projectName = document.getElementById('projectName').value;
+          const projectDescription = document.getElementById('projectDescription').value;
+          const projectImage = document.getElementById('projectImage').files[0];
+          
+          let imageUrl;
+          
+          if (currentProjectId) {
+            // Editing existing project
+            const projectIndex = projects.findIndex(p => p.id === currentProjectId);
+            if (projectIndex !== -1) {
+              // Keep existing image if no new image was uploaded
+              imageUrl = projectImage ? URL.createObjectURL(projectImage) : projects[projectIndex].imageUrl;
+              
+              projects[projectIndex] = {
+                ...projects[projectIndex],
+                name: projectName,
+                description: projectDescription,
+                imageUrl: imageUrl
+              };
+            }
+          } else {
+            // Adding new project
+            imageUrl = projectImage ? URL.createObjectURL(projectImage) : '';
+            
+            const newProject = {
+              id: projects.length > 0 ? Math.max(...projects.map(p => p.id)) + 1 : 1,
+              name: projectName,
+              description: projectDescription,
+              imageUrl: imageUrl
+            };
+            
+            projects.push(newProject);
+          }
+          
+          // Re-render projects
+          renderProjects();
+          
+          // Close dialog and reset form
+          hideDialogs();
+        });
+        
+        // Delete project confirmation
+        confirmDeleteBtn.addEventListener('click', function() {
+          projects = projects.filter(p => p.id !== deleteProjectId);
+          renderProjects();
+          hideDialogs();
+        });
+        
+        // Cancel buttons
+        cancelBtn.addEventListener('click', hideDialogs);
+        cancelDeleteBtn.addEventListener('click', hideDialogs);
+        
+        // Add project button
+        addProjectBtn.addEventListener('click', showAddDialog);
+        
+        // Initial render
+        renderProjects();
+      });
+    </script>
+
+<script src="../GENERAL/script.js"></script>
+
+  </body>
+</html>

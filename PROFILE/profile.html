@@ -512,9 +512,11 @@
               'Content-Type': 'application/json'
             }
           });
+          
           if (!response.ok) {
             throw new Error(`Failed to fetch user profile: ${response.statusText}`);
           }
+          
           const userData = await response.json();
 
           // Populate view mode fields
@@ -524,6 +526,7 @@
           document.getElementById('view-gender').textContent = userData.gender || 'N/A';
           document.getElementById('view-community').textContent = userData.communityName || 'N/A';
           document.getElementById('view-address').textContent = userData.address || 'N/A';
+          document.getElementById('view-password').textContent = '••••••••'; // Masked password
 
           // Populate header
           document.getElementById('user-full-name').textContent = userData.name || 'N/A';
@@ -556,6 +559,7 @@
         document.getElementById('edit-phone').value = document.getElementById('view-phone').textContent;
         document.getElementById('edit-address').value = document.getElementById('view-address').textContent;
         document.getElementById('edit-community').value = document.getElementById('view-community').textContent;
+        document.getElementById('edit-password').value = ''; // Clear password field
 
         // Set gender dropdown
         const genderSelect = document.getElementById('edit-gender');
@@ -574,8 +578,11 @@
             gender: document.getElementById('edit-gender').value,
             communityName: document.getElementById('edit-community').value,
             address: document.getElementById('edit-address').value,
-            password: document.getElementById('edit-password').value // include password
+            password: document.getElementById('edit-password').value || undefined // Only include if changed
           };
+
+          // Remove undefined fields
+          Object.keys(updatedData).forEach(key => updatedData[key] === undefined && delete updatedData[key]);
 
           const response = await fetch(`${baseUrl}/user/${userId}`, {
             method: 'PUT',
@@ -589,6 +596,7 @@
           if (!response.ok) {
             throw new Error(`Failed to update profile: ${response.statusText}`);
           }
+          
           alert('Profile updated successfully!');
           await loadUserProfile();
           cancelEdit();
@@ -597,7 +605,6 @@
           alert(`Failed to update profile: ${error.message}`);
         }
       }
-
 
       // Function to upload profile picture
       async function uploadProfilePicture() {

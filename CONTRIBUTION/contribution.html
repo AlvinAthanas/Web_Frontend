@@ -28,117 +28,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <!-- SheetJS for Excel Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-    <style>
-      .action-btn {
-        background: none;
-        border: none;
-        color: #f5f7ff;
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 4px;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .edit-btn {
-        color: #4caf50;
-        margin-right: 8px;
-      }
-
-      .edit-btn:hover {
-        background-color: rgba(76, 175, 80, 0.1);
-      }
-
-      .delete-btn {
-        color: #f44336;
-      }
-
-      .delete-btn:hover {
-        background-color: rgba(244, 67, 54, 0.1);
-      }
-
-      .action-btn .material-icons-outlined {
-        font-size: 20px;
-      }
-
-      /* Updated Pagination Styles */
-      .pagination {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-        padding: 15px;
-        background: #1b2635;
-        border-radius: 8px;
-        color: #f5f7ff;
-      }
-
-      .page-numbers {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-
-      .pagination button {
-        background: none;
-        border: none;
-        color: #f5f7ff;
-        cursor: pointer;
-        padding: 5px 8px;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .pagination button:hover:not(:disabled) {
-        background-color: rgba(41, 98, 255, 0.3);
-      }
-
-      .pagination button:disabled {
-        color: #55596e;
-        cursor: not-allowed;
-      }
-
-      .pagination #current-page {
-        padding: 5px 10px;
-        background-color: #2962ff;
-        border-radius: 4px;
-        margin: 0 5px;
-      }
-
-      .pagination span {
-        font-size: 14px;
-      }
-
-      .pagination .material-icons-outlined {
-        font-size: 18px;
-      }
-
-      .page-size-selector {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-left: 15px;
-      }
-
-      .page-size-selector select {
-        padding: 6px;
-        border-radius: 4px;
-        border: 1px solid #55596e;
-        /* background-color: #1b2635; */
-        color: #f5f7ff;
-      }
-    </style>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    
   </head>
 
   <body>
     <div class="grid-container" id="containerId">
-      <!-- Main -->
       <main class="main-container">
         <div class="table-title">
           <h2>CONTRIBUTION RECORDS</h2>
@@ -146,14 +41,14 @@
 
         <!-- Filter Section -->
         <div class="filter-container">
-          <label for="type">Select Contribution Type:</label>
+          <label for="type">Type:</label>
           <select id="type-filter">
             <option value="">All</option>
             <option value="sadaka">Sadaka</option>
             <option value="zaka">Zaka</option>
           </select>
 
-          <label for="month">Select Month:</label>
+          <label for="month">Month:</label>
           <select id="month-filter">
             <option value="">All</option>
             <option value="1">January</option>
@@ -170,7 +65,7 @@
             <option value="12">December</option>
           </select>
 
-          <label for="year-filter">Enter Year:</label>
+          <label for="year-filter">Year:</label>
           <input
             type="number"
             id="year-filter"
@@ -190,7 +85,6 @@
           </div>
 
           <div>
-            <!-- Add Contribution Button -->
             <button id="openDialogBtn" class="add-btn">
               <span class="material-icons-outlined">add</span>
               Add Contribution
@@ -198,9 +92,32 @@
           </div>
         </div>
 
+          <!-- Pagination Controls -->
+          <div class="pagination-controls">
+            <div class="entries-selector">
+              <span>Show</span>
+              <select id="entriesPerPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="all">All</option>
+              </select>
+              <span>entries</span>
+            </div>
+            
+            <div class="pagination-buttons">
+              <button id="firstPage">First</button>
+              <button id="prevPage">Previous</button>
+              <span id="pageInfo">Page 1 of 1</span>
+              <button id="nextPage">Next</button>
+              <button id="lastPage">Last</button>
+            </div>
+          </div>
+
         <!-- Contribution Table -->
         <div class="table-container">
-          <table id="table" class="table">
+          <table id="member-table" class="table">
             <thead>
               <tr>
                 <th>S/N</th>
@@ -208,54 +125,20 @@
                 <th>Description</th>
                 <th>Amount</th>
                 <th>Date</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
-            <tbody id="contribution-table-body">
+            <tbody id="member-table-body">
               <!-- Dynamic rows will be inserted here -->
             </tbody>
           </table>
         </div>
-
-        <!-- Pagination Controls -->
-        <div class="pagination">
-          <span id="page-info"
-            >Showing <span id="start-record">1</span> to
-            <span id="end-record">10</span> of
-            <span id="total-records">0</span> contributions</span
-          >
-          <div class="page-numbers">
-            <button id="first-page" disabled>
-              <span class="material-icons-outlined">first_page</span>
-            </button>
-            <button id="prev-page" disabled>
-              <span class="material-icons-outlined">chevron_left</span>
-            </button>
-            <span id="current-page">1</span>
-            <button id="next-page" disabled>
-              <span class="material-icons-outlined">chevron_right</span>
-            </button>
-            <button id="last-page" disabled>
-              <span class="material-icons-outlined">last_page</span>
-            </button>
-          </div>
-          <div class="page-size-selector">
-            <span>Show:</span>
-            <select id="page-size">
-              <option value="20">20</option>
-              <option value="40">40</option>
-              <option value="60">60</option>
-              <option value="80">80</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-        </div>
-
+      
         <!-- Form Dialog -->
         <div id="formDialog" class="dialog-overlay">
           <div class="dialog-box">
             <h3>Add Contribution</h3>
-            <form id="contributionForm">
+            <form id="addMemberForm">
               <label>Contribution Type:</label>
               <input type="text" name="type" id="type" required />
 
@@ -287,261 +170,163 @@
             </form>
           </div>
         </div>
+
+        <div id="member-message" style="margin-top: 10px; color: green"></div>
       </main>
-      <!-- End Main -->
     </div>
-    <div id="response"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="delete-modal">
+      <div class="delete-modal-content">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this contribution? This action cannot be undone.</p>
+        <div class="delete-modal-buttons">
+          <button id="deleteCancel" class="delete-cancel">Cancel</button>
+          <button id="deleteConfirm" class="delete-confirm">Delete</button>
+        </div>
+      </div>
+    </div>
 
     <script>
-      const openDialogBtn = document.getElementById("openDialogBtn");
-      const formDialog = document.getElementById("formDialog");
-      const formEl = document.getElementById("contributionForm");
-      const submitBtn = document.getElementById("submit");
-      const cancelBtn = document.getElementById("cancelBtn");
-      const responseBox = document.getElementById("response");
-
-      // Pagination variables
+      // Global variables
       let currentPage = 1;
-      let pageSize = 20;
-      let totalRecords = 0;
-      let totalPages = 1;
+      let entriesPerPage = 50;
       let allContributions = [];
       let filteredContributions = [];
+      let currentDeleteId = null;
       let editingId = null;
 
-      // DOM elements for pagination
-      const firstPageBtn = document.getElementById("first-page");
-      const prevPageBtn = document.getElementById("prev-page");
-      const nextPageBtn = document.getElementById("next-page");
-      const lastPageBtn = document.getElementById("last-page");
-      const pageSizeSelect = document.getElementById("page-size");
-      const pageInfo = document.getElementById("page-info");
-      const startRecord = document.getElementById("start-record");
-      const endRecord = document.getElementById("end-record");
-      const totalRecordsSpan = document.getElementById("total-records");
-      const currentPageSpan = document.getElementById("current-page");
+      // DOM elements
+      const deleteModal = document.getElementById('deleteModal');
+      const deleteCancel = document.getElementById('deleteCancel');
+      const deleteConfirm = document.getElementById('deleteConfirm');
+      const formDialog = document.getElementById("formDialog");
+      const formEl = document.getElementById("addMemberForm");
 
-      // Initialize pagination controls
-      function initPaginationControls() {
-        firstPageBtn.addEventListener("click", () => goToPage(1));
-        prevPageBtn.addEventListener("click", () => goToPage(currentPage - 1));
-        nextPageBtn.addEventListener("click", () => goToPage(currentPage + 1));
-        lastPageBtn.addEventListener("click", () => goToPage(totalPages));
-        pageSizeSelect.addEventListener("change", (e) => {
-          pageSize = parseInt(e.target.value);
-          currentPage = 1;
-          updatePaginationUI();
-          renderTable();
-        });
-      }
+      // Initialize the page
+      document.addEventListener("DOMContentLoaded", () => {
+        loadContributions();
+        setupPagination();
+        setupSearch();
+        setupDeleteModal();
+        setupForm();
+        populateYearOptions();
+      });
 
-      // Go to specific page
-      function goToPage(page) {
-        if (page < 1 || page > totalPages) return;
-        currentPage = page;
-        updatePaginationUI();
-        renderTable();
-      }
-
-      // Update pagination UI
-      function updatePaginationUI() {
-        const start = (currentPage - 1) * pageSize + 1;
-        const end = Math.min(currentPage * pageSize, totalRecords);
-
-        startRecord.textContent = start;
-        endRecord.textContent = end;
-        totalRecordsSpan.textContent = totalRecords;
-        currentPageSpan.textContent = currentPage;
-
-        firstPageBtn.disabled = currentPage === 1;
-        prevPageBtn.disabled = currentPage === 1;
-        nextPageBtn.disabled = currentPage === totalPages;
-        lastPageBtn.disabled = currentPage === totalPages;
-      }
-
-      // Calculate pagination
-      function calculatePagination(data) {
-        totalRecords = data.length;
-        totalPages = Math.ceil(totalRecords / pageSize);
-        updatePaginationUI();
-      }
-
-      // Render table with paginated data
-      function renderTable() {
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const paginatedData = filteredContributions.slice(startIndex, endIndex);
-
-        const tableBody = document.getElementById("contribution-table-body");
-        tableBody.innerHTML = "";
-
-        paginatedData.forEach((contribution, index) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${startIndex + index + 1}</td>
-            <td>${contribution.type}</td>
-            <td>${contribution.description}</td>
-            <td>${contribution.amount}</td>
-            <td>${contribution.date}</td>
-            <td>
-              <button class="action-btn edit-btn" onclick="editContribution(${
-                contribution.id
-              })" title="Edit">
-                <span class="material-icons-outlined">edit</span>
-              </button>
-              <button class="action-btn delete-btn" onclick="deleteContribution(${
-                contribution.id
-              })" title="Delete">
-                <span class="material-icons-outlined">delete</span>
-              </button>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
-      }
-
-      // Opening and closing the form dialog
-      openDialogBtn.onclick = () => {
-        formEl.reset();
-        submitBtn.innerText = "Save";
-        editingId = null;
-        responseBox.innerText = "";
-
-        formEl.removeEventListener("submit", handleUpdate);
-        formEl.addEventListener("submit", handleCreate);
-
-        formDialog.style.display = "flex";
-      };
-
-      cancelBtn.onclick = () => {
-        formDialog.style.display = "none";
-      };
-
-      // Loading and Displaying all contributions
+      // Load contributions from server
       function loadContributions() {
         fetch("http://localhost:8080/contributions")
           .then((res) => res.json())
           .then((data) => {
             allContributions = data;
             filteredContributions = [...allContributions];
-            calculatePagination(filteredContributions);
-            renderTable();
+            updateTable();
           })
           .catch((error) => {
-            console.error("Failed to load contributions:", error);
+            console.error("Error loading contributions:", error);
+            showMessage("Error loading contributions: " + error.message, "error");
           });
       }
 
-      // Creating a new contribution
-      function handleCreate(event) {
-        event.preventDefault();
-        const formData = new FormData(formEl);
-        const data = Object.fromEntries(formData);
+      // Update table with current data
+      function updateTable() {
+        const tableBody = document.getElementById("member-table-body");
+        tableBody.innerHTML = "";
 
-        fetch("http://localhost:8080/contribution", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-          .then((res) => res.json())
-          .then(() => {
-            responseBox.innerText = "Contribution has been added successfully!";
-            formEl.reset();
-            formDialog.style.display = "none";
-            loadContributions();
-          })
-          .catch((error) => {
-            responseBox.innerText = "Failed to add: " + error.message;
-          });
-      }
-
-      // Updating an Existing contribution
-      function handleUpdate(event) {
-        event.preventDefault();
-        const formData = new FormData(formEl);
-        const data = Object.fromEntries(formData);
-
-        fetch(`http://localhost:8080/contribution/${editingId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-          .then((res) => res.json())
-          .then(() => {
-            responseBox.innerText = "Contribution updated successfully!";
-            formEl.reset();
-            formDialog.style.display = "none";
-            editingId = null;
-            submitBtn.innerText = "Save";
-            loadContributions();
-          })
-          .catch((error) => {
-            responseBox.innerText = "Failed to update: " + error.message;
-          });
-      }
-
-      // Deleting a contribution
-      function deleteContribution(id) {
-        const confirmed = confirm(
-          "Are you sure you want to delete this contribution?"
-        );
-        if (!confirmed) return;
-
-        fetch(`http://localhost:8080/contribution/${id}`, {
-          method: "DELETE",
-        })
-          .then((res) => {
-            if (res.ok) {
-              loadContributions();
-            } else {
-              throw new Error("Delete failed");
-            }
-          })
-          .catch((error) => {
-            console.error("Failed to delete:", error);
-          });
-      }
-
-      // Editing a contribution
-      function editContribution(id) {
-        fetch(`http://localhost:8080/contribution/${id}`)
-          .then((res) => res.json())
-          .then((data) => {
-            editingId = id;
-
-            document.getElementById("type").value = data.type;
-            document.getElementById("description").value = data.description;
-            document.getElementById("amount").value = data.amount;
-            document.getElementById("date").value = data.date;
-
-            submitBtn.innerText = "Update";
-
-            // Switch to update handler
-            formEl.removeEventListener("submit", handleCreate);
-            formEl.addEventListener("submit", handleUpdate);
-
-            formDialog.style.display = "flex";
-          })
-          .catch((err) => {
-            console.error("Error loading for edit:", err);
-          });
-      }
-
-      function populateYearOptions() {
-        const yearSelect = document.getElementById("year-filter");
-        const currentYear = new Date().getFullYear();
-        const startYear = 2020;
-
-        for (let year = currentYear; year >= startYear; year--) {
-          const option = document.createElement("option");
-          option.value = year;
-          option.textContent = year;
-          yearSelect.appendChild(option);
+        // Calculate pagination
+        const startIndex = (currentPage - 1) * entriesPerPage;
+        let endIndex = startIndex + entriesPerPage;
+        if (entriesPerPage === 'all') {
+          endIndex = filteredContributions.length;
         }
+        const paginatedData = filteredContributions.slice(startIndex, endIndex);
+
+        // Populate table
+        paginatedData.forEach((contribution, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${startIndex + index + 1}</td>
+            <td>${contribution.type || ''}</td>
+            <td>${contribution.description || ''}</td>
+            <td>${contribution.amount || ''}</td>
+            <td>${contribution.date || ''}</td>
+            <td class="actions">
+              <span class="material-icons-outlined edit-icon" data-id="${contribution.id}">edit</span>
+              <span class="material-icons-outlined delete-icon" data-id="${contribution.id}">delete</span>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+        // Update pagination info
+        updatePaginationInfo();
+
+        // Add event listeners
+        addActionListeners();
       }
 
-      //FILTERING CONTRIBUTIONS
-      document.getElementById("filter-btn").addEventListener("click", () => {
+      // Setup pagination controls
+      function setupPagination() {
+        document.getElementById("entriesPerPage").addEventListener("change", (e) => {
+          entriesPerPage = e.target.value === 'all' ? 'all' : parseInt(e.target.value);
+          currentPage = 1;
+          updateTable();
+        });
+
+        document.getElementById("firstPage").addEventListener("click", () => {
+          currentPage = 1;
+          updateTable();
+        });
+
+        document.getElementById("prevPage").addEventListener("click", () => {
+          if (currentPage > 1) {
+            currentPage--;
+            updateTable();
+          }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+          const totalPages = entriesPerPage === 'all' ? 1 : Math.ceil(filteredContributions.length / entriesPerPage);
+          if (currentPage < totalPages) {
+            currentPage++;
+            updateTable();
+          }
+        });
+
+        document.getElementById("lastPage").addEventListener("click", () => {
+          const totalPages = entriesPerPage === 'all' ? 1 : Math.ceil(filteredContributions.length / entriesPerPage);
+          currentPage = totalPages;
+          updateTable();
+        });
+      }
+
+      // Update pagination information
+      function updatePaginationInfo() {
+        const totalPages = entriesPerPage === 'all' ? 1 : Math.ceil(filteredContributions.length / entriesPerPage);
+        document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+        
+        // Disable/enable pagination buttons
+        document.getElementById("firstPage").disabled = currentPage === 1;
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
+        document.getElementById("lastPage").disabled = currentPage === totalPages || totalPages === 0;
+      }
+
+      // Setup search/filter functionality
+      function setupSearch() {
+        document.getElementById("filter-btn").addEventListener("click", () => {
+          applyFilters();
+        });
+
+        document.getElementById("year-filter").addEventListener("keyup", (e) => {
+          if (e.key === "Enter") {
+            applyFilters();
+          }
+        });
+      }
+
+      // Apply filters
+      function applyFilters() {
         const type = document.getElementById("type-filter").value;
         const month = document.getElementById("month-filter").value;
         const year = document.getElementById("year-filter").value;
@@ -556,132 +341,244 @@
           .then((data) => {
             filteredContributions = data;
             currentPage = 1;
-            calculatePagination(filteredContributions);
-            renderTable();
+            updateTable();
           })
-          .catch((err) => {
-            console.error("Error filtering contributions:", err);
+          .catch((error) => {
+            console.error("Error filtering contributions:", error);
+            showMessage("Error filtering contributions: " + error.message, "error");
           });
-      });
+      }
 
-      window.addEventListener("DOMContentLoaded", () => {
-        initPaginationControls();
-        populateYearOptions();
-        loadContributions();
-      });
+      // Setup delete confirmation modal
+      function setupDeleteModal() {
+        deleteCancel.addEventListener('click', () => {
+          deleteModal.style.display = 'none';
+          currentDeleteId = null;
+        });
 
-      // Exporting the contributions in form of excel document
-      document
-        .getElementById("exportExcelBtn")
-        .addEventListener("click", () => {
-          const table = document.getElementById("table");
-
-          if (!table) {
-            console.error("Contribution table not found!");
-            return;
+        deleteConfirm.addEventListener('click', () => {
+          if (currentDeleteId) {
+            deleteContribution(currentDeleteId);
           }
+          deleteModal.style.display = 'none';
+        });
 
-          const wb = XLSX.utils.book_new();
-          const ws_data = [];
+        deleteModal.addEventListener('click', (e) => {
+          if (e.target === deleteModal) {
+            deleteModal.style.display = 'none';
+            currentDeleteId = null;
+          }
+        });
+      }
 
-          // Add headers manually
-          ws_data.push([
-            "S/N",
-            "Contribution Type",
-            "Description",
-            "Amount",
-            "Date",
-          ]);
-
-          const tbody = table.querySelector("tbody");
-          tbody.querySelectorAll("tr").forEach((tr) => {
-            const cells = tr.querySelectorAll("td");
-            ws_data.push([
-              cells[0].innerText,
-              cells[1].innerText,
-              cells[2].innerText,
-              cells[3].innerText,
-              cells[4].innerText,
-            ]);
+      // Delete a contribution
+      function deleteContribution(id) {
+        fetch(`http://localhost:8080/contribution/${id}`, {
+          method: "DELETE",
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("Failed to delete contribution");
+            loadContributions();
+            showMessage("Contribution deleted successfully!", "success");
+          })
+          .catch(error => {
+            console.error("Error deleting contribution:", error);
+            showMessage("Error deleting contribution: " + error.message, "error");
           });
+      }
 
-          const ws = XLSX.utils.aoa_to_sheet(ws_data);
-          XLSX.utils.book_append_sheet(wb, ws, "Contributions");
-
-          const fileName = `contributions_report.xlsx`;
-          XLSX.writeFile(wb, fileName);
-
-          addReportToStorage(fileName);
+      // Setup form functionality
+      function setupForm() {
+        document.getElementById("openDialogBtn").addEventListener("click", () => {
+          formEl.reset();
+          formEl.dataset.editId = '';
+          document.getElementById("submit").textContent = "Save";
+          formDialog.style.display = "flex";
         });
 
-      // Exporting the contributions in form of pdf document
-      document.getElementById("exportPdfBtn").addEventListener("click", () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        const table = document.getElementById("table");
-
-        const headers = [
-          ["S/N", "Contribution Type", "Description", "Amount", "Date"],
-        ];
-        const rows = [];
-
-        const tableBody = table.querySelector("tbody");
-        tableBody.querySelectorAll("tr").forEach((tr) => {
-          const cols = tr.querySelectorAll("td");
-          const row = [
-            cols[0].innerText,
-            cols[1].innerText,
-            cols[2].innerText,
-            cols[3].innerText,
-            cols[4].innerText,
-          ];
-          rows.push(row);
+        document.getElementById("cancelBtn").addEventListener("click", () => {
+          formDialog.style.display = "none";
         });
 
-        doc.autoTable({
-          head: headers,
-          body: rows,
-          startY: 20,
-          theme: "striped",
+        formEl.addEventListener("submit", function(e) {
+          e.preventDefault();
+          const formData = new FormData(formEl);
+          const data = Object.fromEntries(formData);
+          const contributionId = formEl.dataset.editId;
+
+          if (contributionId) {
+            // Update existing contribution
+            fetch(`http://localhost:8080/contribution/${contributionId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            })
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to update contribution");
+                formDialog.style.display = "none";
+                loadContributions();
+                showMessage("Contribution updated successfully!", "success");
+              })
+              .catch(error => {
+                console.error("Error updating contribution:", error);
+                showMessage("Error updating contribution: " + error.message, "error");
+              });
+          } else {
+            // Create new contribution
+            fetch("http://localhost:8080/contribution", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            })
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to add contribution");
+                formDialog.style.display = "none";
+                loadContributions();
+                showMessage("Contribution added successfully!", "success");
+              })
+              .catch(error => {
+                console.error("Error adding contribution:", error);
+                showMessage("Error adding contribution: " + error.message, "error");
+              });
+          }
         });
+      }
 
-        doc.text("Contribution Report", 14, 15);
-
-        const fileName = `contributions_report.pdf`;
-        doc.save(fileName);
-        addReportToStorage(fileName);
-      });
-
-
-      function addReportToStorage(fileName) {
-        // Get existing reports or initialize empty array
-        let reports = JSON.parse(localStorage.getItem("reports")) || [];
-
-        // Determine report type based on file extension
-        const type = fileName.endsWith(".xlsx")
-          ? "Excel"
-          : fileName.endsWith(".pdf")
-          ? "PDF"
-          : "Other";
-
-        // Check if report already exists to avoid duplicates
-        const exists = reports.some((report) => report.filename === fileName);
-
-        if (!exists) {
-          // Add new report
-          reports.push({
-            filename: fileName,
-            type: type,
-            date: new Date().toLocaleString(),
+      // Add event listeners for edit and delete
+      function addActionListeners() {
+        document.querySelectorAll('.edit-icon').forEach(icon => {
+          icon.addEventListener('click', (e) => {
+            const contributionId = e.target.getAttribute('data-id');
+            editContribution(contributionId);
           });
+        });
 
-          // Save back to localStorage
-          localStorage.setItem("reports", JSON.stringify(reports));
+        document.querySelectorAll('.delete-icon').forEach(icon => {
+          icon.addEventListener('click', (e) => {
+            const contributionId = e.target.getAttribute('data-id');
+            currentDeleteId = contributionId;
+            deleteModal.style.display = 'flex';
+          });
+        });
+      }
+
+      // Edit a contribution
+      function editContribution(id) {
+        fetch(`http://localhost:8080/contribution/${id}`)
+          .then(res => res.json())
+          .then(contribution => {
+            document.getElementById("type").value = contribution.type || '';
+            document.getElementById("description").value = contribution.description || '';
+            document.getElementById("amount").value = contribution.amount || '';
+            document.getElementById("date").value = contribution.date || '';
+            
+            formEl.dataset.editId = id;
+            document.getElementById("submit").textContent = "Update";
+            formDialog.style.display = "flex";
+          })
+          .catch(error => {
+            console.error("Error loading contribution:", error);
+            showMessage("Error loading contribution: " + error.message, "error");
+          });
+      }
+
+      // Populate year options
+      function populateYearOptions() {
+        const yearSelect = document.getElementById("year-filter");
+        const currentYear = new Date().getFullYear();
+        const startYear = 2020;
+
+        for (let year = currentYear; year >= startYear; year--) {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year;
+          yearSelect.appendChild(option);
         }
       }
+
+      // Show message to user
+      function showMessage(text, type) {
+        const messageEl = document.getElementById("member-message");
+        messageEl.textContent = text;
+        messageEl.style.color = type === "success" ? "green" : "red";
+        setTimeout(() => {
+          messageEl.textContent = "";
+        }, 3000);
+      }
+
+      // Export to Excel
+      document.getElementById("exportExcelBtn").addEventListener("click", () => {
+        try {
+          const table = document.getElementById("member-table");
+          const tableClone = table.cloneNode(true);
+          
+          // Remove actions column
+          const actionsCol = tableClone.querySelectorAll('td.actions, th:nth-child(6)');
+          actionsCol.forEach(el => el.remove());
+          
+          const wb = XLSX.utils.table_to_book(tableClone);
+          XLSX.writeFile(wb, "contributions-list.xlsx");
+          showMessage("Excel exported successfully!", "success");
+        } catch (error) {
+          console.error("Error exporting to Excel:", error);
+          showMessage("Error exporting to Excel: " + error.message, "error");
+        }
+      });
+
+      // Export to PDF
+      document.getElementById("exportPdfBtn").addEventListener("click", () => {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            orientation: 'landscape'
+          });
+
+          doc.setFontSize(16);
+          doc.text("Contribution Records", 14, 10);
+
+          const headers = ["S/N", "Type", "Description", "Amount", "Date"];
+          const tableData = filteredContributions.map((contribution, index) => [
+            index + 1,
+            contribution.type || '',
+            contribution.description || '',
+            contribution.amount || '',
+            contribution.date || ''
+          ]);
+
+          doc.autoTable({
+            head: [headers],
+            body: tableData,
+            startY: 20,
+            margin: { top: 20 },
+            styles: {
+              fontSize: 8,
+              cellPadding: 2,
+              overflow: 'linebreak'
+            },
+            columnStyles: {
+              0: { cellWidth: 10 },
+              1: { cellWidth: 20 },
+              2: { cellWidth: 50 },
+              3: { cellWidth: 20 },
+              4: { cellWidth: 25 }
+            },
+            didDrawPage: function (data) {
+              doc.setFontSize(10);
+              const pageCount = doc.internal.getNumberOfPages();
+              doc.text(`Page ${data.pageNumber} of ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            }
+          });
+
+          doc.save("contributions-list.pdf");
+          showMessage("PDF exported successfully!", "success");
+        } catch (error) {
+          console.error("Error exporting to PDF:", error);
+          showMessage("Error exporting to PDF: " + error.message, "error");
+        }
+      });
     </script>
 
-    <script src="../GENERAL/script.js"></script>
+<script src="../GENERAL/script.js"></script>
+
   </body>
 </html>

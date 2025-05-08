@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Church Sacraments</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+    
+    <style>
+      .sacraments-container {
+        padding: 20px;
+        /* max-width: 600px; */
+        margin: 0 auto;
+      }
+      
+      .main-title {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        text-align: center;
+      }
+      
+      .sacraments-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .sacrament-item {
+        display: flex;
+        align-items: center;
+        padding: 25px;
+        margin-bottom: 10px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      
+      .sacrament-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      
+      .sacrament-icon {
+        font-size: 1.8rem;
+        margin-right: 15px;
+        color: #3498db;
+        min-width: 40px;
+        text-align: center;
+      }
+      
+      .sacrament-title {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #2c3e50;
+        flex-grow: 1;
+      }
+      
+      .sacrament-arrow {
+        color: #95a5a6;
+        font-size: 1.5rem;
+      }
+      
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="sacraments-container">
+          <h1 class="main-title">Church Sacraments</h1>
+          
+          <ul class="sacraments-list">
+            <!-- Holy Communion -->
+            <a href="#holy-communion">
+              <li class="sacrament-item">
+                <span class="material-icons-outlined sacrament-icon">local_dining</span>
+                <h2 class="sacrament-title">Holy Communion</h2>
+                <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
+              </li>
+            </a>
+            
+            <!-- Confirmation -->
+            <a href="#confirmation">
+              <li class="sacrament-item">
+                <span class="material-icons-outlined sacrament-icon">how_to_reg</span>
+                <h2 class="sacrament-title">Confirmation</h2>
+                <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
+              </li>
+            </a>
+            
+            <!-- Baptism -->
+            <a href="#baptism">
+              <li class="sacrament-item">
+                <span class="material-icons-outlined sacrament-icon">water_drop</span>
+                <h2 class="sacrament-title">Baptism</h2>
+                <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
+              </li>
+            </a>
+            
+            <!-- Marriage -->
+            <a href="#marriage">
+              <li class="sacrament-item">
+                <span class="material-icons-outlined sacrament-icon">favorite</span>
+                <h2 class="sacrament-title">Marriage</h2>
+                <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
+              </li>
+            </a>
+            
+            <!-- Preaching -->
+            <a href="#preaching">
+              <li class="sacrament-item">
+                <span class="material-icons-outlined sacrament-icon">record_voice_over</span>
+                <h2 class="sacrament-title">Preaching</h2>
+                <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
+              </li>
+            </a>
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <script src="../GENERAL/script.js"></script>
+  </body>
+</html>
