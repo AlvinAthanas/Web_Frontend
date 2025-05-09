@@ -22,10 +22,12 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../DASHBOARD/dashboard.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
-    
+
     <!-- FullCalendar CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-   
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+    />
   </head>
   <body>
     <div class="grid-container" id="containerId">
@@ -64,8 +66,8 @@
             </div>
           </a>
 
-          <div class="card">
-            <div class="card-inner">
+          <div class="card" id="project-card">
+            <div class="card-inner" >
               <h3>ONGOING PROJECTS</h3>
               <span class="material-icons-outlined"> rowing </span>
             </div>
@@ -83,17 +85,25 @@
             <div class="filter-controls">
               <h2 class="chart-title">Contributions Calendar</h2>
               <div class="filter-buttons">
-                <button id="view-month" class="filter-btn">View Month Summary</button>
+                <button id="view-month" class="filter-btn">
+                  View Month Summary
+                </button>
                 <button id="reset-filter" class="filter-btn">Show All</button>
               </div>
             </div>
             <div id="calendar-container">
               <div id="calendar"></div>
-              <div id="month-summary" class="month-summary" style="display: none;">
+              <div
+                id="month-summary"
+                class="month-summary"
+                style="display: none"
+              >
                 <h4>Month Summary</h4>
                 <p>Total Contributions: <span id="month-total">0</span></p>
                 <p>Number of Contributions: <span id="month-count">0</span></p>
-                <p>Average Daily Contribution: <span id="month-average">0</span></p>
+                <p>
+                  Average Daily Contribution: <span id="month-average">0</span>
+                </p>
               </div>
             </div>
           </div>
@@ -110,7 +120,7 @@
         let allContributions = [];
         let barChart;
         let currentCalendar;
-        let currentView = 'all'; // 'all', 'day', or 'month'
+        let currentView = "all"; // 'all', 'day', or 'month'
 
         if (!token) {
           console.error("No auth token found.");
@@ -121,7 +131,7 @@
         function initBarChart(data = []) {
           // Group contributions by type and sum amounts
           const contributionTypes = {};
-          data.forEach(contribution => {
+          data.forEach((contribution) => {
             if (!contributionTypes[contribution.type]) {
               contributionTypes[contribution.type] = 0;
             }
@@ -134,9 +144,11 @@
             .slice(0, 5);
 
           const options = {
-            series: [{
-              data: sortedTypes.map(item => item[1])
-            }],
+            series: [
+              {
+                data: sortedTypes.map((item) => item[1]),
+              },
+            ],
             chart: {
               type: "bar",
               background: "transparent",
@@ -186,7 +198,7 @@
               theme: "dark",
             },
             xaxis: {
-              categories: sortedTypes.map(item => item[0]),
+              categories: sortedTypes.map((item) => item[0]),
               title: {
                 style: {
                   color: "#f5f7ff",
@@ -232,82 +244,94 @@
           if (barChart) {
             barChart.updateOptions(options);
           } else {
-            barChart = new ApexCharts(document.querySelector("#bar-chart"), options);
+            barChart = new ApexCharts(
+              document.querySelector("#bar-chart"),
+              options
+            );
             barChart.render();
           }
         }
 
         // Show month summary
         function showMonthSummary(dateStr) {
-          const [year, month] = dateStr.split('-');
+          const [year, month] = dateStr.split("-");
           const startDate = new Date(year, month - 1, 1);
           const endDate = new Date(year, month, 0);
-          
-          const monthContributions = allContributions.filter(c => {
+
+          const monthContributions = allContributions.filter((c) => {
             const contribDate = new Date(c.date);
             return contribDate >= startDate && contribDate <= endDate;
           });
-          
-          const total = monthContributions.reduce((sum, c) => sum + c.amount, 0);
+
+          const total = monthContributions.reduce(
+            (sum, c) => sum + c.amount,
+            0
+          );
           const count = monthContributions.length;
           const avg = count > 0 ? total / count : 0;
-          
-          document.getElementById('month-total').textContent = total.toLocaleString();
-          document.getElementById('month-count').textContent = count;
-          document.getElementById('month-average').textContent = avg.toLocaleString(undefined, {maximumFractionDigits: 2});
-          
-          document.getElementById('month-summary').style.display = 'block';
+
+          document.getElementById("month-total").textContent =
+            total.toLocaleString();
+          document.getElementById("month-count").textContent = count;
+          document.getElementById("month-average").textContent =
+            avg.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+          document.getElementById("month-summary").style.display = "block";
           initBarChart(monthContributions);
-          currentView = 'month';
+          currentView = "month";
         }
 
         // Initialize calendar
         function initCalendar(contributions) {
-          const calendarEl = document.getElementById('calendar');
-          
+          const calendarEl = document.getElementById("calendar");
+
           // Get unique dates with contributions
-          const contributionDates = [...new Set(contributions.map(c => c.date.split('T')[0]))];
-          
+          const contributionDates = [
+            ...new Set(contributions.map((c) => c.date.split("T")[0])),
+          ];
+
           const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
+            initialView: "dayGridMonth",
             headerToolbar: {
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,dayGridWeek,dayGridDay'
+              left: "prev,next today",
+              center: "title",
+              right: "dayGridMonth,dayGridWeek,dayGridDay",
             },
-            dayCellDidMount: function(arg) {
-              const dateStr = arg.date.toISOString().split('T')[0];
+            dayCellDidMount: function (arg) {
+              const dateStr = arg.date.toISOString().split("T")[0];
               if (contributionDates.includes(dateStr)) {
-                arg.el.classList.add('fc-day-has-contributions');
+                arg.el.classList.add("fc-day-has-contributions");
               }
             },
-            dateClick: function(info) {
+            dateClick: function (info) {
               const clickedDate = info.dateStr;
-              const filtered = allContributions.filter(c => c.date.includes(clickedDate));
+              const filtered = allContributions.filter((c) =>
+                c.date.includes(clickedDate)
+              );
               initBarChart(filtered);
-              
+
               // Remove previous selection
-              document.querySelectorAll('.fc-day-selected').forEach(el => {
-                el.classList.remove('fc-day-selected');
+              document.querySelectorAll(".fc-day-selected").forEach((el) => {
+                el.classList.remove("fc-day-selected");
               });
-              
+
               // Add selection to clicked date
-              info.dayEl.classList.add('fc-day-selected');
-              
+              info.dayEl.classList.add("fc-day-selected");
+
               // Hide month summary
-              document.getElementById('month-summary').style.display = 'none';
-              currentView = 'day';
+              document.getElementById("month-summary").style.display = "none";
+              currentView = "day";
             },
-            datesSet: function(info) {
+            datesSet: function (info) {
               // When month changes, hide the summary
-              document.getElementById('month-summary').style.display = 'none';
-              currentView = 'all';
+              document.getElementById("month-summary").style.display = "none";
+              currentView = "all";
             },
-            events: contributions.map(c => ({
+            events: contributions.map((c) => ({
               title: `${c.type}: ${c.amount.toLocaleString()}`,
               start: c.date,
-              allDay: true
-            }))
+              allDay: true,
+            })),
           });
 
           calendar.render();
@@ -339,7 +363,8 @@
           })
             .then((res) => res.json())
             .then((total) => {
-              document.querySelector("#contribution-card h1").textContent = total.toLocaleString();
+              document.querySelector("#contribution-card h1").textContent =
+                total.toLocaleString();
             })
             .catch((error) => {
               console.error("Failed to fetch total contributions:", error);
@@ -353,10 +378,47 @@
           })
             .then((res) => res.json())
             .then((groupCount) => {
-              document.querySelector("#community-card h1").textContent = groupCount;
+              document.querySelector("#community-card h1").textContent =
+                groupCount;
             })
             .catch((error) => {
               console.error("Failed to fetch group count:", error);
+            });
+
+          // Fetch logged-in user's parishId and project count
+          fetch(
+            "http://localhost:8080/user?email=" + getEmailFromToken(token),
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+            .then((res) => res.json())
+            .then((user) => {
+              const parishId = user.parishId;
+              if (parishId) {
+                fetch(
+                  `http://localhost:8080/parish/${parishId}/project-count`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                )
+                  .then((res) => res.json())
+                  .then((projectCount) => {
+                    document.querySelector("#project-card h1").textContent = projectCount;
+                  })
+                  .catch((error) => {
+                    console.error("Failed to fetch project count:", error);
+                  });
+              } else {
+                console.error("Parish ID not found for the user.");
+              }
+            })
+            .catch((error) => {
+              console.error("Failed to fetch user details:", error);
             });
 
           // Fetch all contributions
@@ -376,24 +438,34 @@
             });
         }
 
+        // Helper function to extract email from JWT
+        function getEmailFromToken(token) {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          return payload.sub; // Assuming the email is stored in the "sub" field of the JWT
+        }
+
         // View Month Summary button
         document.getElementById("view-month").addEventListener("click", () => {
           if (currentCalendar) {
             const currentDate = currentCalendar.getDate();
-            const monthStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+            const monthStr = `${currentDate.getFullYear()}-${String(
+              currentDate.getMonth() + 1
+            ).padStart(2, "0")}`;
             showMonthSummary(monthStr);
           }
         });
 
         // Reset filter button
-        document.getElementById("reset-filter").addEventListener("click", () => {
-          initBarChart(allContributions);
-          document.querySelectorAll('.fc-day-selected').forEach(el => {
-            el.classList.remove('fc-day-selected');
+        document
+          .getElementById("reset-filter")
+          .addEventListener("click", () => {
+            initBarChart(allContributions);
+            document.querySelectorAll(".fc-day-selected").forEach((el) => {
+              el.classList.remove("fc-day-selected");
+            });
+            document.getElementById("month-summary").style.display = "none";
+            currentView = "all";
           });
-          document.getElementById('month-summary').style.display = 'none';
-          currentView = 'all';
-        });
 
         // Initial fetch
         fetchAllData();
