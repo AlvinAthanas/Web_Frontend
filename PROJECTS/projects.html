@@ -302,26 +302,27 @@
         let currentProjectId = null;
         let deleteProjectId = null;
 
-async function fetchProjects() {
-  try {
-    const token = localStorage.getItem("authToken"); // Use correct key name
-    const response = await fetch(`${apiUrl}/projects`, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+        async function fetchProjects() {
+          try {
+            const token = localStorage.getItem("authToken"); // Use correct key name
+            const response = await fetch(`${apiUrl}/projects`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} - ${response.statusText}`);
-    }
+            if (!response.ok) {
+              throw new Error(
+                `HTTP ${response.status} - ${response.statusText}`
+              );
+            }
 
-    projects = await response.json();
-    renderProjects();
-  } catch (error) {
-    console.error("Failed to fetch projects:", error);
-  }
-}
-
+            projects = await response.json();
+            renderProjects();
+          } catch (error) {
+            console.error("Failed to fetch projects:", error);
+          }
+        }
 
         // Render projects in the UI
         function renderProjects() {
@@ -409,41 +410,54 @@ async function fetchProjects() {
         }
 
         // Add/Edit project form submission
-        projectForm.addEventListener("submit", async function (e) {
-          e.preventDefault();
+projectForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-          const projectName = document.getElementById("projectName").value;
-          const projectDescription =
-            document.getElementById("projectDescription").value;
-          const projectImage = document.getElementById("projectImage").files[0];
+  const projectName = document.getElementById("projectName").value;
+  const projectDescription = document.getElementById("projectDescription").value;
+  const projectImage = document.getElementById("projectImage").files[0];
 
-          const formData = new FormData();
-          formData.append("name", projectName);
-          formData.append("description", projectDescription);
-          if (projectImage) {
-            formData.append("featuredImage", projectImage);
-          }
+  const formData = new FormData();
+  formData.append("name", projectName);
+  formData.append("description", projectDescription);
+  if (projectImage) {
+    formData.append("featuredImage", projectImage);
+  }
 
-          try {
-            if (currentProjectId) {
-              // Update project
-              await fetch(`${apiUrl}/project/${currentProjectId}`, {
-                method: "PUT",
-                body: formData,
-              });
-            } else {
-              // Add new project
-              await fetch(`${apiUrl}/project`, {
-                method: "POST",
-                body: formData,
-              });
-            }
-            await fetchProjects();
-            hideDialogs();
-          } catch (error) {
-            console.error("Failed to save project:", error);
-          }
-        });
+  try {
+    const token = localStorage.getItem("authToken");
+    const headers = {
+      "Authorization": `Bearer ${token}`,
+    };
+
+    let response;
+    if (currentProjectId) {
+      // Update project
+      response = await fetch(`${apiUrl}/project/${currentProjectId}`, {
+        method: "PUT",
+        body: formData,
+        headers, // Include the Authorization header
+      });
+    } else {
+      // Add new project
+      response = await fetch(`${apiUrl}/project`, {
+        method: "POST",
+        body: formData,
+        headers, // Include the Authorization header
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Failed to save project. ${response.status}: ${response.statusText}`);
+    }
+
+    await fetchProjects();
+    hideDialogs();
+  } catch (error) {
+    console.error("Failed to save project:", error);
+  }
+});
+
 
         // Delete project confirmation
         confirmDeleteBtn.addEventListener("click", async function () {
