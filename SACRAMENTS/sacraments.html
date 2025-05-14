@@ -25,7 +25,6 @@
     <style>
       .sacraments-container {
         padding: 20px;
-        /* max-width: 600px; */
         margin: 0 auto;
       }
       
@@ -66,16 +65,32 @@
         text-align: center;
       }
       
+      .sacrament-content {
+        flex-grow: 1;
+      }
+      
       .sacrament-title {
         margin: 0;
         font-size: 1.1rem;
         color: #2c3e50;
-        flex-grow: 1;
+      }
+      
+      .sacrament-count {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+      }
+      
+      .sacrament-count strong {
+        color: #2c3e50;
+        font-weight: 600;
       }
       
       .sacrament-arrow {
         color: #95a5a6;
         font-size: 1.5rem;
+        margin-left: 15px;
       }
       
       a {
@@ -92,10 +107,13 @@
           
           <ul class="sacraments-list">
             <!-- Holy Communion -->
-            <a href="#holy-communion">
+            <a href="holy_communion.html">
               <li class="sacrament-item">
                 <span class="material-icons-outlined sacrament-icon">local_dining</span>
-                <h2 class="sacrament-title">Holy Communion</h2>
+                <div class="sacrament-content">
+                  <h2 class="sacrament-title">Holy Communion</h2>
+                  <span class="sacrament-count"><strong>142 people</strong> preparing</span>
+                </div>
                 <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
               </li>
             </a>
@@ -104,7 +122,10 @@
             <a href="#confirmation">
               <li class="sacrament-item">
                 <span class="material-icons-outlined sacrament-icon">how_to_reg</span>
-                <h2 class="sacrament-title">Confirmation</h2>
+                <div class="sacrament-content">
+                  <h2 class="sacrament-title">Confirmation</h2>
+                  <span class="sacrament-count"><strong>28 people</strong> registered</span>
+                </div>
                 <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
               </li>
             </a>
@@ -113,7 +134,10 @@
             <a href="#baptism">
               <li class="sacrament-item">
                 <span class="material-icons-outlined sacrament-icon">water_drop</span>
-                <h2 class="sacrament-title">Baptism</h2>
+                <div class="sacrament-content">
+                  <h2 class="sacrament-title">Baptism</h2>
+                  <span class="sacrament-count"><strong>45 people</strong> preparing</span>
+                </div>
                 <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
               </li>
             </a>
@@ -122,7 +146,10 @@
             <a href="#marriage">
               <li class="sacrament-item">
                 <span class="material-icons-outlined sacrament-icon">favorite</span>
-                <h2 class="sacrament-title">Marriage</h2>
+                <div class="sacrament-content">
+                  <h2 class="sacrament-title">Marriage</h2>
+                  <span class="sacrament-count"><strong>12 couples</strong> preparing</span>
+                </div>
                 <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
               </li>
             </a>
@@ -131,7 +158,10 @@
             <a href="#preaching">
               <li class="sacrament-item">
                 <span class="material-icons-outlined sacrament-icon">record_voice_over</span>
-                <h2 class="sacrament-title">Preaching</h2>
+                <div class="sacrament-content">
+                  <h2 class="sacrament-title">Preaching</h2>
+                  <span class="sacrament-count"><strong>18 volunteers</strong> active</span>
+                </div>
                 <span class="material-icons-outlined sacrament-arrow">chevron_right</span>
               </li>
             </a>

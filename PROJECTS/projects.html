@@ -209,6 +209,62 @@
         margin-top: 10px;
         display: none;
       }
+
+      /* Budget styles */
+      .project-budget {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+      }
+
+      .budget-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+
+      .budget-label {
+        font-weight: 600;
+        color: #555;
+      }
+
+      .budget-amount {
+        font-weight: 500;
+      }
+
+      .budget-progress {
+        height: 6px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        margin-top: 8px;
+        overflow: hidden;
+      }
+
+      .budget-progress-bar {
+        height: 100%;
+        background-color: #4caf50;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .no-budget {
+        color: #999;
+        font-style: italic;
+        margin-top: 10px;
+      }
+
+      /* Radio button styles */
+      .radio-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 5px;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
     </style>
   </head>
   <body>
@@ -247,6 +303,42 @@
             <input type="file" id="projectImage" accept="image/*" />
             <img id="imagePreview" class="image-preview" alt="Image preview" />
           </div>
+          <!-- Budget Fields -->
+          <!-- Change these lines in the form -->
+          <div class="form-group">
+            <label for="projectBudget">Expected Budget (Tsh)</label>
+            <input type="number" id="projectBudget" min="0" step="0.01" />
+          </div>
+          <div
+            class="form-group"
+            id="collectedAmountGroup"
+            style="display: none"
+          >
+            <label for="projectCollected">Amount Collected (Tsh)</label>
+            <input type="number" id="projectCollected" min="0" step="0.01" />
+          </div>
+          <div
+            class="form-group"
+            id="remainingAmountGroup"
+            style="display: none"
+          >
+            <label>Remaining Amount (Tsh)</label>
+            <input type="text" id="projectRemaining" readonly />
+          </div>
+
+          <!-- Contribution Type -->
+          <div class="form-group">
+            <label>Contribution Type</label>
+            <div class="radio-group">
+              <!-- <label class="radio-option"> -->
+              <input type="radio" name="contributionType" value="ujenzi" />
+              Ujenzi
+              <input type="radio" name="contributionType" value="mengineyo" />
+              Mengineyo
+              <!-- </label> -->
+            </div>
+          </div>
+
           <div class="dialog-actions">
             <button type="button" class="dialog-btn cancel" id="cancelBtn">
               Cancel
@@ -325,11 +417,13 @@
         }
 
         // Render projects in the UI
+
         function renderProjects() {
           projectsContainer.innerHTML = "";
           projects.forEach((project) => {
             const projectCard = document.createElement("div");
             projectCard.className = "project-card";
+
             projectCard.innerHTML = `
           <img src="${
             project.featuredImage
@@ -349,6 +443,7 @@
             <p class="project-description">${project.description}</p>
           </div>
         `;
+
             projectsContainer.appendChild(projectCard);
           });
 
@@ -374,11 +469,14 @@
           projectForm.reset();
           imagePreview.style.display = "none";
           currentProjectId = null;
+
           projectDialog.style.display = "flex";
         }
 
         // Show edit project dialog
+
         async function editProject(id) {
+
           const project = projects.find((p) => p.id === id);
           if (project) {
             dialogTitle.textContent = "Edit Project";
@@ -387,10 +485,12 @@
             document.getElementById("projectName").value = project.name;
             document.getElementById("projectDescription").value =
               project.description;
+
             imagePreview.src = project.featuredImage
               ? `data:image/jpeg;base64,${project.featuredImage}`
               : "";
             imagePreview.style.display = "block";
+
             currentProjectId = id;
             projectDialog.style.display = "flex";
           }
@@ -402,7 +502,7 @@
           deleteDialog.style.display = "flex";
         }
 
-        // Hide dialogs
+
         function hideDialogs() {
           projectDialog.style.display = "none";
           deleteDialog.style.display = "none";
@@ -410,6 +510,7 @@
         }
 
         // Add/Edit project form submission
+
 projectForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
