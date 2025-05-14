@@ -392,7 +392,7 @@
                 <label>Community Name</label>
                 <p id="view-community">Loading...</p>
               </div>
-         
+
             </div>
 
             <!-- Edit Mode -->
@@ -420,7 +420,7 @@
                 <label for="edit-community">Community Name</label>
                 <input type="text" id="edit-community" readonly />
               </div>
-         
+
               <div class="info-item">
                 <label for="profile-picture">Profile Picture</label>
                 <input type="file" id="profile-picture" accept="image/*" />
@@ -439,7 +439,7 @@
             </h3>
 
             <!-- View Mode -->
-            <div class="profile-info" id="view-address">
+            <div class="profile-info" id="view-address-section">
               <div class="info-item">
                 <label>Address</label>
                 <p id="view-address">Loading...</p>
@@ -447,7 +447,7 @@
             </div>
 
             <!-- Edit Mode -->
-            <div class="profile-info hidden" id="edit-address">
+            <div class="profile-info hidden" id="edit-address-section">
               <div class="info-item">
                 <label for="edit-address">Address</label>
                 <input type="text" id="edit-address" />
@@ -511,8 +511,8 @@
       const saveActions = document.getElementById('save-actions');
       const viewMode = document.getElementById('view-mode');
       const editMode = document.getElementById('edit-mode');
-      const viewAddress = document.getElementById('view-address');
-      const editAddress = document.getElementById('edit-address');
+      const viewAddress = document.getElementById('view-address-section');
+      const editAddress = document.getElementById('edit-address-section');
       const profileImage = document.getElementById('profile-image');
 
       // Event listeners
@@ -534,11 +534,11 @@
               'Content-Type': 'application/json'
             }
           });
-          
+
           if (!response.ok) {
             throw new Error(`Failed to fetch user profile: ${response.statusText}`);
           }
-          
+
           const userData = await response.json();
           currentUserId = userData.id; // ✅ Save for reuse
 
@@ -602,7 +602,6 @@ try {
         document.getElementById('edit-full-name').value = document.getElementById('view-full-name').textContent;
         document.getElementById('edit-email').value = document.getElementById('view-email').textContent;
         document.getElementById('edit-phone').value = document.getElementById('view-phone').textContent;
-        document.getElementById('edit-address').value = document.getElementById('view-address').textContent;
         document.getElementById('edit-community').value = document.getElementById('view-community').textContent;
         document.getElementById('edit-address').value = document.getElementById('view-address').textContent;
 
