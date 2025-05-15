@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  
+
     <!-- Material Icons Outlined -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
@@ -63,6 +63,10 @@
             id="address"
           />
         </div>
+        <div
+          id="response-address"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
 
         <div class="input-group">
           <span class="material-icons-outlined"> call </span>
@@ -89,6 +93,10 @@
           <span class="material-icons-outlined"> calendar_month </span>
           <input type="date" name="birthDate" id="birthDate" required />
         </div>
+        <div
+          id="response-birthDate"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
         <div class="input-group">
           <label for="gender">Gender</label>
         </div>
@@ -96,6 +104,10 @@
           <input type="radio" name="gender" value="Male" id="Male" />Male
           <input type="radio" name="gender" value="Female" id="Female" />Female
         </div>
+        <div
+          id="response-gender"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
 
         <div class="divider"><span>Your credentials</span></div>
 
@@ -123,6 +135,10 @@
           id="response-password"
           style="font-size: 14px; margin: 2px; color: red"
         ></div>
+        <div
+          id="response-password2"
+          style="font-size: 14px; margin: 2px; color: red"
+        ></div>
 
         <button type="submit" class="Signup-btn">
           Submit <span class="material-icons-outlined"> chevron_right </span>
@@ -131,8 +147,6 @@
         <h6>Have an account?<a href="../index.html">Login</a></h6>
       </form>
       <div id="response" style="font-size: 14px; margin: 5px; color: red"></div>
-    </div>
-        </form>
     </div>
     <script>
         const formEl = document.querySelector(".form");
