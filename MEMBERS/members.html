@@ -87,7 +87,7 @@
           <div class="dialog-box">
             <h3>Register new member here!</h3>
             <form id="addMemberForm">
-              <label for="fullname">FullName</label>
+              <label for="name">FullName</label>
               <input type="text" name="name" id="name" required />
 
               <label for="email">Email</label>
@@ -99,7 +99,7 @@
               <label for="phone">Phone number</label>
               <input type="text" id="phone" name="phone" />
 
-              <label for="gender">Gender</label>
+              <label for="Male">Gender</label>
               <div class="gender">
                 <input type="radio" name="gender" id="Male" value="Male" required />Male
                 <input type="radio" name="gender" id="Female" value="Female" required />Female
@@ -173,7 +173,7 @@
       // Function to load members from the database
       function loadMembers() {
         const token = localStorage.getItem("authToken");
-        
+
         if (!token) {
           showMessage("Please login first", "error");
           return;
@@ -219,7 +219,7 @@
 
         formEl.addEventListener("submit", function(e) {
           e.preventDefault();
-          
+
           const token = localStorage.getItem("authToken");
           if (!token) {
             showMessage("Please login first", "error");
@@ -388,7 +388,7 @@
       function updatePaginationInfo() {
         const totalPages = entriesPerPage === "all" ? 1 : Math.ceil(filteredMembers.length / entriesPerPage);
         document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
-        
+
         // Disable/enable pagination buttons
         document.getElementById("firstPage").disabled = currentPage === 1;
         document.getElementById("prevPage").disabled = currentPage === 1;
@@ -462,7 +462,7 @@
           return;
         }
 
-        fetch(`http://localhost:8080/user/${id}`, {
+        fetch(`http://localhost:8080/user?id=${id}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -475,7 +475,7 @@
             document.getElementById("email").value = member.email || "";
             document.getElementById("address").value = member.address || "";
             document.getElementById("phone").value = member.phone || "";
-            
+
             if (member.gender) {
               document.getElementById(member.gender).checked = true;
             }
@@ -506,18 +506,18 @@
         try {
           const table = document.getElementById("member-table");
           const tableClone = table.cloneNode(true);
-          
+
           // Remove actions column
           const actionsCol = tableClone.querySelectorAll("td.actions, th:nth-child(7)");
           actionsCol.forEach(el => el.remove());
-          
+
           const wb = XLSX.utils.table_to_book(tableClone);
           const filename = "members-list.xlsx";
           XLSX.writeFile(wb, filename);
-          
+
           // Add to reports
           addNewReport(filename, "Members");
-          
+
           showMessage("Excel exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to Excel:", error);
@@ -577,10 +577,10 @@
 
           const filename = "members-list.pdf";
           doc.save(filename);
-          
+
           // Add to reports
           addNewReport(filename, "Members");
-          
+
           showMessage("PDF exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to PDF:", error);
@@ -591,10 +591,10 @@
       // Add new report to localStorage
       function addNewReport(filename, type) {
         const reports = JSON.parse(localStorage.getItem("reports") || []);
-        
+
         // Check if report already exists
         const exists = reports.some(report => report.filename === filename);
-        
+
         if (!exists) {
           reports.push({
             filename: filename,
