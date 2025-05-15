@@ -85,6 +85,7 @@
  <div class="input-group autocomplete-container">
                 <span class="material-icons-outlined">location_city</span>
                 <input type="text" name="parish" id="parish" placeholder="Parish Name" required>
+                <input type="hidden" name="parishId" id="parishId">
                 <ul class="autocomplete-suggestions" id="parishSuggestions"></ul>
             </div>
             <div id="response-parish"></div>
@@ -299,6 +300,7 @@
                     li.textContent = parish.name;
                     li.addEventListener('click', () => {
                         parishInput.value = parish.name;
+                        document.getElementById('parishId').value = parish.id;
                         suggestionsList.innerHTML = '';
                     });
                     suggestionsList.appendChild(li);
