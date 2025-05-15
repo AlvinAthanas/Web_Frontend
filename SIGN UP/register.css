@@ -1,10 +1,10 @@
- /* --------General Styling--------- */
- body {
+/* --------General Styling--------- */
+body {
   background: #f4f4f4;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   height: 100vh;
   margin: 0;
 }
@@ -40,7 +40,7 @@ h6 {
 }
 
 select {
-  padding: 12px 12px 12px 40px; 
+  padding: 12px 12px 12px 40px;
   width: 100%;
   border: none;
   border-radius: 5px;
@@ -69,10 +69,10 @@ img {
   display: flex;
   gap: 10px;
   align-items: center;
-}   
+}
 .input-group input {
   width: 100%;
-  padding: 12px 12px 12px 40px; 
+  padding: 12px 12px 12px 40px;
   font-size: 14px;
   background: #e6eaea;
   border: none;
@@ -89,7 +89,6 @@ img {
 .input-group-icon {
   position: relative;
 }
-
 
 /* -----------Forgot Link----------- */
 .forgot-link {
@@ -127,7 +126,7 @@ img {
 }
 
 .divider span {
-  opacity: 0.5; 
+  opacity: 0.5;
 }
 
 /* -------Buttons-------- */
@@ -150,6 +149,47 @@ img {
   background: #7090ad;
 }
 
+.autocomplete-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 40px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-suggestions li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.autocomplete-suggestions li:hover {
+  background: #f0f0f0;
+}
+
+[id^="response"] {
+  font-size: 14px;
+  margin: 2px 0;
+  color: red;
+  text-align: left;
+  margin-left: 40px;
+}
 
 /* -------Media Query--------- */
 @media (max-width: 600px) {

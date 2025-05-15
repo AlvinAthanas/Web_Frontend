@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+
     <!-- Montserrat Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  
+    <!-- Material Icons Outlined -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-    <!-- Material Icons -->
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"
-    />
+    <!-- External CSS -->
+    <link rel="stylesheet" href="register.css">
 
-    <link rel="stylesheet" href="register.css" />
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <!-- <h5>Sign Up</h5> -->
-      <img src="add.png" alt="">
-      <p>All fields are required</p>
-      <form action="" class="form">
+        <img src="add.png" alt="Add Icon">
+        <p>All fields are required</p>
+        <form action="" class="form">
         <div class="divider"><span>Personal Details</span></div>
 
         <div class="input-group">
@@ -82,7 +78,12 @@
           id="response-phone"
           style="font-size: 14px; margin: 2px; color: red"
         ></div>
-
+ <div class="input-group autocomplete-container">
+                <span class="material-icons-outlined">location_city</span>
+                <input type="text" name="parish" id="parish" placeholder="Parish Name" required>
+                <ul class="autocomplete-suggestions" id="parishSuggestions"></ul>
+            </div>
+            <div id="response-parish"></div>
         <div class="input-group">
           <label for="birthDate">Birth Date</label>
           <span class="material-icons-outlined"> calendar_month </span>
@@ -131,81 +132,175 @@
       </form>
       <div id="response" style="font-size: 14px; margin: 5px; color: red"></div>
     </div>
-
+        </form>
+    </div>
     <script>
-      const formEl = document.querySelector(".form");
-      const responseEl = document.getElementById("response");
-      const responseName = document.getElementById("response-name");
-      const responseEmail = document.getElementById("response-email");
-      const responsePhone = document.getElementById("response-phone");
-      const responsePassword = document.getElementById("response-password");
+        const formEl = document.querySelector(".form");
+        const responseEl = document.getElementById("response");
+        const responseName = document.getElementById("response-name");
+        const responseEmail = document.getElementById("response-email");
+        const responseAddress = document.getElementById("response-address");
+        const responsePhone = document.getElementById("response-phone");
+        const responseParish = document.getElementById("response-parish");
+        const responseBirthDate = document.getElementById("response-birthDate");
+        const responseGender = document.getElementById("response-gender");
+        const responsePassword = document.getElementById("response-password");
+        const responsePassword2 = document.getElementById("response-password2");
 
-      formEl.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const formData = new FormData(formEl);
-        const data = Object.fromEntries(formData);
-        const password = document.getElementById("password").value;
-        const password2 = document.getElementById("password2").value;
+        // Form submission logic
+        formEl.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+            const password = document.getElementById("password").value;
+            const password2 = document.getElementById("password2").value;
 
-        if (password == password2) {
-          responsePassword.innerHTML = "";
-          fetch("http://localhost:8080/user", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          })
-            .then(async (response) => {
-              const responseData = await response.json(); // Convert response to JSON
-              if (!response.ok) {
-                throw new Error(responseData.message || "An error occurred");
-              }
-              return responseData;
-            })
-            .then(() => {
-              responseName.innerHTML = "";
-              responseEmail.innerHTML = "";
-              responsePhone.innerHTML = "";
-              responsePassword.innerHTML = "";
-              responseEl.style.color = "green";
-              responseEl.innerText = "Registration Successful!";
-              formEl.reset();
-            })
+            if (password === password2) {
+                responsePassword2.innerHTML = "";
+                fetch("http://localhost:8080/user", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                })
+                    .then(async (response) => {
+                        const responseData = await response.json();
+                        if (!response.ok) {
+                            throw new Error(responseData.message || "An error occurred");
+                        }
+                        return responseData;
+                    })
+                    .then(() => {
+                        responseName.innerHTML = "";
+                        responseEmail.innerHTML = "";
+                        responseAddress.innerHTML = "";
+                        responsePhone.innerHTML = "";
+                        responseParish.innerHTML = "";
+                        responseBirthDate.innerHTML = "";
+                        responseGender.innerHTML = "";
+                        responsePassword.innerHTML = "";
+                        responsePassword2.innerHTML = "";
+                        responseEl.style.color = "green";
+                        responseEl.innerText = "Registration Successful!";
+                        formEl.reset();
+                        // Redirect to login page
+                        setTimeout(() => {
+                            window.location.href = '../index.html';
+                        }, 1000); // 1-second delay to show success message
+                    })
+                    .catch((error) => {
+                        responseEl.style.color = "red";
+                        const message = error.message;
+                        if (message === "Full name is required") {
+                            responseEmail.innerHTML = "";
+                            responseAddress.innerHTML = "";
+                            responsePhone.innerHTML = "";
+                            responseParish.innerHTML = "";
+                            responseBirthDate.innerHTML = "";
+                            responseGender.innerHTML = "";
+                            responsePassword.innerHTML = "";
+                            responsePassword2.innerHTML = "";
+                            responseName.innerHTML = "*" + message + "!";
+                        } else if (message === "Invalid email") {
+                            responseName.innerHTML = "";
+                            responseAddress.innerHTML = "";
+                            responsePhone.innerHTML = "";
+                            responseParish.innerHTML = "";
+                            responseBirthDate.innerHTML = "";
+                            responseGender.innerHTML = "";
+                            responsePassword.innerHTML = "";
+                            responsePassword2.innerHTML = "";
+                            responseEmail.innerHTML = "*" + message + "!";
+                        } else if (message === "Invalid phone number") {
+                            responseName.innerHTML = "";
+                            responseAddress.innerHTML = "";
+                            responseEmail.innerHTML = "";
+                            responseParish.innerHTML = "";
+                            responseBirthDate.innerHTML = "";
+                            responseGender.innerHTML = "";
+                            responsePassword.innerHTML = "";
+                            responsePassword2.innerHTML = "";
+                            responsePhone.innerHTML = "*" + message + "!";
+                        } else if (message === "Email already exists") {
+                            responseName.innerHTML = "";
+                            responseAddress.innerHTML = "";
+                            responsePhone.innerHTML = "";
+                            responseParish.innerHTML = "";
+                            responseBirthDate.innerHTML = "";
+                            responseGender.innerHTML = "";
+                            responsePassword.innerHTML = "";
+                            responsePassword2.innerHTML = "";
+                            responseEmail.innerHTML = "*" + message + "!";
+                        } else {
+                            responseName.innerHTML = "";
+                            responseAddress.innerHTML = "";
+                            responseEmail.innerHTML = "";
+                            responsePhone.innerHTML = "";
+                            responseParish.innerHTML = "";
+                            responseBirthDate.innerHTML = "";
+                            responseGender.innerHTML = "";
+                            responsePassword.innerHTML = "";
+                            responsePassword2.innerHTML = "";
+                            responseEl.innerText = message;
+                        }
+                    });
+            } else {
+                responsePassword2.innerHTML = "*Passwords do not match!";
+            }
+        });
 
-            .catch((error) => {
-              responseEl.style.color = "red";
-              var message = error.message;
-              if (message == "Full name is required") {
-                responseEmail.innerHTML = "";
-                responsePhone.innerHTML = "";
-                responsePassword.innerHTML = "";
-                responseName.innerHTML = "*" + message + "!";
-              } else if (message == "Invalid email") {
-                responsePhone.innerHTML = "";
-                responsePassword.innerHTML = "";
-                responseName.innerHTML = "";
-                responseEmail.innerHTML = "*" + message + "!";
-              } else if (message == "Invalid phone number") {
-                responseEmail.innerHTML = "";
-                responsePassword.innerHTML = "";
-                responseName.innerHTML = "";
-                responsePhone.innerHTML = "*" + message + "!";
-              } else if (message == "Email already exists") {
-                responsePassword.innerHTML = "";
-                responseName.innerHTML = "";
-                responsePhone.innerHTML = "";
-                responseEmail.innerHTML = "*" + message + "!";
-              } else {
-                responseEmail.innerHTML = "";
-                responseName.innerHTML = "";
-                responsePhone.innerHTML = "";
-                responsePassword.innerHTML = "";
-                responseEl.innerText = message; // Display only the error message
-              }
-            });
-        } else {
-          responsePassword.innerHTML = "*Password do not match!";
-        }
-      });
+        // Parish search functionality
+        const parishInput = document.getElementById("parish");
+        const suggestionsList = document.getElementById("parishSuggestions");
+
+        parishInput.addEventListener("input", async () => {
+            const query = parishInput.value.trim();
+            suggestionsList.innerHTML = '';
+
+            if (query.length < 2) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/parish/search?name=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const parishes = await response.json();
+                console.log('Parishes:', parishes);
+
+                if (parishes.length === 0) {
+                    suggestionsList.innerHTML = '<li>No parishes found</li>';
+                    return;
+                }
+
+                parishes.forEach(parish => {
+                    const li = document.createElement('li');
+                    li.textContent = parish.name;
+                    li.addEventListener('click', () => {
+                        parishInput.value = parish.name;
+                        suggestionsList.innerHTML = '';
+                    });
+                    suggestionsList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching parishes:', error);
+                suggestionsList.innerHTML = '<li>Error loading parishes</li>';
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!parishInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+                suggestionsList.innerHTML = '';
+            }
+        });
     </script>
-  </body>
+</body>
 </html>

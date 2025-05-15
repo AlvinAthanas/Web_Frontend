@@ -67,15 +67,38 @@
       </main>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="delete-modal">
+      <div class="delete-modal-content">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this report? This action cannot be undone.</p>
+        <div class="delete-modal-buttons">
+          <button id="deleteCancel" class="delete-cancel">Cancel</button>
+          <button id="deleteConfirm" class="delete-confirm">Delete</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Scripts -->
     <script>
+      let currentDeleteIndex = null;
+      const deleteModal = document.getElementById('deleteModal');
+      const deleteCancel = document.getElementById('deleteCancel');
+      const deleteConfirm = document.getElementById('deleteConfirm');
+
       document.addEventListener("DOMContentLoaded", () => {
+        loadReports();
+        setupDeleteModal();
+      });
+
+      function loadReports() {
         const reports = JSON.parse(localStorage.getItem("reports") || "[]");
         const tableBody = document.getElementById("reports-table-body");
     
         if (reports.length === 0) {
           tableBody.innerHTML = "<tr><td colspan='4'>No reports downloaded yet.</td></tr>";
         } else {
+          tableBody.innerHTML = "";
           reports.forEach((report, index) => {
             const row = document.createElement("tr");
     
@@ -85,36 +108,65 @@
               <td>${report.date}</td>
               <td>
                 <div class="action-icons">
-                  <span class="material-icons-outlined download-icon" onclick="downloadReport('${report.filename}')">download</span>
-                  <span class="material-icons-outlined delete-icon" onclick="deleteReport(${index})">delete</span>
+                  <span class="material-icons-outlined download-icon" data-id="${index}">download</span>
+                  <span class="material-icons-outlined delete-icon" data-id="${index}">delete</span>
                 </div>
               </td>
             `;
             tableBody.appendChild(row);
           });
-        }
-      });
 
-      function downloadReport(filename) {
-        // Create a temporary anchor element to trigger download
-        const link = document.createElement('a');
-        link.href = `../downloads/${filename}`;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Add to recent downloads if not already there
-        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
-        const existingReport = reports.find(r => r.filename === filename);
-        
-        if (!existingReport) {
-          reports.push({
-            filename: filename,
-            type: filename.includes('members') ? 'Members' : filename.includes('contributions') ? 'Contributions' : 'Other',
-            date: new Date().toLocaleString()
+          // Add event listeners
+          document.querySelectorAll('.download-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+              const index = e.target.getAttribute('data-id');
+              downloadReport(index);
+            });
           });
-          localStorage.setItem("reports", JSON.stringify(reports));
+
+          document.querySelectorAll('.delete-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+              const index = e.target.getAttribute('data-id');
+              currentDeleteIndex = index;
+              deleteModal.style.display = 'flex';
+            });
+          });
+        }
+      }
+
+      function setupDeleteModal() {
+        deleteCancel.addEventListener('click', () => {
+          deleteModal.style.display = 'none';
+          currentDeleteIndex = null;
+        });
+
+        deleteConfirm.addEventListener('click', () => {
+          if (currentDeleteIndex !== null) {
+            deleteReport(currentDeleteIndex);
+          }
+          deleteModal.style.display = 'none';
+        });
+
+        deleteModal.addEventListener('click', (e) => {
+          if (e.target === deleteModal) {
+            deleteModal.style.display = 'none';
+            currentDeleteIndex = null;
+          }
+        });
+      }
+
+      function downloadReport(index) {
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+        if (index >= 0 && index < reports.length) {
+          const report = reports[index];
+          
+          // Create a temporary anchor element to trigger download
+          const link = document.createElement('a');
+          link.href = `../downloads/${report.filename}`;
+          link.download = report.filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
       }
 
@@ -123,14 +175,13 @@
         if (index >= 0 && index < reports.length) {
           reports.splice(index, 1);
           localStorage.setItem("reports", JSON.stringify(reports));
-          // Refresh the table
-          location.reload();
+          loadReports();
         }
       }
 
-      // This function should be called whenever a new report is generated
+      // This function is called from other pages when a new report is generated
       function addNewReport(filename, type) {
-        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+        const reports = JSON.parse(localStorage.getItem("reports") || []);
         
         // Check if report already exists
         const exists = reports.some(report => report.filename === filename);

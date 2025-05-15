@@ -389,14 +389,21 @@
         const projectImageInput = document.getElementById("projectImage");
         const imagePreview = document.getElementById("imagePreview");
 
+        const projectBudgetInput = document.getElementById("projectBudget");
+        const projectCollectedInput = document.getElementById("projectCollected");
+        const projectRemainingInput = document.getElementById("projectRemaining");
+        const collectedAmountGroup = document.getElementById("collectedAmountGroup");
+        const remainingAmountGroup = document.getElementById("remainingAmountGroup");
+
         const apiUrl = "http://localhost:8080";
         let projects = [];
         let currentProjectId = null;
         let deleteProjectId = null;
 
+        // Fetch projects from API
         async function fetchProjects() {
           try {
-            const token = localStorage.getItem("authToken"); // Use correct key name
+            const token = localStorage.getItem("authToken");
             const response = await fetch(`${apiUrl}/projects`, {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -416,34 +423,66 @@
           }
         }
 
-        // Render projects in the UI
-
+        // Render projects in the UI (with budget features)
         function renderProjects() {
           projectsContainer.innerHTML = "";
           projects.forEach((project) => {
             const projectCard = document.createElement("div");
             projectCard.className = "project-card";
 
-            projectCard.innerHTML = `
-          <img src="${
-            project.featuredImage
-              ? `data:image/jpeg;base64,${project.featuredImage}`
-              : ""
-          }" alt="${project.name}" class="project-image">
-          <div class="project-actions">
-            <button class="action-btn edit-btn" data-id="${project.id}">
-              <span class="material-icons-outlined">edit</span>
-            </button>
-            <button class="action-btn delete-btn" data-id="${project.id}">
-              <span class="material-icons-outlined">delete</span>
-            </button>
-          </div>
-          <div class="project-info">
-            <h3 class="project-title">${project.name}</h3>
-            <p class="project-description">${project.description}</p>
-          </div>
-        `;
+            // Use featuredImage (base64) if available, else fallback to imageUrl
+            let imgSrc = "";
+            if (project.featuredImage) {
+              imgSrc = `data:image/jpeg;base64,${project.featuredImage}`;
+            } else if (project.imageUrl) {
+              imgSrc = project.imageUrl;
+            }
 
+            // Budget HTML
+            let budgetHtml = "";
+            if (project.budget) {
+              const percentage = project.collected
+                ? (project.collected / project.budget) * 100
+                : 0;
+              budgetHtml = `
+                <div class="project-budget">
+                  <div class="budget-row">
+                    <span class="budget-label">Expected:</span>
+                    <span class="budget-amount">Tsh ${Number(project.budget).toLocaleString()}</span>
+                  </div>
+                  <div class="budget-row">
+                    <span class="budget-label">Collected:</span>
+                    <span class="budget-amount">Tsh ${(project.collected || 0).toLocaleString()}</span>
+                  </div>
+                  <div class="budget-row">
+                    <span class="budget-label">Remaining:</span>
+                    <span class="budget-amount">Tsh ${(project.budget - (project.collected || 0)).toLocaleString()}</span>
+                  </div>
+                  <div class="budget-progress">
+                    <div class="budget-progress-bar" style="width: ${percentage}%"></div>
+                  </div>
+                </div>
+              `;
+            } else {
+              budgetHtml = `<div class="no-budget">No budget information available</div>`;
+            }
+
+            projectCard.innerHTML = `
+              <img src="${imgSrc}" alt="${project.name}" class="project-image">
+              <div class="project-actions">
+                <button class="action-btn edit-btn" data-id="${project.id}">
+                  <span class="material-icons-outlined">edit</span>
+                </button>
+                <button class="action-btn delete-btn" data-id="${project.id}">
+                  <span class="material-icons-outlined">delete</span>
+                </button>
+              </div>
+              <div class="project-info">
+                <h3 class="project-title">${project.name}</h3>
+                <p class="project-description">${project.description}</p>
+                ${budgetHtml}
+              </div>
+            `;
             projectsContainer.appendChild(projectCard);
           });
 
@@ -461,6 +500,27 @@
           });
         }
 
+        // Image preview handler
+        projectImageInput.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              imagePreview.src = event.target.result;
+              imagePreview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // Budget calculation handler
+        function updateRemainingAmount() {
+          const budget = parseFloat(projectBudgetInput.value) || 0;
+          const collected = parseFloat(projectCollectedInput.value) || 0;
+          const remaining = budget - collected;
+          projectRemainingInput.value = remaining.toFixed(2);
+        }
+
         // Show add project dialog
         function showAddDialog() {
           dialogTitle.textContent = "Add New Project";
@@ -469,27 +529,48 @@
           projectForm.reset();
           imagePreview.style.display = "none";
           currentProjectId = null;
-
+          collectedAmountGroup.style.display = "none";
+          remainingAmountGroup.style.display = "none";
           projectDialog.style.display = "flex";
         }
 
         // Show edit project dialog
-
-        async function editProject(id) {
-
+        function editProject(id) {
           const project = projects.find((p) => p.id === id);
           if (project) {
             dialogTitle.textContent = "Edit Project";
             submitBtn.textContent = "Update Project";
             projectIdInput.value = project.id;
             document.getElementById("projectName").value = project.name;
-            document.getElementById("projectDescription").value =
-              project.description;
+            document.getElementById("projectDescription").value = project.description;
 
-            imagePreview.src = project.featuredImage
-              ? `data:image/jpeg;base64,${project.featuredImage}`
-              : "";
-            imagePreview.style.display = "block";
+            // Set budget values if they exist
+            if (project.budget) {
+              projectBudgetInput.value = project.budget;
+              collectedAmountGroup.style.display = "block";
+              remainingAmountGroup.style.display = "block";
+              if (project.collected) {
+                projectCollectedInput.value = project.collected;
+              } else {
+                projectCollectedInput.value = "";
+              }
+              updateRemainingAmount();
+            } else {
+              projectBudgetInput.value = "";
+              collectedAmountGroup.style.display = "none";
+              remainingAmountGroup.style.display = "none";
+            }
+
+            // Show image preview
+            if (project.featuredImage) {
+              imagePreview.src = `data:image/jpeg;base64,${project.featuredImage}`;
+              imagePreview.style.display = "block";
+            } else if (project.imageUrl) {
+              imagePreview.src = project.imageUrl;
+              imagePreview.style.display = "block";
+            } else {
+              imagePreview.style.display = "none";
+            }
 
             currentProjectId = id;
             projectDialog.style.display = "flex";
@@ -502,69 +583,94 @@
           deleteDialog.style.display = "flex";
         }
 
-
+        // Hide dialogs
         function hideDialogs() {
           projectDialog.style.display = "none";
           deleteDialog.style.display = "none";
           projectForm.reset();
         }
 
+        // Budget input listeners
+        projectBudgetInput.addEventListener("input", function () {
+          if (projectBudgetInput.value) {
+            collectedAmountGroup.style.display = "block";
+            remainingAmountGroup.style.display = "block";
+          } else {
+            collectedAmountGroup.style.display = "none";
+            remainingAmountGroup.style.display = "none";
+          }
+          updateRemainingAmount();
+        });
+        projectCollectedInput.addEventListener("input", updateRemainingAmount);
+
         // Add/Edit project form submission
+        projectForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
 
-projectForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
+          const projectName = document.getElementById("projectName").value;
+          const projectDescription = document.getElementById("projectDescription").value;
+          const projectImage = document.getElementById("projectImage").files[0];
+          const projectBudget = projectBudgetInput.value ? parseFloat(projectBudgetInput.value) : null;
+          const projectCollected = projectCollectedInput.value ? parseFloat(projectCollectedInput.value) : null;
 
-  const projectName = document.getElementById("projectName").value;
-  const projectDescription = document.getElementById("projectDescription").value;
-  const projectImage = document.getElementById("projectImage").files[0];
+          // Build the DTO object
+          const projectDTO = {
+            name: projectName,
+            description: projectDescription,
+            budget: projectBudget,
+            collected: projectCollected
+          };
 
-  const formData = new FormData();
-  formData.append("name", projectName);
-  formData.append("description", projectDescription);
-  if (projectImage) {
-    formData.append("featuredImage", projectImage);
-  }
+          const formData = new FormData();
+          formData.append("project", new Blob([JSON.stringify(projectDTO)], { type: "application/json" }));
+          if (projectImage) {
+            formData.append("featuredImage", projectImage);
+          }
 
-  try {
-    const token = localStorage.getItem("authToken");
-    const headers = {
-      "Authorization": `Bearer ${token}`,
-    };
+          try {
+            const token = localStorage.getItem("authToken");
+            const headers = {
+              Authorization: `Bearer ${token}`,
+              // Do NOT set Content-Type for FormData
+            };
 
-    let response;
-    if (currentProjectId) {
-      // Update project
-      response = await fetch(`${apiUrl}/project/${currentProjectId}`, {
-        method: "PUT",
-        body: formData,
-        headers, // Include the Authorization header
-      });
-    } else {
-      // Add new project
-      response = await fetch(`${apiUrl}/project`, {
-        method: "POST",
-        body: formData,
-        headers, // Include the Authorization header
-      });
-    }
+            let response;
+            if (currentProjectId) {
+              // Update project
+              response = await fetch(`${apiUrl}/project/${currentProjectId}`, {
+                method: "PUT",
+                body: formData,
+                headers,
+              });
+            } else {
+              // Add new project
+              response = await fetch(`${apiUrl}/project`, {
+                method: "POST",
+                body: formData,
+                headers,
+              });
+            }
 
-    if (!response.ok) {
-      throw new Error(`Failed to save project. ${response.status}: ${response.statusText}`);
-    }
+            if (!response.ok) {
+              throw new Error(`Failed to save project. ${response.status}: ${response.statusText}`);
+            }
 
-    await fetchProjects();
-    hideDialogs();
-  } catch (error) {
-    console.error("Failed to save project:", error);
-  }
-});
-
+            await fetchProjects();
+            hideDialogs();
+          } catch (error) {
+            console.error("Failed to save project:", error);
+          }
+        });
 
         // Delete project confirmation
         confirmDeleteBtn.addEventListener("click", async function () {
           try {
+            const token = localStorage.getItem("authToken");
             await fetch(`${apiUrl}/project/${deleteProjectId}`, {
               method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             });
             await fetchProjects();
             hideDialogs();

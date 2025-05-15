@@ -50,7 +50,7 @@
   background-color: #2e7d32;
 }
 
-.card:nth-child(4) {
+.card.four {
   background-color: #d50000;
 }
 

@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Holy Communion Participants</title>
-
-    <!-- Montserrat Font -->
+    <title>Confirmation Participants</title>
+     <!-- Montserrat Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -23,7 +22,19 @@
     <link rel="stylesheet" href="../GENERAL/style.css" />
         <link rel="stylesheet" href="sacraments.css" />
 
-   
+        <style>
+  .add-member-btn {
+    display: flex; /* Changed from absolute positioning */
+    align-items: center;
+    margin-left: auto; /* Pushes button to the right */
+    background: none;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+  }
+</style>
   </head>
   <body>
     <div class="grid-container" id="containerId">
@@ -34,24 +45,22 @@
             Back to Sacraments
           </a>
           
-          <h1 class="main-title">Holy Communion Participants</h1>
+          <h1 class="main-title">Confirmation Participants</h1>
           
-          <div class="tab-container">
-            <div class="tab active" data-tab="training">In Training (<span id="training-count">0</span>)</div>
-            <div class="tab" data-tab="completed">Completed (<span id="completed-count">0</span>)</div>
-            <button class="add-member-btn" id="addMemberBtn">
-              <span class="material-icons-outlined">person_add</span>
-              Add Member
-            </button>
-          </div>
+         <div class="tab-container">
+  <div class="tab active" data-tab="training">In Training (<span id="training-count">0</span>)</div>
+  <div class="tab" data-tab="completed">Completed (<span id="completed-count">0</span>)</div>
+  <button class="add-member-btn" id="addMemberBtn">
+    <span class="material-icons-outlined">person_add</span>
+    Add Member
+  </button>
+</div>
           
-          <!-- In Training Tab Content -->
           <div class="tab-content active" id="training-content">
             <div class="participant-count"><span id="training-count-display">0</span> Participants</div>
             <ul class="participant-list" id="training-list"></ul>
           </div>
           
-          <!-- Completed Tab Content -->
           <div class="tab-content" id="completed-content">
             <div class="participant-count"><span id="completed-count-display">0</span> Participants</div>
             <ul class="participant-list" id="completed-list"></ul>
@@ -60,7 +69,6 @@
       </main>
     </div>
 
-    <!-- Search Dialog -->
     <div class="overlay" id="overlay"></div>
     <div class="search-dialog" id="searchDialog">
       <div class="search-dialog-header">
@@ -75,10 +83,10 @@
       <div class="search-results" id="searchResults"></div>
     </div>
 
-   <script src="sacraments.js"></script>
+    <script src="sacraments.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        initSacramentPage('Holy_communion');
+        initSacramentPage('confirmation');
       });
     </script>
     <script src="../GENERAL/script.js"></script>

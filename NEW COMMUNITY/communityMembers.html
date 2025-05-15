@@ -883,7 +883,7 @@
 
               // Add event listener to the add button
               userElement.querySelector('.add-user-btn').addEventListener('click', () => {
-                addUserToCommunity(user.id, user.fullName);
+                addUserToCommunity(user.id, user.name);
               });
             });
           })
@@ -900,7 +900,7 @@
       }
 
       // Add user to community
-      function addUserToCommunity(userId, userName) {
+      function addUserToCommunity(userId, name) {
         const command = {
           userId: userId,
           groupId: window.currentCommunity.id
@@ -920,7 +920,7 @@
         .then(() => {
           searchModal.classList.remove('active');
           fetchCommunityMembers(); // Refresh the member list
-          showNotification(`${userName} added to community successfully!`, "success");
+          showNotification(`${name} added to community successfully!`, "success");
         })
         .catch(error => {
           console.error("Error adding member:", error);

@@ -520,7 +520,12 @@
           actionsCol.forEach(el => el.remove());
           
           const wb = XLSX.utils.table_to_book(tableClone);
-          XLSX.writeFile(wb, "contributions-list.xlsx");
+          const filename = "contributions-list.xlsx";
+          XLSX.writeFile(wb, filename);
+          
+          // Add to reports
+          addNewReport(filename, "Contributions");
+          
           showMessage("Excel exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to Excel:", error);
@@ -572,13 +577,35 @@
             }
           });
 
-          doc.save("contributions-list.pdf");
+          const filename = "contributions-list.pdf";
+          doc.save(filename);
+          
+          // Add to reports
+          addNewReport(filename, "Contributions");
+          
           showMessage("PDF exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to PDF:", error);
           showMessage("Error exporting to PDF: " + error.message, "error");
         }
       });
+
+      // Add new report to localStorage
+      function addNewReport(filename, type) {
+        const reports = JSON.parse(localStorage.getItem("reports") || []);
+        
+        // Check if report already exists
+        const exists = reports.some(report => report.filename === filename);
+        
+        if (!exists) {
+          reports.push({
+            filename: filename,
+            type: type || (filename.includes('members') ? 'Members' : filename.includes('contributions') ? 'Contributions' : 'Other'),
+            date: new Date().toLocaleString()
+          });
+          localStorage.setItem("reports", JSON.stringify(reports));
+        }
+      }
     </script>
 
 <script src="../GENERAL/script.js"></script>

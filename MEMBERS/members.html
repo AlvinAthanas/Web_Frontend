@@ -101,8 +101,8 @@
 
               <label for="gender">Gender</label>
               <div class="gender">
-                <input type="radio" name="gender" id="Male" required />Male
-                <input type="radio" name="gender" id="Female" required />Female
+                <input type="radio" name="gender" id="Male" value="Male" required />Male
+                <input type="radio" name="gender" id="Female" value="Female" required />Female
               </div>
 
               <div class="dialog-buttons">
@@ -156,91 +156,33 @@
       let entriesPerPage = 50;
       let allMembers = [];
       let filteredMembers = [];
-
       let currentDeleteId = null;
       const deleteModal = document.getElementById("deleteModal");
       const deleteCancel = document.getElementById("deleteCancel");
       const deleteConfirm = document.getElementById("deleteConfirm");
 
+      // Initialize the page
       document.addEventListener("DOMContentLoaded", () => {
-        const openDialogBtn = document.getElementById("openDialogBtn");
-        const submitBtn = document.getElementById("submit");
-        const cancelBtn = document.getElementById("cancelBtn");
-        const formDialog = document.getElementById("formDialog");
-        const formEl = document.getElementById("addMemberForm");
-
-        // Initialize the page
         loadMembers();
         setupPagination();
         setupSearch();
-
-        openDialogBtn.onclick = () => {
-          formEl.reset();
-          formDialog.style.display = "flex";
-        };
-
-        cancelBtn.onclick = () => {
-          formDialog.style.display = "none";
-        };
-
-        formEl.addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          const name = document.getElementById("name").value;
-          const email = document.getElementById("email").value;
-          const address = document.getElementById("address").value;
-          const phone = document.getElementById("phone").value;
-          const gender = document.querySelector(
-            "input[name='gender']:checked"
-          )?.id;
-
-          const memberData = { name, email, address, phone, gender };
-          const token = localStorage.getItem("authToken");
-          const editId = formEl.dataset.editId;
-
-          const url = editId
-            ? `http://localhost:8080/user/${editId}`
-            : "http://localhost:8080/user";
-          const method = editId ? "PUT" : "POST";
-
-          fetch(url, {
-            method,
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(memberData),
-          })
-            .then((res) => {
-              if (!res.ok)
-                throw new Error(`Failed to ${editId ? "update" : "add"} user`);
-              return res.json();
-            })
-            .then((data) => {
-              formDialog.style.display = "none";
-              loadMembers(); // Refresh table
-              showMessage(
-                `Member ${editId ? "updated" : "added"} successfully!`,
-                "success"
-              );
-              formEl.dataset.editId = ""; // Clear edit flag
-              document.getElementById("submit").textContent = "Save"; // Reset button
-            })
-            .catch((error) => {
-              console.error("Error:", error.message);
-              showMessage(`Error: ${error.message}`, "error");
-            });
-        });
+        setupForm();
+        setupDeleteModal();
       });
 
       // Function to load members from the database
       function loadMembers() {
         const token = localStorage.getItem("authToken");
+        
+        if (!token) {
+          showMessage("Please login first", "error");
+          return;
+        }
 
         fetch("http://localhost:8080/users", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         })
@@ -254,12 +196,122 @@
             updateTable();
           })
           .catch((error) => {
-            console.error("Error loading members:", error.message);
+            console.error("Error loading members:", error);
             showMessage("Error loading members: " + error.message, "error");
           });
       }
 
-      // Update the table with current pagination and filters
+      // Setup form functionality
+      function setupForm() {
+        const formEl = document.getElementById("addMemberForm");
+        const formDialog = document.getElementById("formDialog");
+
+        document.getElementById("openDialogBtn").addEventListener("click", () => {
+          formEl.reset();
+          formEl.dataset.editId = '';
+          document.getElementById("submit").textContent = "Save";
+          formDialog.style.display = "flex";
+        });
+
+        document.getElementById("cancelBtn").addEventListener("click", () => {
+          formDialog.style.display = "none";
+        });
+
+        formEl.addEventListener("submit", function(e) {
+          e.preventDefault();
+          
+          const token = localStorage.getItem("authToken");
+          if (!token) {
+            showMessage("Please login first", "error");
+            return;
+          }
+
+          const formData = new FormData(formEl);
+          const data = {
+            name: formData.get("name"),
+            email: formData.get("email"),
+            address: formData.get("address"),
+            phone: formData.get("phone"),
+            gender: formData.get("gender")
+          };
+
+          const memberId = formEl.dataset.editId;
+          const url = memberId ? `http://localhost:8080/user/${memberId}` : "http://localhost:8080/user";
+          const method = memberId ? "PUT" : "POST";
+
+          fetch(url, {
+            method: method,
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+          })
+            .then(res => {
+              if (!res.ok) throw new Error(`Failed to ${memberId ? "update" : "add"} member`);
+              return res.json();
+            })
+            .then(data => {
+              formDialog.style.display = "none";
+              loadMembers();
+              showMessage(`Member ${memberId ? "updated" : "added"} successfully!`, "success");
+            })
+            .catch(error => {
+              console.error("Error:", error);
+              showMessage("Error: " + error.message, "error");
+            });
+        });
+      }
+
+      // Setup delete confirmation modal
+      function setupDeleteModal() {
+        deleteCancel.addEventListener("click", () => {
+          deleteModal.style.display = "none";
+          currentDeleteId = null;
+        });
+
+        deleteConfirm.addEventListener("click", () => {
+          if (currentDeleteId) {
+            deleteMember(currentDeleteId);
+          }
+          deleteModal.style.display = "none";
+        });
+
+        deleteModal.addEventListener("click", (e) => {
+          if (e.target === deleteModal) {
+            deleteModal.style.display = "none";
+            currentDeleteId = null;
+          }
+        });
+      }
+
+      // Delete a member
+      function deleteMember(id) {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          showMessage("Please login first", "error");
+          return;
+        }
+
+        fetch(`http://localhost:8080/user/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("Failed to delete member");
+            loadMembers();
+            showMessage("Member deleted successfully!", "success");
+          })
+          .catch(error => {
+            console.error("Error deleting member:", error);
+            showMessage("Error deleting member: " + error.message, "error");
+          });
+      }
+
+      // Update the table with current data
       function updateTable() {
         const tableBody = document.getElementById("member-table-body");
         tableBody.innerHTML = "";
@@ -270,25 +322,21 @@
         if (entriesPerPage === "all") {
           endIndex = filteredMembers.length;
         }
-        const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+        const paginatedData = filteredMembers.slice(startIndex, endIndex);
 
         // Populate table
-        paginatedMembers.forEach((user, index) => {
+        paginatedData.forEach((member, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${startIndex + index + 1}</td>
-            <td>${user.name || ""}</td>
-            <td>${user.email || ""}</td>
-            <td>${user.phone || ""}</td>
-            <td>${user.address || ""}</td>
-            <td>${user.gender || ""}</td>
+            <td>${member.name || ""}</td>
+            <td>${member.email || ""}</td>
+            <td>${member.phone || ""}</td>
+            <td>${member.address || ""}</td>
+            <td>${member.gender || ""}</td>
             <td class="actions">
-              <span class="material-icons-outlined edit-icon" data-id="${
-                user.id
-              }">edit</span>
-              <span class="material-icons-outlined delete-icon" data-id="${
-                user.id
-              }">delete</span>
+              <span class="material-icons-outlined edit-icon" data-id="${member.id}">edit</span>
+              <span class="material-icons-outlined delete-icon" data-id="${member.id}">delete</span>
             </td>
           `;
           tableBody.appendChild(row);
@@ -297,39 +345,17 @@
         // Update pagination info
         updatePaginationInfo();
 
-        // Add event listeners for edit and delete buttons
+        // Add event listeners for edit and delete
         addActionListeners();
       }
 
-      // Update pagination information
-      function updatePaginationInfo() {
-        const totalPages =
-          entriesPerPage === "all"
-            ? 1
-            : Math.ceil(filteredMembers.length / entriesPerPage);
-        document.getElementById(
-          "pageInfo"
-        ).textContent = `Page ${currentPage} of ${totalPages}`;
-
-        // Disable/enable pagination buttons
-        document.getElementById("firstPage").disabled = currentPage === 1;
-        document.getElementById("prevPage").disabled = currentPage === 1;
-        document.getElementById("nextPage").disabled =
-          currentPage === totalPages || totalPages === 0;
-        document.getElementById("lastPage").disabled =
-          currentPage === totalPages || totalPages === 0;
-      }
-
-      // Setup pagination event listeners
+      // Setup pagination controls
       function setupPagination() {
-        document
-          .getElementById("entriesPerPage")
-          .addEventListener("change", (e) => {
-            entriesPerPage =
-              e.target.value === "all" ? "all" : parseInt(e.target.value);
-            currentPage = 1;
-            updateTable();
-          });
+        document.getElementById("entriesPerPage").addEventListener("change", (e) => {
+          entriesPerPage = e.target.value === "all" ? "all" : parseInt(e.target.value);
+          currentPage = 1;
+          updateTable();
+        });
 
         document.getElementById("firstPage").addEventListener("click", () => {
           currentPage = 1;
@@ -344,10 +370,7 @@
         });
 
         document.getElementById("nextPage").addEventListener("click", () => {
-          const totalPages =
-            entriesPerPage === "all"
-              ? 1
-              : Math.ceil(filteredMembers.length / entriesPerPage);
+          const totalPages = entriesPerPage === "all" ? 1 : Math.ceil(filteredMembers.length / entriesPerPage);
           if (currentPage < totalPages) {
             currentPage++;
             updateTable();
@@ -355,13 +378,22 @@
         });
 
         document.getElementById("lastPage").addEventListener("click", () => {
-          const totalPages =
-            entriesPerPage === "all"
-              ? 1
-              : Math.ceil(filteredMembers.length / entriesPerPage);
+          const totalPages = entriesPerPage === "all" ? 1 : Math.ceil(filteredMembers.length / entriesPerPage);
           currentPage = totalPages;
           updateTable();
         });
+      }
+
+      // Update pagination information
+      function updatePaginationInfo() {
+        const totalPages = entriesPerPage === "all" ? 1 : Math.ceil(filteredMembers.length / entriesPerPage);
+        document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+        
+        // Disable/enable pagination buttons
+        document.getElementById("firstPage").disabled = currentPage === 1;
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
+        document.getElementById("lastPage").disabled = currentPage === totalPages || totalPages === 0;
       }
 
       // Setup search functionality
@@ -371,21 +403,17 @@
           applySearch();
         });
 
-        document
-          .getElementById("searchInput")
-          .addEventListener("keyup", (e) => {
-            if (e.key === "Enter") {
-              currentPage = 1;
-              applySearch();
-            }
-          });
+        document.getElementById("searchInput").addEventListener("keyup", (e) => {
+          if (e.key === "Enter") {
+            currentPage = 1;
+            applySearch();
+          }
+        });
       }
 
-      // Apply search filter with null checks
+      // Apply search filter
       function applySearch() {
-        const searchTerm = document
-          .getElementById("searchInput")
-          .value.toLowerCase();
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
         if (searchTerm) {
           filteredMembers = allMembers.filter((member) => {
             const name = member.name ? member.name.toLowerCase() : "";
@@ -412,130 +440,90 @@
       function addActionListeners() {
         document.querySelectorAll(".edit-icon").forEach((icon) => {
           icon.addEventListener("click", (e) => {
-            const userId = e.target.getAttribute("data-id");
-            editMember(userId);
+            const memberId = e.target.getAttribute("data-id");
+            editMember(memberId);
           });
         });
 
         document.querySelectorAll(".delete-icon").forEach((icon) => {
           icon.addEventListener("click", (e) => {
-            const userId = e.target.getAttribute("data-id");
-            showDeleteConfirmation(userId);
+            const memberId = e.target.getAttribute("data-id");
+            currentDeleteId = memberId;
+            deleteModal.style.display = "flex";
           });
         });
       }
 
-      function editMember(userId) {
+      // Edit a member
+      function editMember(id) {
         const token = localStorage.getItem("authToken");
-        fetch(`http://localhost:8080/user?id=${userId}`, {
+        if (!token) {
+          showMessage("Please login first", "error");
+          return;
+        }
+
+        fetch(`http://localhost:8080/user/${id}`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         })
-          .then((res) => res.json())
-          .then((user) => {
-            console.log("User data:", user); // Debugging log
-            console.log("Phone:", user.phone); // Log the phone number
-
-            // Populate the form fields with the user's data
-            document.getElementById("name").value = user.name || "";
-            document.getElementById("email").value = user.email || "";
-            document.getElementById("address").value = user.address || "";
-            document.getElementById("phone").value = user.phone || ""; // Ensure phone is set here
-            if (user.gender) {
-              document.getElementById(user.gender).checked = true;
+          .then(res => res.json())
+          .then(member => {
+            document.getElementById("name").value = member.name || "";
+            document.getElementById("email").value = member.email || "";
+            document.getElementById("address").value = member.address || "";
+            document.getElementById("phone").value = member.phone || "";
+            
+            if (member.gender) {
+              document.getElementById(member.gender).checked = true;
             }
 
-            // Update the dialog title and button text
-            const formDialog = document.getElementById("formDialog");
-            const dialogTitle = formDialog.querySelector("h3");
-            dialogTitle.textContent = "Update Member Details"; // Change title for editing
-            document.getElementById("submit").textContent = "Update"; // Change button text
-
-            // Set the edit ID in the form's dataset
             const form = document.getElementById("addMemberForm");
-            form.dataset.editId = userId;
-
-            // Show the dialog
-            formDialog.style.display = "flex";
+            form.dataset.editId = id;
+            document.getElementById("submit").textContent = "Update";
+            document.getElementById("formDialog").style.display = "flex";
           })
-          .catch((error) => {
-            console.error("Error fetching user:", error);
-            showMessage("Error fetching member: " + error.message, "error");
+          .catch(error => {
+            console.error("Error loading member:", error);
+            showMessage("Error loading member: " + error.message, "error");
           });
       }
 
-      function showDeleteConfirmation(userId) {
-        currentDeleteId = userId;
-        deleteModal.style.display = "flex";
-      }
-
-      // Setup modal event listeners
-      deleteCancel.addEventListener("click", () => {
-        deleteModal.style.display = "none";
-        currentDeleteId = null;
-      });
-
-      deleteConfirm.addEventListener("click", () => {
-        if (currentDeleteId) {
-          performMemberDeletion(currentDeleteId);
-        }
-        deleteModal.style.display = "none";
-      });
-
-      // Close modal when clicking outside
-      deleteModal.addEventListener("click", (e) => {
-        if (e.target === deleteModal) {
-          deleteModal.style.display = "none";
-          currentDeleteId = null;
-        }
-      });
-
-      // Updated delete function
-      function performMemberDeletion(userId) {
-        const token = localStorage.getItem("authToken");
-        fetch(`http://localhost:8080/user/${userId}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => {
-            if (!res.ok) throw new Error("Failed to delete user");
-            loadMembers();
-            showMessage("Member deleted successfully!", "success");
-          })
-          .catch((error) => {
-            console.error("Error deleting user:", error);
-            showMessage("Error deleting member: " + error.message, "error");
-          });
+      // Show message to user
+      function showMessage(text, type) {
+        const messageEl = document.getElementById("member-message");
+        messageEl.textContent = text;
+        messageEl.style.color = type === "success" ? "green" : "red";
+        setTimeout(() => {
+          messageEl.textContent = "";
+        }, 3000);
       }
 
       // Export to Excel
-      document
-        .getElementById("exportExcelBtn")
-        .addEventListener("click", () => {
-          try {
-            const table = document.getElementById("member-table");
-            const tableClone = table.cloneNode(true);
-
-            // Remove actions column
-            const actionsCol = tableClone.querySelectorAll(
-              "td.actions, th:nth-child(7)"
-            );
-            actionsCol.forEach((el) => el.remove());
-
-            const wb = XLSX.utils.table_to_book(tableClone);
-            XLSX.writeFile(wb, "members-list.xlsx");
-            showMessage("Excel exported successfully!", "success");
-          } catch (error) {
-            console.error("Error exporting to Excel:", error);
-            showMessage("Error exporting to Excel: " + error.message, "error");
-          }
-        });
+      document.getElementById("exportExcelBtn").addEventListener("click", () => {
+        try {
+          const table = document.getElementById("member-table");
+          const tableClone = table.cloneNode(true);
+          
+          // Remove actions column
+          const actionsCol = tableClone.querySelectorAll("td.actions, th:nth-child(7)");
+          actionsCol.forEach(el => el.remove());
+          
+          const wb = XLSX.utils.table_to_book(tableClone);
+          const filename = "members-list.xlsx";
+          XLSX.writeFile(wb, filename);
+          
+          // Add to reports
+          addNewReport(filename, "Members");
+          
+          showMessage("Excel exported successfully!", "success");
+        } catch (error) {
+          console.error("Error exporting to Excel:", error);
+          showMessage("Error exporting to Excel: " + error.message, "error");
+        }
+      });
 
       // Export to PDF
       document.getElementById("exportPdfBtn").addEventListener("click", () => {
@@ -548,21 +536,14 @@
           doc.setFontSize(16);
           doc.text("Registered Members List", 14, 10);
 
-          const headers = [
-            "S/N",
-            "Full Name",
-            "Email",
-            "Phone",
-            "Address",
-            "Gender",
-          ];
+          const headers = ["S/N", "Full Name", "Email", "Phone", "Address", "Gender"];
           const tableData = filteredMembers.map((member, index) => [
             index + 1,
             member.name || "",
             member.email || "",
             member.phone || "",
             member.address || "",
-            member.gender || "",
+            member.gender || ""
           ]);
 
           doc.autoTable({
@@ -594,7 +575,12 @@
             },
           });
 
-          doc.save("members-list.pdf");
+          const filename = "members-list.pdf";
+          doc.save(filename);
+          
+          // Add to reports
+          addNewReport(filename, "Members");
+          
           showMessage("PDF exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to PDF:", error);
@@ -602,14 +588,21 @@
         }
       });
 
-      // Helper function to show messages
-      function showMessage(text, type) {
-        const messageEl = document.getElementById("member-message");
-        messageEl.textContent = text;
-        messageEl.style.color = type === "success" ? "green" : "red";
-        setTimeout(() => {
-          messageEl.textContent = "";
-        }, 3000);
+      // Add new report to localStorage
+      function addNewReport(filename, type) {
+        const reports = JSON.parse(localStorage.getItem("reports") || []);
+        
+        // Check if report already exists
+        const exists = reports.some(report => report.filename === filename);
+        
+        if (!exists) {
+          reports.push({
+            filename: filename,
+            type: type || (filename.includes("members") ? "Members" : filename.includes("contributions") ? "Contributions" : "Other"),
+            date: new Date().toLocaleString()
+          });
+          localStorage.setItem("reports", JSON.stringify(reports));
+        }
       }
     </script>
 
