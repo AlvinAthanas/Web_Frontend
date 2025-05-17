@@ -152,8 +152,37 @@
           });
       }
 
+      // Function to decode JWT token
+      function parseJwt(token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          return JSON.parse(jsonPayload);
+        } catch (e) {
+          console.error("Error parsing JWT:", e);
+          return null;
+        }
+      }
+
+      // Function to get user details by email
+      async function getUserByEmail(email) {
+        try {
+          const response = await fetch(`http://localhost:8080/user?email=${encodeURIComponent(email)}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+          return await response.json();
+        } catch (error) {
+          console.error("Error fetching user:", error);
+          return null;
+        }
+      }
+
       // Creating a new event
-      function handleCreate(event) {
+      async function handleCreate(event) {
         event.preventDefault();
 
         const name = formEl.name.value;
@@ -163,7 +192,35 @@
         const time = formEl.eventTime.value;
         const dateTime = `${date}T${time}`;
 
-        const data = { name, description, location, dateTime };
+        // Get user email from JWT token
+        const token = localStorage.getItem('authToken');
+        let parishId = null;
+        let userId = null;
+
+        if (token) {
+          try {
+            const decodedToken = parseJwt(token);
+            if (decodedToken && decodedToken.sub) {
+              const userEmail = decodedToken.sub;
+              const userData = await getUserByEmail(userEmail);
+              if (userData) {
+                parishId = userData.parishId;
+                userId = userData.id;
+              }
+            }
+          } catch (error) {
+            console.error("Error getting user data:", error);
+          }
+        }
+
+        const data = { 
+          name, 
+          description, 
+          location, 
+          dateTime,
+          parishId,
+          userId
+        };
 
         fetch("http://localhost:8080/event", {
           method: "POST",
@@ -183,7 +240,7 @@
       }
 
       // Updating an Existing event
-      function handleUpdate(event) {
+      async function handleUpdate(event) {
         event.preventDefault();
         // const formData = new FormData(formEl);
         // const data = Object.fromEntries(formData);
@@ -195,7 +252,35 @@
         const time = formEl.eventTime.value;
         const dateTime = `${date}T${time}`;
 
-        const data = { name, description, location, dateTime };
+        // Get user email from JWT token
+        const token = localStorage.getItem('token');
+        let parishId = null;
+        let userId = null;
+
+        if (token) {
+          try {
+            const decodedToken = parseJwt(token);
+            if (decodedToken && decodedToken.sub) {
+              const userEmail = decodedToken.sub;
+              const userData = await getUserByEmail(userEmail);
+              if (userData) {
+                parishId = userData.parishId;
+                userId = userData.id;
+              }
+            }
+          } catch (error) {
+            console.error("Error getting user data:", error);
+          }
+        }
+
+        const data = { 
+          name, 
+          description, 
+          location, 
+          dateTime,
+          parishId,
+          userId
+        };
 
         fetch(`http://localhost:8080/event/${editingId}`, {
           method: "PUT",
