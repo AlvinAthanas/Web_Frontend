@@ -191,6 +191,7 @@
   let selectedUserId = null;
   let allRoles = [];
   let allAuthorities = [];
+  let isCheckboxClicked = false;
 
   // Define the specific authorities as mentioned in the issue description
   const specificAuthorities = [
@@ -297,9 +298,13 @@
 
   function renderRuleRoleDropdown() {
     const ruleRoleSelect = document.getElementById('rule-role');
+    // Save the currently selected role before clearing the dropdown
+    const selectedRole = ruleRoleSelect.value;
     ruleRoleSelect.innerHTML = '';
     allRoles.forEach(role => {
-      ruleRoleSelect.innerHTML += `<option value="${role}">${role.replace(/_/g, ' ')}</option>`;
+      // Set the selected attribute if this role matches the previously selected role
+      const selected = (role === selectedRole) ? 'selected' : '';
+      ruleRoleSelect.innerHTML += `<option value="${role}" ${selected}>${role.replace(/_/g, ' ')}</option>`;
     });
   }
   function renderRuleAuthorityCheckboxes(granted = [], denied = []) {
@@ -335,6 +340,21 @@
       } else if (auth.startsWith("READ_")) {
         deniesReadDiv.innerHTML += checkbox;
       }
+    });
+
+    // Add click event listeners to prevent form submission when checkboxes are clicked
+    document.querySelectorAll('.rule-grants-write input[type="checkbox"], .rule-grants-read input[type="checkbox"], .rule-denies-write input[type="checkbox"], .rule-denies-read input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('click', function(e) {
+        // Set the flag to indicate a checkbox was clicked
+        isCheckboxClicked = true;
+        // Stop the event from propagating to prevent form submission
+        e.stopPropagation();
+
+        // Reset the flag after a short delay to allow other events to complete
+        setTimeout(() => {
+          isCheckboxClicked = false;
+        }, 100);
+      });
     });
   }
 
@@ -446,6 +466,9 @@
   // ---- FORM SUBMISSION: CREATE/MODIFY RULES ----
   document.querySelector("#rules-form").addEventListener("submit", function(e){
     e.preventDefault();
+    // Reset the checkbox clicked flag to ensure it doesn't interfere with future operations
+    isCheckboxClicked = false;
+
     const roleName = document.getElementById('rule-role').value;
     const overrideDefault = document.getElementById('rule-override').checked;
     const grantedAuthorities = Array.from(
@@ -463,24 +486,67 @@
       deniedAuthorities
     };
 
+    // First try to create a new rule using POST
     fetch(`${API_BASE}/role-authority-rules/AuthorityRule`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload),
     })
-            .then((res) => res.json())
-            .then((data) => {
-              document.getElementById('rule-message').textContent = "Rule saved successfully.";
-            })
-            .catch(() => {
-              document.getElementById('rule-message').textContent = "Error saving rule.";
-            });
+    .then((res) => {
+      if (res.ok) {
+        return res.json().then(data => {
+          document.getElementById('rule-message').textContent = "Rule saved successfully.";
+        });
+      } else {
+        // If the response is not OK, parse the error message
+        return res.json().then(errorData => {
+          // Check if the error is because the rule already exists
+          if (errorData.message && errorData.message.includes("Authority rule already exists for role")) {
+            // Get the existing rule's ID
+            return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to get existing rule");
+                return res.json();
+              })
+              .then(existingRule => {
+                // Update the existing rule using PUT
+                return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/${existingRule.id}`, {
+                  method: "PUT",
+                  headers: {"Content-Type": "application/json"},
+                  body: JSON.stringify(payload),
+                });
+              })
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to update rule");
+                return res.json();
+              })
+              .then(data => {
+                document.getElementById('rule-message').textContent = "Rule updated successfully.";
+              });
+          } else {
+            // If it's a different error, throw it
+            throw new Error(errorData.message || "Error saving rule");
+          }
+        });
+      }
+    })
+    .catch((error) => {
+      document.getElementById('rule-message').textContent = `Error: ${error.message || "Failed to save rule"}`;
+    });
   });
 
   // ---- RULES TAB: LOAD RULE WHEN SELECTING ROLE ----
   document.getElementById('rules-tab').addEventListener('click', function() {
     // On show, update rule dropdown
     renderRuleRoleDropdown();
+
+    // Trigger the change event on the dropdown to fetch and display the authorities for the selected role
+    const ruleRoleSelect = document.getElementById('rule-role');
+    if (ruleRoleSelect.value) {
+      // Create and dispatch a change event
+      const event = new Event('change');
+      ruleRoleSelect.dispatchEvent(event);
+    }
   });
 
   // On tab click, if user is selected, update authorities tab as well
@@ -493,20 +559,27 @@
   document.getElementById('rule-role').addEventListener('change', function() {
     // Optionally load existing rule for editing
     const roleName = this.value;
-    fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
-            .then(res => {
-              if (!res.ok) throw new Error();
-              return res.json();
-            })
-            .then(rule => {
-              document.getElementById('rule-override').checked = rule.overrideDefault;
-              renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
-            })
-            .catch(() => {
-              // No rule yet, clear form
-              document.getElementById('rule-override').checked = false;
-              renderRuleAuthorityCheckboxes([], []);
-            });
+    // Ensure the dropdown value is set to the selected role
+    this.value = roleName;
+
+    // Only fetch the rule if a checkbox was not clicked
+    if (!isCheckboxClicked) {
+      fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+              .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+              })
+              .then(rule => {
+                document.getElementById('rule-override').checked = rule.overrideDefault;
+                renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
+              })
+              .catch(() => {
+                // No rule yet, clear form but keep the selected role
+                document.getElementById('rule-override').checked = false;
+                renderRuleAuthorityCheckboxes([], []);
+                console.log(`No existing rule found for role: ${roleName}`);
+              });
+    }
   });
 
   // ---- INITIALIZE ROLES & AUTHORITIES ON LOAD ----
