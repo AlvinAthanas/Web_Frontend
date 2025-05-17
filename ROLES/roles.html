@@ -614,6 +614,19 @@
   loadRoles();
   loadAuthorities();
 
+  // Add event listener to the override default checkbox to prevent form submission when clicked
+  document.getElementById('rule-override').addEventListener('click', function(e) {
+    // Set the flag to indicate a checkbox was clicked
+    isCheckboxClicked = true;
+    // Stop the event from propagating to prevent form submission
+    e.stopPropagation();
+
+    // Reset the flag after a short delay to allow other events to complete
+    setTimeout(() => {
+      isCheckboxClicked = false;
+    }, 100);
+  });
+
 
 </script>
 <script src="../GENERAL/script.js"></script>
