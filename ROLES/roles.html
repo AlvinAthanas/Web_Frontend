@@ -16,64 +16,13 @@
           rel="stylesheet"
   />
   <link rel="stylesheet" href="../GENERAL/style.css" />
-  <link rel="stylesheet" href="../ROLES/roles.css" />
+  <link rel="stylesheet" href="../ROLES/roles-enhanced.css" />
   <style>
-    .suggestions-list {
-      position: absolute;
-      background: white;
-      border: 1px solid #ccc;
-      width: 100%;
-      z-index: 1000;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .suggestions-list div {
-      padding: 8px;
-      cursor: pointer;
-    }
-    .suggestions-list div:hover {
-      background-color: #79b3f1;
-      color: white;
-    }
-    .tabs {
-      display: flex;
-      border-bottom: 2px solid #d9d9d9;
-      margin-bottom: 15px;
-      gap: 10px;
-    }
-    .tab {
-      padding: 8px 18px;
-      cursor: pointer;
-      background: #f7f7f7;
-      border-radius: 6px 6px 0 0;
-      border: 1px solid #d9d9d9;
-      border-bottom: none;
-      margin-bottom: -2px;
-      transition: background 0.2s;
-    }
-    .tab.active {
-      background: #fff;
-      border: 2px solid #79b3f1;
-      color: #0767d6;
-      font-weight: 600;
-    }
     .tab-content {
       display: none;
     }
     .tab-content.active {
       display: block;
-    }
-    .roles .input, .authorities .input {
-      margin-bottom: 2px;
-    }
-    /* For better check visual distinction */
-    .highlighted {
-      background-color: #e3f1ff !important;
-      font-weight: 600;
-      border-radius: 3px;
-    }
-    .form {
-      position: relative;
     }
   </style>
 </head>
@@ -118,13 +67,13 @@
         <form id="authorities-form">
           <h5>Assign Authorities</h5>
           <hr/>
-          <div style="display:flex; gap:25px;">
-            <div style="flex:1;">
-              <div><strong>Write Permissions:</strong></div>
+          <div class="two-column">
+            <div class="column">
+              <div class="section-title">Write Permissions:</div>
               <div class="authorities-write"></div>
             </div>
-            <div style="flex:1;">
-              <div><strong>Read Permissions:</strong></div>
+            <div class="column">
+              <div class="section-title">Read Permissions:</div>
               <div class="authorities-read"></div>
             </div>
           </div>
@@ -140,27 +89,33 @@
           <label for="rule-role">Role Name:</label>
           <select id="rule-role" required></select>
           <br /><br />
-          <label><input type="checkbox" id="rule-override" /> Override default authorities?</label>
+          <label class="toggle-label">
+            <span class="toggle-switch">
+              <input type="checkbox" id="rule-override">
+              <span class="toggle-slider"></span>
+            </span>
+            Override default authorities?
+          </label>
           <br /><br />
-          <label>Grant Authorities:</label>
-          <div style="display:flex; gap:25px;">
-            <div style="flex:1;">
-              <div><strong>Write Permissions:</strong></div>
+          <div class="section-title">Grant Authorities:</div>
+          <div class="two-column">
+            <div class="column">
+              <div class="section-title">Write Permissions:</div>
               <div class="rule-grants-write"></div>
             </div>
-            <div style="flex:1;">
-              <div><strong>Read Permissions:</strong></div>
+            <div class="column">
+              <div class="section-title">Read Permissions:</div>
               <div class="rule-grants-read"></div>
             </div>
           </div>
-          <label>Deny Authorities:</label>
-          <div style="display:flex; gap:25px;">
-            <div style="flex:1;">
-              <div><strong>Write Permissions:</strong></div>
+          <div class="section-title">Deny Authorities:</div>
+          <div class="two-column">
+            <div class="column">
+              <div class="section-title">Write Permissions:</div>
               <div class="rule-denies-write"></div>
             </div>
-            <div style="flex:1;">
-              <div><strong>Read Permissions:</strong></div>
+            <div class="column">
+              <div class="section-title">Read Permissions:</div>
               <div class="rule-denies-read"></div>
             </div>
           </div>
@@ -256,9 +211,11 @@
     allRoles.forEach(role => {
       const checked = selected.includes(role) ? 'checked' : '';
       rolesDiv.innerHTML += `
-            <div class="input${checked ? ' highlighted' : ''}">
-              <input type="checkbox" value="${role}" ${checked} /> ${role.replace(/_/g, ' ')}
-            </div>`;
+            <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+              <input type="checkbox" value="${role}" ${checked} />
+              <span class="checkmark"></span>
+              ${role.replace(/_/g, ' ')}
+            </label>`;
     });
   }
 
@@ -268,9 +225,11 @@
     allAuthorities.forEach(auth => {
       const checked = selected.includes(auth) ? 'checked' : '';
       authoritiesDiv.innerHTML += `
-            <div class="input${checked ? ' highlighted' : ''}">
-              <input type="checkbox" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}
-            </div>`;
+            <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+              <input type="checkbox" value="${auth}" ${checked} />
+              <span class="checkmark"></span>
+              ${auth.replace(/_/g, ' ')}
+            </label>`;
     });
   }
 
@@ -285,13 +244,17 @@
 
     authoritiesToRender.forEach(auth => {
       const inUser = userAuthorities.includes(auth);
-      const checkbox = `<input type="checkbox" value="${auth}" ${inUser ? "checked" : ""}/> ${auth.replace(/_/g," ")}`;
-      const divClass = inUser ? "input highlighted" : "input";
+      const checkboxHtml = `
+        <label class="custom-checkbox${inUser ? ' highlighted' : ''}">
+          <input type="checkbox" value="${auth}" ${inUser ? "checked" : ""}/>
+          <span class="checkmark"></span>
+          ${auth.replace(/_/g," ")}
+        </label>`;
 
       if (auth.startsWith("WRITE_")) {
-        writeDiv.innerHTML += `<div class="${divClass}">${checkbox}</div>`;
+        writeDiv.innerHTML += checkboxHtml;
       } else if (auth.startsWith("READ_")) {
-        readDiv.innerHTML += `<div class="${divClass}">${checkbox}</div>`;
+        readDiv.innerHTML += checkboxHtml;
       }
     });
   }
@@ -316,7 +279,12 @@
 
     allAuthorities.forEach(auth => {
       const checked = granted.includes(auth) ? 'checked' : '';
-      const checkbox = `<div class="input"><label><input type="checkbox" class="rule-grant" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}</label></div>`;
+      const checkbox = `
+        <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+          <input type="checkbox" class="rule-grant" value="${auth}" ${checked} />
+          <span class="checkmark"></span>
+          ${auth.replace(/_/g, ' ')}
+        </label>`;
 
       if (auth.startsWith("WRITE_")) {
         grantsWriteDiv.innerHTML += checkbox;
@@ -333,7 +301,12 @@
 
     allAuthorities.forEach(auth => {
       const checked = denied.includes(auth) ? 'checked' : '';
-      const checkbox = `<div class="input"><label><input type="checkbox" class="rule-deny" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}</label></div>`;
+      const checkbox = `
+        <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+          <input type="checkbox" class="rule-deny" value="${auth}" ${checked} />
+          <span class="checkmark"></span>
+          ${auth.replace(/_/g, ' ')}
+        </label>`;
 
       if (auth.startsWith("WRITE_")) {
         deniesWriteDiv.innerHTML += checkbox;
@@ -354,6 +327,14 @@
         setTimeout(() => {
           isCheckboxClicked = false;
         }, 100);
+      });
+    });
+
+    // Add animation effect when clicking on custom checkboxes
+    document.querySelectorAll('.custom-checkbox').forEach(label => {
+      label.addEventListener('click', function(e) {
+        // Prevent the event from bubbling up to avoid unwanted form submissions
+        e.stopPropagation();
       });
     });
   }
@@ -614,7 +595,7 @@
   loadRoles();
   loadAuthorities();
 
-  // Add event listener to the override default checkbox to prevent form submission when clicked
+  // Add event listener to the override default toggle switch to prevent form submission when clicked
   document.getElementById('rule-override').addEventListener('click', function(e) {
     // Set the flag to indicate a checkbox was clicked
     isCheckboxClicked = true;
@@ -625,6 +606,12 @@
     setTimeout(() => {
       isCheckboxClicked = false;
     }, 100);
+  });
+
+  // Add event listener to the toggle switch label to prevent form submission
+  document.querySelector('.toggle-label').addEventListener('click', function(e) {
+    // Prevent the event from bubbling up to avoid unwanted form submissions
+    e.stopPropagation();
   });
 
 
