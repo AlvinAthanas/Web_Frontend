@@ -143,9 +143,27 @@
           <label><input type="checkbox" id="rule-override" /> Override default authorities?</label>
           <br /><br />
           <label>Grant Authorities:</label>
-          <div class="rule-grants"></div>
+          <div style="display:flex; gap:25px;">
+            <div style="flex:1;">
+              <div><strong>Write Permissions:</strong></div>
+              <div class="rule-grants-write"></div>
+            </div>
+            <div style="flex:1;">
+              <div><strong>Read Permissions:</strong></div>
+              <div class="rule-grants-read"></div>
+            </div>
+          </div>
           <label>Deny Authorities:</label>
-          <div class="rule-denies"></div>
+          <div style="display:flex; gap:25px;">
+            <div style="flex:1;">
+              <div><strong>Write Permissions:</strong></div>
+              <div class="rule-denies-write"></div>
+            </div>
+            <div style="flex:1;">
+              <div><strong>Read Permissions:</strong></div>
+              <div class="rule-denies-read"></div>
+            </div>
+          </div>
           <button class="save-rule-btn">Save Rule</button>
         </form>
         <div id="rule-message"></div>
@@ -174,12 +192,34 @@
   let allRoles = [];
   let allAuthorities = [];
 
+  // Define the specific authorities as mentioned in the issue description
+  const specificAuthorities = [
+    "WRITE_MEMBERS",
+    "WRITE_CONTRIBUTIONS",
+    "WRITE_SCHEDULES",
+    "WRITE_EVENTS",
+    "WRITE_COMMUNITIES",
+    "WRITE_PROJECTS",
+    "WRITE_SACRAMENTS",
+    "READ_MEMBERS",
+    "READ_CONTRIBUTIONS",
+    "READ_SCHEDULES",
+    "READ_EVENTS",
+    "READ_COMMUNITIES",
+    "READ_PROJECTS",
+    "READ_SACRAMENTS"
+  ];
+
   // ---- LOAD ROLES AND AUTHORITIES FOR FORMS ----
   function loadRoles() {
     fetch(`${API_BASE}/roles`)
             .then(res => res.json())
             .then(data => {
               allRoles = data.map(r => r.name || r.roleName || r); // adapt for your object structure
+              // Ensure PARISHIONER role is included
+              if (!allRoles.includes("PARISHIONER")) {
+                allRoles.push("PARISHIONER");
+              }
               renderRolesCheckboxes();
               renderRuleRoleDropdown();
             });
@@ -188,10 +228,22 @@
   function loadAuthorities() {
     // It is assumed there is an endpoint `/authorities` returning a list of authority names.
     fetch(`${API_BASE}/authorities`)
-            .then(res => res.json())
+            .then(res => {
+              if (!res.ok) {
+                throw new Error('Authorities endpoint not available');
+              }
+              return res.json();
+            })
             .then(data => {
-              allAuthorities = data;
+              allAuthorities = Array.isArray(data) ? data : specificAuthorities;
               // On startup, render everything not assigned
+              renderAuthoritiesAssignable([]);
+              renderRuleAuthorityCheckboxes();
+            })
+            .catch(error => {
+              console.warn('Error loading authorities:', error);
+              // Use specificAuthorities as fallback
+              allAuthorities = specificAuthorities;
               renderAuthoritiesAssignable([]);
               renderRuleAuthorityCheckboxes();
             });
@@ -227,26 +279,8 @@
     writeDiv.innerHTML = "";
     readDiv.innerHTML = "";
 
-    // Define the specific authorities as mentioned in the issue description
-    const specificAuthorities = [
-      "WRITE_MEMBERS",
-      "WRITE_CONTRIBUTIONS",
-      "WRITE_SCHEDULES",
-      "WRITE_EVENTS",
-      "WRITE_COMMUNITIES",
-      "WRITE_PROJECTS",
-      "WRITE_SACRAMENTS",
-      "READ_MEMBERS",
-      "READ_CONTRIBUTIONS",
-      "READ_SCHEDULES",
-      "READ_EVENTS",
-      "READ_COMMUNITIES",
-      "READ_PROJECTS",
-      "READ_SACRAMENTS"
-    ];
-
     // Use the specific authorities if available, otherwise use all authorities
-    const authoritiesToRender = specificAuthorities.length > 0 ? specificAuthorities : allAuthorities;
+    const authoritiesToRender = allAuthorities;
 
     authoritiesToRender.forEach(auth => {
       const inUser = userAuthorities.includes(auth);
@@ -270,18 +304,37 @@
   }
   function renderRuleAuthorityCheckboxes(granted = [], denied = []) {
     // For rule grants
-    const grantsDiv = document.querySelector('.rule-grants');
-    grantsDiv.innerHTML = '';
+    const grantsWriteDiv = document.querySelector('.rule-grants-write');
+    const grantsReadDiv = document.querySelector('.rule-grants-read');
+    grantsWriteDiv.innerHTML = '';
+    grantsReadDiv.innerHTML = '';
+
     allAuthorities.forEach(auth => {
       const checked = granted.includes(auth) ? 'checked' : '';
-      grantsDiv.innerHTML += `<label><input type="checkbox" class="rule-grant" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}</label> `;
+      const checkbox = `<div class="input"><label><input type="checkbox" class="rule-grant" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}</label></div>`;
+
+      if (auth.startsWith("WRITE_")) {
+        grantsWriteDiv.innerHTML += checkbox;
+      } else if (auth.startsWith("READ_")) {
+        grantsReadDiv.innerHTML += checkbox;
+      }
     });
+
     // For rule denies
-    const deniesDiv = document.querySelector('.rule-denies');
-    deniesDiv.innerHTML = '';
+    const deniesWriteDiv = document.querySelector('.rule-denies-write');
+    const deniesReadDiv = document.querySelector('.rule-denies-read');
+    deniesWriteDiv.innerHTML = '';
+    deniesReadDiv.innerHTML = '';
+
     allAuthorities.forEach(auth => {
       const checked = denied.includes(auth) ? 'checked' : '';
-      deniesDiv.innerHTML += `<label><input type="checkbox" class="rule-deny" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}</label> `;
+      const checkbox = `<div class="input"><label><input type="checkbox" class="rule-deny" value="${auth}" ${checked} /> ${auth.replace(/_/g, ' ')}</label></div>`;
+
+      if (auth.startsWith("WRITE_")) {
+        deniesWriteDiv.innerHTML += checkbox;
+      } else if (auth.startsWith("READ_")) {
+        deniesReadDiv.innerHTML += checkbox;
+      }
     });
   }
 
@@ -395,8 +448,12 @@
     e.preventDefault();
     const roleName = document.getElementById('rule-role').value;
     const overrideDefault = document.getElementById('rule-override').checked;
-    const grantedAuthorities = Array.from(document.querySelectorAll('.rule-grants input[type="checkbox"]:checked')).map(cb => cb.value);
-    const deniedAuthorities = Array.from(document.querySelectorAll('.rule-denies input[type="checkbox"]:checked')).map(cb => cb.value);
+    const grantedAuthorities = Array.from(
+      document.querySelectorAll('.rule-grants-write input[type="checkbox"]:checked, .rule-grants-read input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
+    const deniedAuthorities = Array.from(
+      document.querySelectorAll('.rule-denies-write input[type="checkbox"]:checked, .rule-denies-read input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
 
     // This matches your backend's CreateRoleAuthorityRuleCommand
     const payload = {
@@ -406,7 +463,7 @@
       deniedAuthorities
     };
 
-    fetch(`${API_BASE}/role-authority-rule`, { // Adjust if necessary
+    fetch(`${API_BASE}/role-authority-rules/AuthorityRule`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload),
@@ -436,7 +493,7 @@
   document.getElementById('rule-role').addEventListener('change', function() {
     // Optionally load existing rule for editing
     const roleName = this.value;
-    fetch(`${API_BASE}/role-authority-rule/${roleName}`)
+    fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
             .then(res => {
               if (!res.ok) throw new Error();
               return res.json();
@@ -456,10 +513,6 @@
   loadRoles();
   loadAuthorities();
 
-  // Reload Grant&Deny authorities whenever switching role in rules tab
-  document.getElementById('rule-role').addEventListener('change', () => {
-    renderRuleAuthorityCheckboxes([], []);
-  });
 
 </script>
 <script src="../GENERAL/script.js"></script>
