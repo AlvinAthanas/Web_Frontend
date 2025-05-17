@@ -496,6 +496,20 @@
       if (res.ok) {
         return res.json().then(data => {
           document.getElementById('rule-message').textContent = "Rule saved successfully.";
+
+          // Refresh the checkboxes to reflect the updated state
+          fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+            .then(res => {
+              if (!res.ok) throw new Error();
+              return res.json();
+            })
+            .then(rule => {
+              document.getElementById('rule-override').checked = rule.overrideDefault;
+              renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
+            })
+            .catch(error => {
+              console.error("Error refreshing rule data:", error);
+            });
         });
       } else {
         // If the response is not OK, parse the error message
@@ -522,6 +536,20 @@
               })
               .then(data => {
                 document.getElementById('rule-message').textContent = "Rule updated successfully.";
+
+                // Refresh the checkboxes to reflect the updated state
+                fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+                  .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                  })
+                  .then(rule => {
+                    document.getElementById('rule-override').checked = rule.overrideDefault;
+                    renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
+                  })
+                  .catch(error => {
+                    console.error("Error refreshing rule data:", error);
+                  });
               });
           } else {
             // If it's a different error, throw it
