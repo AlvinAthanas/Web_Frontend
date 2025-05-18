@@ -19,14 +19,35 @@
       rel="stylesheet"
     />
 
-    <!-- External CSS -->
+    <!-- FullCalendar CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- External Stylesheets -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
 
     <style>
+      :root {
+        --primary-color: #e6f2ff; /* Light blue */
+        --secondary-color: #ffffff; /* White */
+        --accent-color: #4caf50; /* Green for buttons */
+        --text-color: #333333;
+      }
+      
+      body {
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        font-family: 'Montserrat', sans-serif;
+      }
+      
       .main-title {
         font-size: 30px;
         font-weight: 600;
+        color: var(--text-color);
       }
+      
       .events-header {
         display: flex;
         justify-content: space-between;
@@ -34,48 +55,100 @@
         margin-bottom: 20px;
       }
 
-      .events-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
+      .calendar-container {
+        margin-bottom: 30px;
+        background: var(--secondary-color);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
       }
 
-      .event-card {
+      .events-list-container {
+        background: var(--secondary-color);
         border-radius: 8px;
-        overflow: hidden;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+        padding: 20px;
+      }
+
+      .events-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .event-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        background-color: var(--primary-color);
+        border-radius: 8px;
         position: relative;
       }
 
-      .event-card:hover {
-        transform: translateY(-5px);
-      }
-
-      .event-image {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-      }
-
-      .event-info {
-        padding: 15px;
+      .event-item:last-child {
+        border-bottom: none;
       }
 
       .event-title {
         margin: 0;
-        font-size: 1.2rem;
-        color: #333;
+        font-size: 1.3rem;
+        color: var(--text-color);
+        font-weight: 600;
       }
 
       .event-details {
-        margin-top: 10px;
-        color: #666;
+        margin-top: 8px;
+        color: var(--text-color);
+        font-size: 0.95rem;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+      }
+
+      .event-details strong {
+        font-weight: 600;
+      }
+
+      .event-description {
+        margin-top: 8px;
+        color: var(--text-color);
         font-size: 0.9rem;
       }
 
+      .event-actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        gap: 5px;
+      }
+
+      .action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+
+      .action-btn:hover {
+        background-color: rgba(255, 255, 255, 1);
+      }
+
+      .edit-btn {
+        color: #2196f3;
+      }
+
+      .delete-btn {
+        color: #f44336;
+      }
+
       .add-event-btn {
-        background-color: #4caf50;
+        background-color: var(--accent-color);
         color: white;
         border: none;
         padding: 10px 15px;
@@ -88,41 +161,6 @@
 
       .add-event-btn:hover {
         background-color: #45a049;
-      }
-
-      /* Action buttons on card */
-      .event-actions {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        display: flex;
-        gap: 5px;
-      }
-
-      .action-btn {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: none;
-        background-color: rgba(255, 255, 255, 0.9);
-        color: #333;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .action-btn:hover {
-        background-color: white;
-      }
-
-      .edit-btn {
-        color: #2196f3;
-      }
-
-      .delete-btn {
-        color: #f44336;
       }
 
       /* Dialog styles */
@@ -140,7 +178,7 @@
       }
 
       .dialog-content {
-        background-color: white;
+        background-color: var(--secondary-color);
         padding: 20px;
         border-radius: 8px;
         width: 90%;
@@ -149,6 +187,7 @@
 
       .dialog-title {
         margin-top: 0;
+        color: var(--text-color);
       }
 
       .form-group {
@@ -159,6 +198,7 @@
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
+        color: var(--text-color);
       }
 
       .form-group input,
@@ -169,6 +209,8 @@
         border: 1px solid #ddd;
         border-radius: 4px;
         box-sizing: border-box;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
       }
 
       .form-group textarea {
@@ -195,7 +237,7 @@
       }
 
       .dialog-btn.submit {
-        background-color: #4caf50;
+        background-color: var(--accent-color);
         color: white;
         border: none;
       }
@@ -204,126 +246,139 @@
         background-color: #45a049;
       }
 
-      .image-preview {
-        max-width: 100%;
-        max-height: 150px;
-        margin-top: 10px;
-        display: none;
-      }
-
-      .event-date-time {
-        color: #79b3f1;
-        font-weight: 500;
-        margin: 5px 0;
-      }
-
-      .event-location {
-        font-weight: 500;
-        margin: 5px 0;
-      }
-
-      .import-export {
+      .top {
         display: flex;
-        gap: 10px;
+        justify-content: space-between;
         margin-bottom: 20px;
       }
 
-      .import-export button {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      #exportPdfBtn {
-        background-color: #f44336;
-        color: white;
-      }
-
-      #exportPdfBtn:hover {
-        background-color: #d32f2f;
-      }
-
-      #importBtn {
-        background-color: #2196f3;
-        color: white;
-      }
-
-      #importBtn:hover {
-        background-color: #1976d2;
-      }
-
-      .date-range-group {
+      .duration-fields {
         display: none;
         margin-top: 10px;
+        padding: 10px;
+        background-color: rgba(230, 242, 255, 0.3);
+        border-radius: 4px;
       }
 
-      .multi-day-label {
-        font-weight: 600;
-        margin-bottom: 5px;
+      /* Responsive styles */
+      @media (max-width: 768px) {
+        .events-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 15px;
+        }
+        
+        .top {
+          width: 100%;
+          flex-direction: column;
+          gap: 15px;
+        }
+        
+        .import {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .calendar-container {
+          padding: 10px 5px;
+        }
+        
+        .event-details {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
+
+    <!-- External Javascript -->
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- html2canvas to capture HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF for creating the PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
     <div class="grid-container" id="containerId">
       <main class="main-container">
         <div class="events-header">
-          <div class="main-title">Upcoming Events</div>
-          <button class="add-event-btn" id="addEventBtn">
-            <span class="material-icons-outlined">add</span>
-            Add Event
-          </button>
+          <div class="main-title">Church Events</div>
+          <div class="top">
+            <div class="import">
+              <button id="importBtn">Import</button>
+              <button id="exportPdfBtn">Export PDF</button>
+            </div>
+            <button class="add-event-btn" id="openDialogBtn">
+              <span class="material-icons-outlined">add</span>
+              Add Event
+            </button>
+          </div>
         </div>
 
-        <div class="import-export">
-          <button id="importBtn">Import</button>
-          <button id="exportPdfBtn">Export PDF</button>
+        <!-- Calendar View -->
+        <div class="calendar-container">
+          <div id="calendar"></div>
         </div>
 
-        <div class="events-grid" id="eventsContainer">
-          <!-- Event cards will be added here dynamically -->
+        <!-- Events List -->
+        <div class="events-list-container">
+          <h3>Upcoming Events</h3>
+          <div class="events-list" id="eventsContainer">
+            <!-- Events will be added here dynamically -->
+          </div>
         </div>
       </main>
     </div>
 
     <!-- Add/Edit Event Dialog -->
-    <div class="dialog-overlay" id="eventDialog">
+    <div class="dialog-overlay" id="formDialog">
       <div class="dialog-content">
-        <h3 class="dialog-title" id="dialogTitle">Add New Event</h3>
+        <h3 class="dialog-title" id="dialogTitle">Add Event</h3>
         <form id="eventForm">
           <input type="hidden" id="eventId" />
           <div class="form-group">
-            <label for="eventName">Event Name</label>
-            <input type="text" id="eventName" required />
+            <label for="name">Event Name</label>
+            <input type="text" id="name" name="name" required />
           </div>
           <div class="form-group">
-            <label for="eventDate">Date</label>
-            <input type="date" id="eventDate" required />
+            <label for="duration">Duration (days)</label>
+            <select id="duration" name="duration" required>
+              <option value="1">1 day</option>
+              <option value="2">2 days</option>
+              <option value="3">3 days</option>
+              <option value="4">4 days</option>
+              <option value="5">5 days</option>
+              <option value="6">6 days</option>
+              <option value="7">7 days</option>
+            </select>
           </div>
           <div class="form-group">
-            <label for="eventTime">Time</label>
-            <input type="time" id="eventTime" required />
+            <label for="eventDate">Start Date</label>
+            <input type="date" id="eventDate" name="eventDate" required />
           </div>
           <div class="form-group">
-            <label for="eventLocation">Location</label>
-            <input type="text" id="eventLocation" required />
+            <label for="eventTime">Start Time</label>
+            <input type="time" id="eventTime" name="eventTime" required />
+          </div>
+          <div id="endDateGroup" class="duration-fields">
+            <div class="form-group">
+              <label for="endDate">End Date</label>
+              <input type="date" id="endDate" name="endDate" />
+            </div>
           </div>
           <div class="form-group">
-            <label for="eventDescription">Description</label>
-            <textarea id="eventDescription" required></textarea>
+            <label for="location">Venue</label>
+            <input type="text" id="location" name="location" required />
           </div>
           <div class="form-group">
-            <label for="eventImage">Event Image</label>
-            <input type="file" id="eventImage" accept="image/*" />
-            <img id="imagePreview" class="image-preview" alt="Image preview" />
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3" required></textarea>
           </div>
-
           <div class="dialog-actions">
             <button type="button" class="dialog-btn cancel" id="cancelBtn">
               Cancel
             </button>
-            <button type="submit" class="dialog-btn submit" id="submitBtn">
-              Add Event
+            <button type="submit" class="dialog-btn submit" id="submit">
+              Save Event
             </button>
           </div>
         </form>
@@ -351,152 +406,336 @@
       </div>
     </div>
 
-    <!-- External Javascript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <div id="response"></div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", async function () {
-        const addEventBtn = document.getElementById("addEventBtn");
-        const eventDialog = document.getElementById("eventDialog");
+      document.addEventListener("DOMContentLoaded", function () {
+        const openDialogBtn = document.getElementById("openDialogBtn");
+        const eventsContainer = document.getElementById("eventsContainer");
+        const formDialog = document.getElementById("formDialog");
         const deleteDialog = document.getElementById("deleteDialog");
+        const eventForm = document.getElementById("eventForm");
+        const submitBtn = document.getElementById("submit");
         const cancelBtn = document.getElementById("cancelBtn");
         const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
         const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-        const eventForm = document.getElementById("eventForm");
-        const eventsContainer = document.getElementById("eventsContainer");
+        const responseBox = document.getElementById("response");
         const dialogTitle = document.getElementById("dialogTitle");
-        const submitBtn = document.getElementById("submitBtn");
-        const eventIdInput = document.getElementById("eventId");
-        const eventImageInput = document.getElementById("eventImage");
-        const imagePreview = document.getElementById("imagePreview");
-        const importBtn = document.getElementById("importBtn");
-        const exportPdfBtn = document.getElementById("exportPdfBtn");
+        const durationSelect = document.getElementById("duration");
+        const endDateGroup = document.getElementById("endDateGroup");
+        const endDateInput = document.getElementById("endDate");
 
-        const apiUrl = "http://localhost:8080";
-        let events = [];
-        let currentEventId = null;
+        let editingId = null;
         let deleteEventId = null;
+        let calendar;
 
-        // Fetch events from API
-        async function fetchEvents() {
-          try {
-            const response = await fetch(`${apiUrl}/events`);
-            if (!response.ok) {
-              throw new Error(
-                `HTTP ${response.status} - ${response.statusText}`
-              );
+        // Initialize calendar
+        function initCalendar() {
+          const calendarEl = document.getElementById('calendar');
+          
+          calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: function(fetchInfo, successCallback, failureCallback) {
+              fetch("http://localhost:8080/events")
+                .then((res) => res.json())
+                .then((data) => {
+                  // Filter out events where description is exactly "mass" (case-insensitive)
+                  const filteredEvents = data.filter(
+                    (event) => event.description?.toLowerCase() !== "mass"
+                  );
+                  
+                  const calendarEvents = filteredEvents.map(event => {
+                    // Handle multi-day events
+                    if (event.duration > 1) {
+                      const startDate = new Date(event.dateTime);
+                      const endDate = new Date(startDate);
+                      endDate.setDate(endDate.getDate() + (event.duration - 1));
+                      
+                      return {
+                        id: event.id,
+                        title: event.name,
+                        start: event.dateTime,
+                        end: endDate.toISOString().split('T')[0],
+                        allDay: false,
+                        extendedProps: {
+                          description: event.description,
+                          location: event.location,
+                          duration: event.duration
+                        }
+                      };
+                    } else {
+                      return {
+                        id: event.id,
+                        title: event.name,
+                        start: event.dateTime,
+                        extendedProps: {
+                          description: event.description,
+                          location: event.location,
+                          duration: event.duration || 1
+                        }
+                      };
+                    }
+                  });
+                  successCallback(calendarEvents);
+                })
+                .catch(failureCallback);
+            },
+            eventClick: function(info) {
+              // When an event is clicked in the calendar, scroll to it in the list
+              const eventItem = document.querySelector(`.event-item[data-id="${info.event.id}"]`);
+              if (eventItem) {
+                eventItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Add highlight effect
+                eventItem.style.backgroundColor = 'rgba(66, 165, 245, 0.3)';
+                setTimeout(() => {
+                  eventItem.style.backgroundColor = '';
+                }, 2000);
+              }
             }
-
-            const data = await response.json();
-            // Filter out events where description is exactly "mass" (case-insensitive)
-            events = data.filter(
-              (event) => event.description?.toLowerCase() !== "mass"
-            );
-            renderEvents();
-          } catch (error) {
-            console.error("Failed to fetch events:", error);
-            alert("Failed to load events: " + error.message);
-          }
+          });
+          
+          calendar.render();
         }
 
-        // Render events in the UI
-        function renderEvents() {
-          eventsContainer.innerHTML = "";
-          events.forEach((event) => {
-            const eventCard = document.createElement("div");
-            eventCard.className = "event-card";
-
-            // Use imageUrl if available, else use default image
-            let imgSrc = event.imageUrl || "https://via.placeholder.com/300x200?text=Event";
-
-            const [date, time] = (event.dateTime || "").split("T");
-
-            eventCard.innerHTML = `
-              <img src="${imgSrc}" alt="${event.name}" class="event-image">
-              <div class="event-actions">
-                <button class="action-btn edit-btn" data-id="${event.id}">
-                  <span class="material-icons-outlined">edit</span>
-                </button>
-                <button class="action-btn delete-btn" data-id="${event.id}">
-                  <span class="material-icons-outlined">delete</span>
-                </button>
-              </div>
-              <div class="event-info">
-                <h3 class="event-title">${event.name}</h3>
-                <div class="event-date-time">${date} at ${time || 'TBD'}</div>
-                <div class="event-location">${event.location}</div>
-                <p class="event-details">${event.description}</p>
-              </div>
-            `;
-            eventsContainer.appendChild(eventCard);
-          });
-
-          // Add event listeners to action buttons
-          document.querySelectorAll(".edit-btn").forEach((btn) => {
-            btn.addEventListener("click", function () {
-              editEvent(this.getAttribute("data-id"));
-            });
-          });
-
-          document.querySelectorAll(".delete-btn").forEach((btn) => {
-            btn.addEventListener("click", function () {
-              showDeleteDialog(this.getAttribute("data-id"));
-            });
-          });
-        }
-
-        // Image preview handler
-        eventImageInput.addEventListener("change", function (e) {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-              imagePreview.src = event.target.result;
-              imagePreview.style.display = "block";
-            };
-            reader.readAsDataURL(file);
+        // Duration selection handler
+        durationSelect.addEventListener('change', function() {
+          if (this.value > 1) {
+            endDateGroup.style.display = 'block';
+            calculateEndDate();
+          } else {
+            endDateGroup.style.display = 'none';
           }
         });
 
-        // Show add event dialog
-        function showAddDialog() {
-          dialogTitle.textContent = "Add New Event";
-          submitBtn.textContent = "Add Event";
-          eventIdInput.value = "";
-          eventForm.reset();
-          imagePreview.style.display = "none";
-          currentEventId = null;
-          eventDialog.style.display = "flex";
+        // Calculate end date based on duration
+        function calculateEndDate() {
+          const startDate = document.getElementById('eventDate').value;
+          const duration = parseInt(durationSelect.value);
+          
+          if (startDate && duration > 1) {
+            const start = new Date(startDate);
+            const end = new Date(start);
+            end.setDate(start.getDate() + (duration - 1));
+            
+            const endDateStr = end.toISOString().split('T')[0];
+            endDateInput.value = endDateStr;
+          }
         }
 
-        // Show edit event dialog
-        function editEvent(id) {
-          const event = events.find((e) => e.id == id);
-          if (event) {
-            dialogTitle.textContent = "Edit Event";
-            submitBtn.textContent = "Update Event";
-            eventIdInput.value = event.id;
-            document.getElementById("eventName").value = event.name;
-            document.getElementById("eventDescription").value = event.description;
-            document.getElementById("eventLocation").value = event.location;
-
-            // Split dateTime into date and time
-            const [date, time] = (event.dateTime || "").split("T");
-            document.getElementById("eventDate").value = date || "";
-            document.getElementById("eventTime").value = time || "";
-
-            // Show image preview if available
-            if (event.imageUrl) {
-              imagePreview.src = event.imageUrl;
-              imagePreview.style.display = "block";
-            } else {
-              imagePreview.style.display = "none";
-            }
-
-            currentEventId = id;
-            eventDialog.style.display = "flex";
+        // Update end date when start date changes
+        document.getElementById('eventDate').addEventListener('change', function() {
+          if (durationSelect.value > 1) {
+            calculateEndDate();
           }
+        });
+
+        // Opening and closing the form dialog
+        openDialogBtn.onclick = () => {
+          eventForm.reset();
+          submitBtn.innerText = "Save Event";
+          dialogTitle.textContent = "Add Event";
+          editingId = null;
+          responseBox.innerText = "";
+          formDialog.style.display = "flex";
+          endDateGroup.style.display = "none";
+
+          eventForm.removeEventListener("submit", handleUpdate);
+          eventForm.addEventListener("submit", handleCreate);
+        };
+
+        cancelBtn.onclick = () => {
+          formDialog.style.display = "none";
+          eventForm.reset();
+        };
+
+        // Loading and Displaying all events
+        function loadEvents() {
+          fetch("http://localhost:8080/events")
+            .then((res) => res.json())
+            .then((data) => {
+              eventsContainer.innerHTML = "";
+
+              // Filter out events where description is exactly "mass" (case-insensitive)
+              const filteredEvents = data.filter(
+                (event) => event.description?.toLowerCase() !== "mass"
+              );
+
+              filteredEvents.forEach((event) => {
+                const formattedDate = formatDateTime(event.dateTime);
+                const eventItem = document.createElement("div");
+                eventItem.className = "event-item";
+                eventItem.setAttribute("data-id", event.id);
+
+                // Format duration display
+                let durationText = '';
+                if (event.duration > 1) {
+                  const startDate = new Date(event.dateTime);
+                  const endDate = new Date(startDate);
+                  endDate.setDate(endDate.getDate() + (event.duration - 1));
+                  durationText = ` (${event.duration} days: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()})`;
+                }
+
+                eventItem.innerHTML = `
+                  <div class="event-actions">
+                    <button class="action-btn edit-btn" data-id="${event.id}" title="Edit">
+                      <span class="material-icons-outlined">edit</span>
+                    </button>
+                    <button class="action-btn delete-btn" data-id="${event.id}" title="Delete">
+                      <span class="material-icons-outlined">delete</span>
+                    </button>
+                  </div>
+                  <h3 class="event-title">${event.name}${durationText}</h3>
+                  <div class="event-details">
+                    <div><strong>Date & Time:</strong></div>
+                    <div>${formattedDate}</div>
+                    <div><strong>Venue:</strong></div>
+                    <div>${event.location}</div>
+                  </div>
+                  ${event.description ? `<div class="event-description"><strong>Description:</strong> ${event.description}</div>` : ''}
+                `;
+                eventsContainer.appendChild(eventItem);
+              });
+
+              // Add event listeners to action buttons
+              document.querySelectorAll(".edit-btn").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                  editEvent(parseInt(this.getAttribute("data-id")));
+                });
+              });
+
+              document.querySelectorAll(".delete-btn").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                  showDeleteDialog(parseInt(this.getAttribute("data-id")));
+                });
+              });
+              
+              // Refresh calendar to show new events
+              if (calendar) {
+                calendar.refetchEvents();
+              }
+            })
+            .catch((err) => {
+              responseBox.innerText = "Failed to load events: " + err.message;
+            });
+        }
+
+        // Helper to format date and time
+        function formatDateTime(dateTimeStr) {
+          if (!dateTimeStr) return "No date available";
+          
+          try {
+            const [datePart, timePart] = dateTimeStr.split('T');
+            if (!datePart) return "Invalid date";
+            
+            const dateObj = new Date(datePart + (timePart ? 'T' + timePart : ''));
+            
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            let formattedStr = dateObj.toLocaleDateString(undefined, dateOptions);
+            
+            if (timePart) {
+              const timeOptions = { hour: '2-digit', minute: '2-digit' };
+              formattedStr += ' at ' + dateObj.toLocaleTimeString(undefined, timeOptions);
+            }
+            
+            return formattedStr;
+          } catch (e) {
+            return dateTimeStr.replace('T', ' ');
+          }
+        }
+
+        // Creating a new event
+        function handleCreate(event) {
+          event.preventDefault();
+
+          const name = eventForm.name.value;
+          const description = eventForm.description.value;
+          const location = eventForm.location.value;
+          const date = eventForm.eventDate.value;
+          const time = eventForm.eventTime.value;
+          const duration = parseInt(eventForm.duration.value);
+          const dateTime = `${date}T${time}`;
+
+          let data = { 
+            name, 
+            description, 
+            location, 
+            dateTime,
+            duration
+          };
+
+          // For multi-day events, include end date
+          if (duration > 1) {
+            data.endDate = eventForm.endDate.value;
+          }
+
+          fetch("http://localhost:8080/event", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+            .then((res) => res.json())
+            .then(() => {
+              responseBox.innerText = "Event has been added successfully!";
+              eventForm.reset();
+              formDialog.style.display = "none";
+              loadEvents();
+            })
+            .catch((error) => {
+              responseBox.innerText = "Failed to add event: " + error.message;
+            });
+        }
+
+        // Updating an Existing event
+        function handleUpdate(event) {
+          event.preventDefault();
+
+          const name = eventForm.name.value;
+          const description = eventForm.description.value;
+          const location = eventForm.location.value;
+          const date = eventForm.eventDate.value;
+          const time = eventForm.eventTime.value;
+          const duration = parseInt(eventForm.duration.value);
+          const dateTime = `${date}T${time}`;
+
+          let data = { 
+            name, 
+            description, 
+            location, 
+            dateTime,
+            duration
+          };
+
+          // For multi-day events, include end date
+          if (duration > 1) {
+            data.endDate = eventForm.endDate.value;
+          }
+
+          fetch(`http://localhost:8080/event/${editingId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+            .then((res) => {
+              if (!res.ok) throw new Error("Update failed");
+              return res.json();
+            })
+            .then(() => {
+              responseBox.innerText = "Event updated successfully!";
+              eventForm.reset();
+              formDialog.style.display = "none";
+              editingId = null;
+              submitBtn.innerText = "Save Event";
+              loadEvents();
+            })
+            .catch((error) => {
+              responseBox.innerText = "Failed to update: " + error.message;
+            });
         }
 
         // Show delete confirmation dialog
@@ -505,123 +744,84 @@
           deleteDialog.style.display = "flex";
         }
 
-        // Hide dialogs
-        function hideDialogs() {
-          eventDialog.style.display = "none";
-          deleteDialog.style.display = "none";
-          eventForm.reset();
+        // Editing an event
+        function editEvent(id) {
+          fetch(`http://localhost:8080/event/${id}`)
+            .then((res) => res.json())
+            .then((data) => {
+              editingId = id;
+              dialogTitle.textContent = "Edit Event";
+              submitBtn.innerText = "Update Event";
+              
+              const [date, time] = (data.dateTime || "").split("T");
+              eventForm.eventDate.value = date || "";
+              eventForm.eventTime.value = time || "";
+              eventForm.duration.value = data.duration || 1;
+
+              // Show end date fields if duration > 1
+              if (data.duration > 1) {
+                endDateGroup.style.display = 'block';
+                if (data.endDate) {
+                  eventForm.endDate.value = data.endDate;
+                } else {
+                  // Calculate end date if not provided
+                  const startDate = new Date(data.dateTime);
+                  const endDate = new Date(startDate);
+                  endDate.setDate(endDate.getDate() + (data.duration - 1));
+                  eventForm.endDate.value = endDate.toISOString().split('T')[0];
+                }
+              } else {
+                endDateGroup.style.display = 'none';
+              }
+
+              eventForm.name.value = data.name;
+              eventForm.description.value = data.description;
+              eventForm.location.value = data.location;
+
+              // Switch to update handler
+              eventForm.removeEventListener("submit", handleCreate);
+              eventForm.addEventListener("submit", handleUpdate);
+
+              formDialog.style.display = "flex";
+            })
+            .catch((err) => {
+              console.error("Error loading for edit:", err);
+            });
         }
 
-        // Add/Edit event form submission
-        eventForm.addEventListener("submit", async function (e) {
-          e.preventDefault();
-
-          const eventName = document.getElementById("eventName").value;
-          const eventDescription = document.getElementById("eventDescription").value;
-          const eventLocation = document.getElementById("eventLocation").value;
-          const eventDate = document.getElementById("eventDate").value;
-          const eventTime = document.getElementById("eventTime").value;
-          const eventImage = document.getElementById("eventImage").files[0];
-          const dateTime = `${eventDate}T${eventTime}`;
-
-          // Build the event object
-          const eventData = {
-            name: eventName,
-            description: eventDescription,
-            location: eventLocation,
-            dateTime: dateTime
-          };
-
-          try {
-            if (currentEventId) {
-              // Update event - using PUT with JSON body
-              const response = await fetch(`${apiUrl}/event/${currentEventId}`, {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(eventData),
-              });
-
-              if (!response.ok) {
-                throw new Error(`Failed to update event. ${response.status}: ${response.statusText}`);
+        // Deleting an event
+        confirmDeleteBtn.addEventListener("click", function () {
+          fetch(`http://localhost:8080/event/${deleteEventId}`, {
+            method: "DELETE",
+          })
+            .then((res) => {
+              if (res.ok) {
+                deleteDialog.style.display = "none";
+                loadEvents();
+              } else {
+                throw new Error("Delete failed");
               }
-            } else {
-              // Add new event - first create the event
-              const createResponse = await fetch(`${apiUrl}/event`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(eventData),
-              });
-
-              if (!createResponse.ok) {
-                throw new Error(`Failed to create event. ${createResponse.status}: ${createResponse.statusText}`);
-              }
-
-              const newEvent = await createResponse.json();
-
-              // Then upload image if provided
-              if (eventImage) {
-                const formData = new FormData();
-                formData.append("file", eventImage);
-
-                const uploadResponse = await fetch(`${apiUrl}/event/${newEvent.id}/image`, {
-                  method: "POST",
-                  body: formData,
-                });
-
-                if (!uploadResponse.ok) {
-                  throw new Error(`Event created but image upload failed. ${uploadResponse.status}: ${uploadResponse.statusText}`);
-                }
-              }
-            }
-
-            await fetchEvents();
-            hideDialogs();
-          } catch (error) {
-            console.error("Failed to save event:", error);
-            alert("Failed to save event: " + error.message);
-          }
-        });
-
-        // Delete event confirmation
-        confirmDeleteBtn.addEventListener("click", async function () {
-          try {
-            const response = await fetch(`${apiUrl}/event/${deleteEventId}`, {
-              method: "DELETE",
+            })
+            .catch((error) => {
+              console.error("Failed to delete:", error);
             });
-
-            if (!response.ok) {
-              throw new Error(`Failed to delete event. ${response.status}: ${response.statusText}`);
-            }
-
-            await fetchEvents();
-            hideDialogs();
-          } catch (error) {
-            console.error("Failed to delete event:", error);
-            alert("Failed to delete event: " + error.message);
-          }
         });
 
-        // Cancel buttons
-        cancelBtn.addEventListener("click", hideDialogs);
-        cancelDeleteBtn.addEventListener("click", hideDialogs);
-
-        // Add event button
-        addEventBtn.addEventListener("click", showAddDialog);
+        // Cancel delete
+        cancelDeleteBtn.addEventListener("click", function() {
+          deleteDialog.style.display = "none"; 
+        });
 
         // Export to PDF
-        exportPdfBtn.addEventListener("click", () => {
+        document.getElementById("exportPdfBtn").addEventListener("click", () => {
           const { jsPDF } = window.jspdf;
-          const target = document.querySelector(".events-grid");
+          const container = document.querySelector(".main-container");
 
           // Hide buttons temporarily
-          const buttons = target.querySelectorAll(".action-btn");
+          const buttons = container.querySelectorAll("button");
           buttons.forEach((btn) => (btn.style.display = "none"));
 
-          html2canvas(target, {
+          html2canvas(container, {
             scale: 2,
             useCORS: true,
           }).then((canvas) => {
@@ -633,22 +833,23 @@
             const pdfWidth = pageWidth - 20; // some margin
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            // Add heading
-            pdf.setFont("helvetica", "bold");
-            pdf.setFontSize(18);
-            pdf.text("Church Events", pageWidth / 2, 15, { align: "center" });
-
-            // Add image of event list below the title
-            pdf.addImage(imgData, "PNG", 10, 25, pdfWidth, pdfHeight);
+            // Add image of the entire content
+            pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
             pdf.save("church-events.pdf");
 
             // Show buttons again
-            buttons.forEach((btn) => (btn.style.display = "flex"));
+            buttons.forEach((btn) => (btn.style.display = ""));
           });
         });
 
-        // Initial render
-        await fetchEvents();
+        // Import events handling
+        document.getElementById("importBtn").addEventListener("click", function() {
+          alert("Import functionality is not implemented in this version.");
+        });
+
+        // Initialize calendar and load events
+        initCalendar();
+        loadEvents();
       });
     </script>
 
