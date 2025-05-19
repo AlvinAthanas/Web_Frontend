@@ -199,8 +199,7 @@
             editingEvent.name = name;
             editingEvent.dateTime = localDateTime;
 
-            const response = await Fet
-ch(`${apiUrl}/event/${editingId}`, {
+            const response = await fetch(`${apiUrl}/event/${editingId}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(editingEvent),

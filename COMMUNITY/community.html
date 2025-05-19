@@ -35,7 +35,12 @@
     // Fetch and display all communities
     async function fetchCommunities() {
       try {
-        const response = await fetch(`${apiUrl}/groups/communities`);
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(`${apiUrl}/groups/communities`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         const communities = await response.json();
         renderCommunityList(communities);
       } catch (error) {
@@ -79,9 +84,13 @@ link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityNa
       if (!name) return;
 
       try {
+        const token = localStorage.getItem("authToken");
         const response = await fetch(`${apiUrl}/group/community`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify({ name })
         });
 
@@ -98,8 +107,12 @@ link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityNa
     async function deleteCommunity(id, li) {
       if (!confirm("Delete this community?")) return;
       try {
+        const token = localStorage.getItem("authToken");
         const response = await fetch(`${apiUrl}/group/${id}`, {
           method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         });
 
         if (!response.ok) throw new Error("Failed to delete community");
@@ -137,9 +150,13 @@ link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityNa
         if (newName === "") return;
 
         try {
+          const token = localStorage.getItem("authToken");
           const response = await fetch(`${apiUrl}/group/${id}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify({ id, name: newName, description: "community" })
           });
 

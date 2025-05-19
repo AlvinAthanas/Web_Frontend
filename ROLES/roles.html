@@ -1,239 +1,621 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Roles</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Roles & Authorities Management</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"
+  />
+  <link
+          href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+          rel="stylesheet"
+  />
+  <link rel="stylesheet" href="../GENERAL/style.css" />
+  <link rel="stylesheet" href="../ROLES/roles-enhanced.css" />
+  <style>
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<div class="grid-container" id="containerId">
+  <main class="main-container">
+    <div class="container">
+      <div class="tabs">
+        <div class="tab active" data-tab="roles-tab">Assign Roles</div>
+        <div class="tab" data-tab="authorities-tab">Assign Authorities</div>
+        <div class="tab" data-tab="rules-tab">Create/Modify Rules</div>
+      </div>
 
-    <!-- Montserrat Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
+      <!-- Shared User Search -->
+      <form class="form">
+        <div class="Member-name" style="position: relative">
+          <label for="name">Member Name:</label>
+          <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  autocomplete="off"
+                  required
+          />
+          <div id="name-suggestions" class="suggestions-list"></div>
+        </div>
+      </form>
 
-    <!-- Material Icons -->
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="../GENERAL/style.css" />
-    <link rel="stylesheet" href="../ROLES/roles.css" />
-    <style>
-      .suggestions-list {
-        position: absolute;
-        background: white;
-        border: 1px solid #ccc;
-        width: 100%;
-        z-index: 1000;
-        max-height: 200px;
-        overflow-y: auto;
-      }
-
-      .suggestions-list div {
-        padding: 8px;
-        cursor: pointer;
-      }
-
-      .suggestions-list div:hover {
-        background-color: #79b3f1;
-        color: white;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="grid-container" id="containerId">
-      <main class="main-container">
-        <div class="container">
+      <!-- ROLES TAB -->
+      <div class="tab-content active" id="roles-tab">
+        <form id="roles-form">
           <h5>Assign Roles</h5>
           <hr />
-          <form class="form">
-            <div class="Member-name" style="position: relative">
-              <label for="name">Member Name:</label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                autocomplete="off"
-                required
-              />
-              <div id="name-suggestions" class="suggestions-list"></div>
-            </div>
+          <div class="roles"></div>
+          <button class="assign-btn">Assign</button>
+        </form>
+      </div>
 
-            <div class="roles">
-              <label for="roles">Roles:</label>
-              <div class="input">
-                <input type="checkbox" value="PARISH_MEMBER" /> Church Member
-              </div>
-              <div class="input">
-                <input type="checkbox" value="COMMUNITY_TREASURER" /> Community
-                Treasurer
-              </div>
-              <div class="input">
-                <input type="checkbox" value="COMMUNITY_SECRETARY" /> Community
-                Secretary
-              </div>
-              <div class="input">
-                <input type="checkbox" value="COMMUNITY_CHAIRPERSON" />
-                Community Chairperson
-              </div>
-              <div class="input">
-                <input type="checkbox" value="CATECHIST" /> Catechist
-              </div>
-              <div class="input">
-                <input type="checkbox" value="COMMITTEE_TREASURER" /> Committee
-                Treasurer
-              </div>
-              <div class="input">
-                <input type="checkbox" value="COMMITTEE_SECRETARY" /> Committee
-                Secretary
-              </div>
-              <div class="input">
-                <input type="checkbox" value="COMMITTEE_CHAIRPERSON" />
-                Committee Chairperson
-              </div>
-              <div class="input">
-                <input type="checkbox" value="PARISHIONER" /> Parishioner
-              </div>
+      <!-- AUTHORITIES TAB -->
+      <!-- AUTHORITIES TAB (Enhanced) -->
+      <div class="tab-content" id="authorities-tab">
+        <form id="authorities-form">
+          <h5>Assign Authorities</h5>
+          <hr/>
+          <div class="two-column">
+            <div class="column">
+              <div class="section-title">Write Permissions:</div>
+              <div class="authorities-write"></div>
             </div>
+            <div class="column">
+              <div class="section-title">Read Permissions:</div>
+              <div class="authorities-read"></div>
+            </div>
+          </div>
+          <button class="assign-auth-btn">Save Authorities</button>
+        </form>
+      </div>
 
-            <button class="assign-btn">Assign</button>
-          </form>
-        </div>
-      </main>
+      <!-- RULES TAB -->
+      <div class="tab-content" id="rules-tab">
+        <form id="rules-form">
+          <h5>Create/Modify Role-Authority Rule</h5>
+          <hr />
+          <label for="rule-role">Role Name:</label>
+          <select id="rule-role" required></select>
+          <br /><br />
+          <label class="toggle-label">
+            <span class="toggle-switch">
+              <input type="checkbox" id="rule-override">
+              <span class="toggle-slider"></span>
+            </span>
+            Override default authorities?
+          </label>
+          <br /><br />
+          <div class="section-title">Grant Authorities:</div>
+          <div class="two-column">
+            <div class="column">
+              <div class="section-title">Write Permissions:</div>
+              <div class="rule-grants-write"></div>
+            </div>
+            <div class="column">
+              <div class="section-title">Read Permissions:</div>
+              <div class="rule-grants-read"></div>
+            </div>
+          </div>
+          <div class="section-title">Deny Authorities:</div>
+          <div class="two-column">
+            <div class="column">
+              <div class="section-title">Write Permissions:</div>
+              <div class="rule-denies-write"></div>
+            </div>
+            <div class="column">
+              <div class="section-title">Read Permissions:</div>
+              <div class="rule-denies-read"></div>
+            </div>
+          </div>
+          <button class="save-rule-btn">Save Rule</button>
+        </form>
+        <div id="rule-message"></div>
+      </div>
     </div>
+  </main>
+</div>
 
-    <script>
-      const nameInput = document.getElementById("name");
-      const suggestionBox = document.getElementById("name-suggestions");
-      let selectedUserId = null;
-    
-      // When typing in the name input
-      nameInput.addEventListener("input", function () {
-        const query = nameInput.value.trim();
-        selectedUserId = null;
-    
-        if (query.length < 1) {
-          suggestionBox.innerHTML = "";
-          return;
-        }
-    
-        fetch(`http://localhost:8080/user/search?name=${encodeURIComponent(query)}`)
-          .then((res) => res.json())
-          .then((data) => {
-            suggestionBox.innerHTML = "";
-    
-            data.forEach((user) => {
-              const div = document.createElement("div");
-              div.textContent = user.name;
-              div.dataset.id = user.id;
-              div.classList.add("user-suggestion");
-    
-              div.addEventListener("click", () => {
-                nameInput.value = user.name;
-                selectedUserId = user.id;
-                suggestionBox.innerHTML = "";
-    
-                // Fetch and mark the user's existing roles
-                fetch(`http://localhost:8080/user/${selectedUserId}/roles`)
-                  .then((res) => res.json())
-                  .then((roles) => {
-                    // Uncheck all checkboxes first
-                    document.querySelectorAll(".roles input[type='checkbox']").forEach((cb) => {
-                      cb.checked = false;
-                    });
-    
-                    // Check boxes for roles the user already has
-                    roles.forEach((role) => {
-                      const checkbox = document.querySelector(
-                        `.roles input[type='checkbox'][value="${role}"]`
-                      );
-                      if (checkbox) {
-                        checkbox.checked = true;
-                      }
-                    });
+<script>
+  // ---- TABS LOGIC ----
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById(this.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---- ENDPOINTS ----
+  // Adjust if your base API path/pattern is different.
+  const API_BASE = "http://localhost:8080";
+
+  // ---- SHARED STATE ----
+  let selectedUserId = null;
+  let allRoles = [];
+  let allAuthorities = [];
+  let isCheckboxClicked = false;
+
+  // Define the specific authorities as mentioned in the issue description
+  const specificAuthorities = [
+    "WRITE_MEMBERS",
+    "WRITE_CONTRIBUTIONS",
+    "WRITE_SCHEDULES",
+    "WRITE_EVENTS",
+    "WRITE_COMMUNITIES",
+    "WRITE_PROJECTS",
+    "WRITE_SACRAMENTS",
+    "READ_MEMBERS",
+    "READ_CONTRIBUTIONS",
+    "READ_SCHEDULES",
+    "READ_EVENTS",
+    "READ_COMMUNITIES",
+    "READ_PROJECTS",
+    "READ_SACRAMENTS"
+  ];
+
+  // ---- LOAD ROLES AND AUTHORITIES FOR FORMS ----
+  function loadRoles() {
+    fetch(`${API_BASE}/roles`)
+            .then(res => res.json())
+            .then(data => {
+              allRoles = data.map(r => r.name || r.roleName || r); // adapt for your object structure
+              // Ensure PARISHIONER role is included
+              if (!allRoles.includes("PARISHIONER")) {
+                allRoles.push("PARISHIONER");
+              }
+              renderRolesCheckboxes();
+              renderRuleRoleDropdown();
+            });
+  }
+
+  function loadAuthorities() {
+    // It is assumed there is an endpoint `/authorities` returning a list of authority names.
+    fetch(`${API_BASE}/authorities`)
+            .then(res => {
+              if (!res.ok) {
+                throw new Error('Authorities endpoint not available');
+              }
+              return res.json();
+            })
+            .then(data => {
+              allAuthorities = Array.isArray(data) ? data : specificAuthorities;
+              // On startup, render everything not assigned
+              renderAuthoritiesAssignable([]);
+              renderRuleAuthorityCheckboxes();
+            })
+            .catch(error => {
+              console.warn('Error loading authorities:', error);
+              // Use specificAuthorities as fallback
+              allAuthorities = specificAuthorities;
+              renderAuthoritiesAssignable([]);
+              renderRuleAuthorityCheckboxes();
+            });
+  }
+
+  function renderRolesCheckboxes(selected = []) {
+    const rolesDiv = document.querySelector('.roles');
+    rolesDiv.innerHTML = '';
+    allRoles.forEach(role => {
+      const checked = selected.includes(role) ? 'checked' : '';
+      rolesDiv.innerHTML += `
+            <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+              <input type="checkbox" value="${role}" ${checked} />
+              <span class="checkmark"></span>
+              ${role.replace(/_/g, ' ')}
+            </label>`;
+    });
+  }
+
+  function renderAuthoritiesCheckboxes(selected = []) {
+    const authoritiesDiv = document.querySelector('.authorities');
+    authoritiesDiv.innerHTML = '';
+    allAuthorities.forEach(auth => {
+      const checked = selected.includes(auth) ? 'checked' : '';
+      authoritiesDiv.innerHTML += `
+            <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+              <input type="checkbox" value="${auth}" ${checked} />
+              <span class="checkmark"></span>
+              ${auth.replace(/_/g, ' ')}
+            </label>`;
+    });
+  }
+
+  function renderAuthoritiesAssignable(userAuthorities = []) {
+    const writeDiv = document.querySelector('.authorities-write');
+    const readDiv = document.querySelector('.authorities-read');
+    writeDiv.innerHTML = "";
+    readDiv.innerHTML = "";
+
+    // Use the specific authorities if available, otherwise use all authorities
+    const authoritiesToRender = allAuthorities;
+
+    authoritiesToRender.forEach(auth => {
+      const inUser = userAuthorities.includes(auth);
+      const checkboxHtml = `
+        <label class="custom-checkbox${inUser ? ' highlighted' : ''}">
+          <input type="checkbox" value="${auth}" ${inUser ? "checked" : ""}/>
+          <span class="checkmark"></span>
+          ${auth.replace(/_/g," ")}
+        </label>`;
+
+      if (auth.startsWith("WRITE_")) {
+        writeDiv.innerHTML += checkboxHtml;
+      } else if (auth.startsWith("READ_")) {
+        readDiv.innerHTML += checkboxHtml;
+      }
+    });
+  }
+
+  function renderRuleRoleDropdown() {
+    const ruleRoleSelect = document.getElementById('rule-role');
+    // Save the currently selected role before clearing the dropdown
+    const selectedRole = ruleRoleSelect.value;
+    ruleRoleSelect.innerHTML = '';
+    allRoles.forEach(role => {
+      // Set the selected attribute if this role matches the previously selected role
+      const selected = (role === selectedRole) ? 'selected' : '';
+      ruleRoleSelect.innerHTML += `<option value="${role}" ${selected}>${role.replace(/_/g, ' ')}</option>`;
+    });
+  }
+  function renderRuleAuthorityCheckboxes(granted = [], denied = []) {
+    // For rule grants
+    const grantsWriteDiv = document.querySelector('.rule-grants-write');
+    const grantsReadDiv = document.querySelector('.rule-grants-read');
+    grantsWriteDiv.innerHTML = '';
+    grantsReadDiv.innerHTML = '';
+
+    allAuthorities.forEach(auth => {
+      const checked = granted.includes(auth) ? 'checked' : '';
+      const checkbox = `
+        <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+          <input type="checkbox" class="rule-grant" value="${auth}" ${checked} />
+          <span class="checkmark"></span>
+          ${auth.replace(/_/g, ' ')}
+        </label>`;
+
+      if (auth.startsWith("WRITE_")) {
+        grantsWriteDiv.innerHTML += checkbox;
+      } else if (auth.startsWith("READ_")) {
+        grantsReadDiv.innerHTML += checkbox;
+      }
+    });
+
+    // For rule denies
+    const deniesWriteDiv = document.querySelector('.rule-denies-write');
+    const deniesReadDiv = document.querySelector('.rule-denies-read');
+    deniesWriteDiv.innerHTML = '';
+    deniesReadDiv.innerHTML = '';
+
+    allAuthorities.forEach(auth => {
+      const checked = denied.includes(auth) ? 'checked' : '';
+      const checkbox = `
+        <label class="custom-checkbox${checked ? ' highlighted' : ''}">
+          <input type="checkbox" class="rule-deny" value="${auth}" ${checked} />
+          <span class="checkmark"></span>
+          ${auth.replace(/_/g, ' ')}
+        </label>`;
+
+      if (auth.startsWith("WRITE_")) {
+        deniesWriteDiv.innerHTML += checkbox;
+      } else if (auth.startsWith("READ_")) {
+        deniesReadDiv.innerHTML += checkbox;
+      }
+    });
+
+    // Add click event listeners to prevent form submission when checkboxes are clicked
+    document.querySelectorAll('.rule-grants-write input[type="checkbox"], .rule-grants-read input[type="checkbox"], .rule-denies-write input[type="checkbox"], .rule-denies-read input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('click', function(e) {
+        // Set the flag to indicate a checkbox was clicked
+        isCheckboxClicked = true;
+        // Stop the event from propagating to prevent form submission
+        e.stopPropagation();
+
+        // Reset the flag after a short delay to allow other events to complete
+        setTimeout(() => {
+          isCheckboxClicked = false;
+        }, 100);
+      });
+    });
+
+    // Add animation effect when clicking on custom checkboxes
+    document.querySelectorAll('.custom-checkbox').forEach(label => {
+      label.addEventListener('click', function(e) {
+        // Prevent the event from bubbling up to avoid unwanted form submissions
+        e.stopPropagation();
+      });
+    });
+  }
+
+  // ---- AUTOCOMPLETE AND USER DATA FETCH ----
+  const nameInput = document.getElementById("name");
+  const suggestionBox = document.getElementById("name-suggestions");
+
+  nameInput.addEventListener("input", function () {
+    const query = nameInput.value.trim();
+    selectedUserId = null;
+    if (query.length < 1) {
+      suggestionBox.innerHTML = "";
+      return;
+    }
+    fetch(`${API_BASE}/user/search?name=${encodeURIComponent(query)}`)
+            .then((res) => res.json())
+            .then((data) => {
+              suggestionBox.innerHTML = "";
+              data.forEach((user) => {
+                const div = document.createElement("div");
+                div.textContent = user.name;
+                div.dataset.id = user.id;
+                div.classList.add("user-suggestion");
+                div.addEventListener("click", () => {
+                  nameInput.value = user.name;
+                  selectedUserId = user.id;
+                  suggestionBox.innerHTML = "";
+                  highlightRolesAndAuthorities();
+                });
+                suggestionBox.appendChild(div);
+              });
+              if (data.length === 0) {
+                const noMatch = document.createElement("div");
+                noMatch.textContent = "No matching names found";
+                suggestionBox.appendChild(noMatch);
+              }
+            });
+  });
+
+  function highlightRolesAndAuthorities() {
+    if (!selectedUserId) return;
+    // Highlight Roles
+    fetch(`${API_BASE}/user/${selectedUserId}/roles`)
+            .then((res) => res.json())
+            .then((roles) => {
+              renderRolesCheckboxes(roles);
+            });
+
+    // Highlight Authorities (updated)
+    fetch(`${API_BASE}/user/${selectedUserId}/authorities`)
+            .then((res) => res.json())
+            .then((authorities) => {
+              renderAuthoritiesAssignable(authorities);
+            });
+  }
+
+  // ---- FORM SUBMISSION: ASSIGN ROLES ----
+  document.querySelector("#roles-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    if (!selectedUserId) {
+      alert("Please select a user from the suggestions.");
+      return;
+    }
+    const checkedRoles = Array.from(document.querySelectorAll(".roles input[type='checkbox']:checked")).map(cb => cb.value);
+    if (checkedRoles.length === 0) {
+      if (!confirm("No roles selected. This will remove all roles from the user. Proceed?")) return;
+    }
+    fetch(`${API_BASE}/user/${selectedUserId}/roles`, {
+      method: "PUT",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(checkedRoles),
+    })
+            .then((res) => {
+              if (res.ok) {
+                alert("Roles updated successfully!");
+                highlightRolesAndAuthorities();
+              } else {
+                alert("Failed to update roles.");
+              }
+            });
+  });
+
+  // ---- FORM SUBMISSION: ASSIGN AUTHORITIES ----
+  document.querySelector("#authorities-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    if (!selectedUserId) {
+      alert("Please select a user from the suggestions.");
+      return;
+    }
+    const checkedAuthorities = Array.from(
+      document.querySelectorAll(".authorities-write input[type='checkbox'], .authorities-read input[type='checkbox']")
+    ).filter(cb => cb.checked).map(cb => cb.value);
+
+    fetch(`${API_BASE}/user/${selectedUserId}/authorities`, {
+      method: "PUT",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(checkedAuthorities),
+    })
+            .then((res) => {
+              if (res.ok) {
+                alert("Authorities updated successfully!");
+                highlightRolesAndAuthorities();
+              } else {
+                alert("Failed to update authorities.");
+              }
+            });
+  });
+
+  // ---- FORM SUBMISSION: CREATE/MODIFY RULES ----
+  document.querySelector("#rules-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    // Reset the checkbox clicked flag to ensure it doesn't interfere with future operations
+    isCheckboxClicked = false;
+
+    const roleName = document.getElementById('rule-role').value;
+    const overrideDefault = document.getElementById('rule-override').checked;
+    const grantedAuthorities = Array.from(
+      document.querySelectorAll('.rule-grants-write input[type="checkbox"]:checked, .rule-grants-read input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
+    const deniedAuthorities = Array.from(
+      document.querySelectorAll('.rule-denies-write input[type="checkbox"]:checked, .rule-denies-read input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
+
+    // This matches your backend's CreateRoleAuthorityRuleCommand
+    const payload = {
+      roleName,
+      overrideDefault,
+      grantedAuthorities,
+      deniedAuthorities
+    };
+
+    // First try to create a new rule using POST
+    fetch(`${API_BASE}/role-authority-rules/AuthorityRule`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload),
+    })
+    .then((res) => {
+      if (res.ok) {
+        return res.json().then(data => {
+          document.getElementById('rule-message').textContent = "Rule saved successfully.";
+
+          // Refresh the checkboxes to reflect the updated state
+          fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+            .then(res => {
+              if (!res.ok) throw new Error();
+              return res.json();
+            })
+            .then(rule => {
+              document.getElementById('rule-override').checked = rule.overrideDefault;
+              renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
+            })
+            .catch(error => {
+              console.error("Error refreshing rule data:", error);
+            });
+        });
+      } else {
+        // If the response is not OK, parse the error message
+        return res.json().then(errorData => {
+          // Check if the error is because the rule already exists
+          if (errorData.message && errorData.message.includes("Authority rule already exists for role")) {
+            // Get the existing rule's ID
+            return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to get existing rule");
+                return res.json();
+              })
+              .then(existingRule => {
+                // Update the existing rule using PUT
+                return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/${existingRule.id}`, {
+                  method: "PUT",
+                  headers: {"Content-Type": "application/json"},
+                  body: JSON.stringify(payload),
+                });
+              })
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to update rule");
+                return res.json();
+              })
+              .then(data => {
+                document.getElementById('rule-message').textContent = "Rule updated successfully.";
+
+                // Refresh the checkboxes to reflect the updated state
+                fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+                  .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
                   })
-                  .catch((err) => {
-                    console.error("Error fetching user roles:", err);
+                  .then(rule => {
+                    document.getElementById('rule-override').checked = rule.overrideDefault;
+                    renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
+                  })
+                  .catch(error => {
+                    console.error("Error refreshing rule data:", error);
                   });
               });
-    
-              suggestionBox.appendChild(div);
-            });
-    
-            if (data.length === 0) {
-              const noMatch = document.createElement("div");
-              noMatch.textContent = "No matching names found";
-              suggestionBox.appendChild(noMatch);
-            }
-          })
-          .catch((err) => {
-            console.error("Error fetching user names:", err);
-          });
-      });
-    
-      // When clicking "Assign" button
-      document.querySelector(".assign-btn").addEventListener("click", function (e) {
-        e.preventDefault();
-    
-        if (!selectedUserId) {
-          alert("Please select a user from the suggestions.");
-          return;
-        }
-    
-        const checkedRoles = Array.from(
-          document.querySelectorAll(".roles input[type='checkbox']:checked")
-        ).map((cb) => cb.value);
-    
-        if (checkedRoles.length === 0) {
-          if (!confirm("No roles selected. This will remove all roles from the user. Proceed?")) {
-            return;
+          } else {
+            // If it's a different error, throw it
+            throw new Error(errorData.message || "Error saving rule");
           }
-        }
-    
-        // Send the new list of roles
-        fetch(`http://localhost:8080/user/${selectedUserId}/roles`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(checkedRoles),
-        })
-          .then((res) => {
-            if (res.ok) {
-              alert("Roles updated successfully!");
-              // Optionally refresh roles again after assignment
-              fetch(`http://localhost:8080/user/${selectedUserId}/roles`)
-                .then((res) => res.json())
-                .then((roles) => {
-                  // Uncheck all first
-                  document.querySelectorAll(".roles input[type='checkbox']").forEach((cb) => {
-                    cb.checked = false;
-                  });
-    
-                  // Re-check assigned roles
-                  roles.forEach((role) => {
-                    const checkbox = document.querySelector(
-                      `.roles input[type='checkbox'][value="${role}"]`
-                    );
-                    if (checkbox) {
-                      checkbox.checked = true;
-                    }
-                  });
-                });
-            } else {
-              alert("Failed to update roles.");
-            }
-          })
-          .catch((err) => {
-            console.error("Error updating roles:", err);
-            alert("Error updating roles.");
-          });
-      });
-    </script>
+        });
+      }
+    })
+    .catch((error) => {
+      document.getElementById('rule-message').textContent = `Error: ${error.message || "Failed to save rule"}`;
+    });
+  });
 
-    <script src="../GENERAL/script.js"></script>
-  </body>
+  // ---- RULES TAB: LOAD RULE WHEN SELECTING ROLE ----
+  document.getElementById('rules-tab').addEventListener('click', function() {
+    // On show, update rule dropdown
+    renderRuleRoleDropdown();
+
+    // Trigger the change event on the dropdown to fetch and display the authorities for the selected role
+    const ruleRoleSelect = document.getElementById('rule-role');
+    if (ruleRoleSelect.value) {
+      // Create and dispatch a change event
+      const event = new Event('change');
+      ruleRoleSelect.dispatchEvent(event);
+    }
+  });
+
+  // On tab click, if user is selected, update authorities tab as well
+  document.querySelector('[data-tab="authorities-tab"]').addEventListener('click', function () {
+    if (selectedUserId) {
+      highlightRolesAndAuthorities();
+    }
+  });
+
+  document.getElementById('rule-role').addEventListener('change', function() {
+    // Optionally load existing rule for editing
+    const roleName = this.value;
+    // Ensure the dropdown value is set to the selected role
+    this.value = roleName;
+
+    // Only fetch the rule if a checkbox was not clicked
+    if (!isCheckboxClicked) {
+      fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+              .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+              })
+              .then(rule => {
+                document.getElementById('rule-override').checked = rule.overrideDefault;
+                renderRuleAuthorityCheckboxes(rule.grantedAuthorities, rule.deniedAuthorities);
+              })
+              .catch(() => {
+                // No rule yet, clear form but keep the selected role
+                document.getElementById('rule-override').checked = false;
+                renderRuleAuthorityCheckboxes([], []);
+                console.log(`No existing rule found for role: ${roleName}`);
+              });
+    }
+  });
+
+  // ---- INITIALIZE ROLES & AUTHORITIES ON LOAD ----
+  loadRoles();
+  loadAuthorities();
+
+  // Add event listener to the override default toggle switch to prevent form submission when clicked
+  document.getElementById('rule-override').addEventListener('click', function(e) {
+    // Set the flag to indicate a checkbox was clicked
+    isCheckboxClicked = true;
+    // Stop the event from propagating to prevent form submission
+    e.stopPropagation();
+
+    // Reset the flag after a short delay to allow other events to complete
+    setTimeout(() => {
+      isCheckboxClicked = false;
+    }, 100);
+  });
+
+  // Add event listener to the toggle switch label to prevent form submission
+  document.querySelector('.toggle-label').addEventListener('click', function(e) {
+    // Prevent the event from bubbling up to avoid unwanted form submissions
+    e.stopPropagation();
+  });
+
+
+</script>
+<script src="../GENERAL/script.js"></script>
+</body>
 </html>

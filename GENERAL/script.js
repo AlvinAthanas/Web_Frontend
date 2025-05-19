@@ -33,18 +33,27 @@ function setupDropdowns() {
 
 // Dark Mode and Light mode toogle
 function modeToogle() {
-  const body = document.querySelector("body"),
-    toogle = body.querySelector(".toogle"),
+  const body = document.querySelector("body");
+  if (!body) return;
+
+  const toogle = body.querySelector(".toogle"),
     modeSwitch = body.querySelector(".toogle-switch"),
     modeText = body.querySelector(".mode-text");
+
+  if (!modeSwitch) {
+    console.warn("Mode switch element not found");
+    return;
+  }
 
   modeSwitch.addEventListener("click", () => {
     body.classList.toggle("dark");
 
-    if (body.classList.contains("dark")) {
-      modeText.innerText = "Light Mode";
-    } else {
-      modeText.innerText = "Dark Mode";
+    if (modeText) {
+      if (body.classList.contains("dark")) {
+        modeText.innerText = "Light Mode";
+      } else {
+        modeText.innerText = "Dark Mode";
+      }
     }
   });
 }
