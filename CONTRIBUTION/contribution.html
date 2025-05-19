@@ -29,7 +29,7 @@
 
     <!-- SheetJS for Excel Export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-    
+
   </head>
 
   <body>
@@ -108,7 +108,7 @@
               </select>
               <span>entries</span>
             </div>
-            
+
             <div class="pagination-buttons">
               <button id="firstPage">First</button>
               <button id="prevPage">Previous</button>
@@ -136,7 +136,7 @@
             </tbody>
           </table>
         </div>
-      
+
         <!-- Form Dialog -->
         <div id="formDialog" class="dialog-overlay">
           <div class="dialog-box">
@@ -218,7 +218,12 @@
 
       // Load contributions from server
       function loadContributions() {
-        fetch("http://localhost:8080/contributions")
+        const token = localStorage.getItem("authToken");
+        fetch("http://localhost:8080/contributions", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
           .then((res) => res.json())
           .then((data) => {
             allContributions = data;
@@ -307,7 +312,7 @@
       function updatePaginationInfo() {
         const totalPages = entriesPerPage === 'all' ? 1 : Math.ceil(filteredContributions.length / entriesPerPage);
         document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
-        
+
         // Disable/enable pagination buttons
         document.getElementById("firstPage").disabled = currentPage === 1;
         document.getElementById("prevPage").disabled = currentPage === 1;
@@ -339,7 +344,12 @@
         if (month) params.append("month", month);
         if (year) params.append("year", year);
 
-        fetch(`http://localhost:8080/contributions/filter?${params.toString()}`)
+        const token = localStorage.getItem("authToken");
+        fetch(`http://localhost:8080/contributions/filter?${params.toString()}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
           .then((res) => res.json())
           .then((data) => {
             filteredContributions = data;
@@ -376,8 +386,12 @@
 
       // Delete a contribution
       function deleteContribution(id) {
+        const token = localStorage.getItem("authToken");
         fetch(`http://localhost:8080/contribution/${id}`, {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         })
           .then(res => {
             if (!res.ok) throw new Error("Failed to delete contribution");
@@ -408,12 +422,16 @@
           const formData = new FormData(formEl);
           const data = Object.fromEntries(formData);
           const contributionId = formEl.dataset.editId;
+          const token = localStorage.getItem("authToken");
 
           if (contributionId) {
             // Update existing contribution
             fetch(`http://localhost:8080/contribution/${contributionId}`, {
               method: "PUT",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
               body: JSON.stringify(data)
             })
               .then(res => {
@@ -430,7 +448,10 @@
             // Create new contribution
             fetch("http://localhost:8080/contribution", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
               body: JSON.stringify(data)
             })
               .then(res => {
@@ -467,14 +488,19 @@
 
       // Edit a contribution
       function editContribution(id) {
-        fetch(`http://localhost:8080/contribution/${id}`)
+        const token = localStorage.getItem("authToken");
+        fetch(`http://localhost:8080/contribution/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
           .then(res => res.json())
           .then(contribution => {
             document.getElementById("type").value = contribution.type || '';
             document.getElementById("description").value = contribution.description || '';
             document.getElementById("amount").value = contribution.amount || '';
             document.getElementById("date").value = contribution.date || '';
-            
+
             formEl.dataset.editId = id;
             document.getElementById("submit").textContent = "Update";
             formDialog.style.display = "flex";
@@ -514,18 +540,18 @@
         try {
           const table = document.getElementById("member-table");
           const tableClone = table.cloneNode(true);
-          
+
           // Remove actions column
           const actionsCol = tableClone.querySelectorAll('td.actions, th:nth-child(6)');
           actionsCol.forEach(el => el.remove());
-          
+
           const wb = XLSX.utils.table_to_book(tableClone);
           const filename = "contributions-list.xlsx";
           XLSX.writeFile(wb, filename);
-          
+
           // Add to reports
           addNewReport(filename, "Contributions");
-          
+
           showMessage("Excel exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to Excel:", error);
@@ -579,10 +605,10 @@
 
           const filename = "contributions-list.pdf";
           doc.save(filename);
-          
+
           // Add to reports
           addNewReport(filename, "Contributions");
-          
+
           showMessage("PDF exported successfully!", "success");
         } catch (error) {
           console.error("Error exporting to PDF:", error);
@@ -593,10 +619,10 @@
       // Add new report to localStorage
       function addNewReport(filename, type) {
         const reports = JSON.parse(localStorage.getItem("reports") || []);
-        
+
         // Check if report already exists
         const exists = reports.some(report => report.filename === filename);
-        
+
         if (!exists) {
           reports.push({
             filename: filename,
