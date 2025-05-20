@@ -275,14 +275,12 @@
             })
               .then((response) => {
                 if (!response.ok) throw new Error("Login failed");
-                return response.json();
+                return response.text(); // <-- Use text instead of json
               })
-              .then((data) => {
-                // Store the token and parish info
-                localStorage.setItem("authToken", data.token);
-                localStorage.setItem("parishName", data.parishName);
-
-                // Redirect to dashboard
+              .then((text) => {
+                // If response is just the token string:
+                localStorage.setItem("authToken", text);
+                // You may not have parishName info this way!
                 window.location.href = "../DASHBOARD/dashboard.html";
               })
               .catch((error) => {
