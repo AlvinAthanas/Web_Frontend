@@ -264,9 +264,7 @@
           }
 
           if (isValid) {
-            // Here you would send the login data to your backend
-            // For demo purposes, we'll simulate a successful login
-            fetch("http://localhost:8080/login", {
+            fetch("http://localhost:8080/admin/login", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -275,12 +273,12 @@
             })
               .then((response) => {
                 if (!response.ok) throw new Error("Login failed");
-                return response.text(); // <-- Use text instead of json
+                return response.json();
               })
-              .then((text) => {
-                // If response is just the token string:
-                localStorage.setItem("authToken", text);
-                // You may not have parishName info this way!
+              .then((data) => {
+                // Store JWT and user details in localStorage
+                localStorage.setItem("authToken", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
                 window.location.href = "../DASHBOARD/dashboard.html";
               })
               .catch((error) => {

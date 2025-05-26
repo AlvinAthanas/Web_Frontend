@@ -323,6 +323,19 @@
             3. Login Info
           </button>
         </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link disabled"
+            id="verify-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#verify"
+            type="button"
+            role="tab"
+            aria-disabled="true"
+          >
+            4. Verify Key
+          </button>
+        </li>
       </ul>
 
       <div class="tab-content" id="registerTabContent">
@@ -350,7 +363,9 @@
 
           <div class="form-section">
             <label for="parishInput" class="form-label">Parish Name</label>
-            <span class="material-icons-outlined input-icon">location_city</span>
+            <span class="material-icons-outlined input-icon"
+              >location_city</span
+            >
             <input
               type="text"
               class="form-control"
@@ -387,7 +402,8 @@
           aria-labelledby="personal-tab"
         >
           <div class="alert alert-success" id="personalSuccessAlert">
-            Church information submitted successfully! Please provide your personal details.
+            Church information submitted successfully! Please provide your
+            personal details.
           </div>
 
           <div class="form-section">
@@ -452,7 +468,9 @@
 
           <div class="form-section">
             <label for="birthdateInput" class="form-label">Birth Date</label>
-            <span class="material-icons-outlined input-icon">calendar_today</span>
+            <span class="material-icons-outlined input-icon"
+              >calendar_today</span
+            >
             <input
               type="date"
               class="form-control"
@@ -501,7 +519,11 @@
             >
               Back
             </button>
-            <button type="button" class="btn btn-action" id="continueToLoginBtn">
+            <button
+              type="button"
+              class="btn btn-action"
+              id="continueToLoginBtn"
+            >
               Save & Continue
             </button>
           </div>
@@ -516,7 +538,8 @@
           aria-labelledby="login-tab"
         >
           <div class="alert alert-success" id="loginSuccessAlert">
-            Personal information submitted successfully! Please create your login credentials.
+            Personal information submitted successfully! Please create your
+            login credentials.
           </div>
 
           <div class="form-section">
@@ -559,15 +582,65 @@
             >
               Back
             </button>
-            <button
-              type="button"
-              class="btn btn-action"
-              id="registerBtn"
-            >
+            <button type="button" class="btn btn-action" id="registerBtn">
               Complete Registration
             </button>
           </div>
           <div id="registerApiError" class="api-error"></div>
+        </div>
+
+        <!-- Verification Tab -->
+        <div
+          class="tab-pane fade"
+          id="verify"
+          role="tabpanel"
+          aria-labelledby="verify-tab"
+        >
+          <div class="alert alert-success" id="verifyInfoAlert">
+            Registration successful! Please check your email for the
+            verification key.
+          </div>
+          <div class="form-section">
+            <label for="verifyEmailInput" class="form-label">Email</label>
+            <span class="material-icons-outlined input-icon">mail</span>
+            <input
+              type="email"
+              class="form-control"
+              id="verifyEmailInput"
+              placeholder="Enter your email"
+            />
+            <div class="error-message" id="verifyEmailError">
+              Please enter your email
+            </div>
+          </div>
+          <div class="form-section">
+            <label for="verifyKeyInput" class="form-label"
+              >Verification Key</label
+            >
+            <span class="material-icons-outlined input-icon">vpn_key</span>
+            <input
+              type="text"
+              class="form-control"
+              id="verifyKeyInput"
+              placeholder="Enter your verification key"
+            />
+            <div class="error-message" id="verifyKeyError">
+              Please enter your verification key
+            </div>
+          </div>
+          <div class="d-flex justify-content-between mt-4">
+            <button
+              type="button"
+              class="btn btn-outline btn-action"
+              id="backToLoginBtn"
+            >
+              Back
+            </button>
+            <button type="button" class="btn btn-action" id="verifyKeyBtn">
+              Verify Key
+            </button>
+          </div>
+          <div id="verifyApiError" class="api-error"></div>
         </div>
       </div>
 
@@ -625,9 +698,9 @@
       function fadeOutSuccessMessage(elementId) {
         const element = document.getElementById(elementId);
         setTimeout(() => {
-          element.classList.add('fade-out');
+          element.classList.add("fade-out");
           setTimeout(() => {
-            element.style.display = 'none';
+            element.style.display = "none";
           }, 500);
         }, 3000);
       }
@@ -816,13 +889,15 @@
 
           if (isValid) {
             churchInfoSubmitted = true;
-            document.getElementById("personal-tab").classList.remove("disabled");
+            document
+              .getElementById("personal-tab")
+              .classList.remove("disabled");
             const personalTab = new bootstrap.Tab(
               document.getElementById("personal-tab")
             );
             personalTab.show();
             // Start fading out success message after showing
-            fadeOutSuccessMessage('personalSuccessAlert');
+            fadeOutSuccessMessage("personalSuccessAlert");
           }
         });
 
@@ -903,7 +978,7 @@
             );
             loginTab.show();
             // Start fading out success message after showing
-            fadeOutSuccessMessage('loginSuccessAlert');
+            fadeOutSuccessMessage("loginSuccessAlert");
           }
         });
 
@@ -1027,16 +1102,17 @@
                 parishId: parishId,
               };
 
-              console.log("Submitting user data:", userData);
-
-              // Submit to the backend
-              const response = await fetch("http://localhost:8080/user", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userData),
-              });
+              // Submit to the new backend endpoint
+              const response = await fetch(
+                "http://localhost:8080/admin/register",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(userData),
+                }
+              );
 
               if (!response.ok) {
                 const errorData = await response.json();
@@ -1046,11 +1122,84 @@
                 );
               }
 
-              // Show success message
-              showSuccessModal();
+              // Show the verify tab instead of the modal
+              document
+                .getElementById("verify-tab")
+                .classList.remove("disabled");
+              const verifyTab = new bootstrap.Tab(
+                document.getElementById("verify-tab")
+              );
+              verifyTab.show();
+              // Prefill email for convenience
+              document.getElementById("verifyEmailInput").value = email;
             } catch (error) {
               console.error("Registration error:", error);
               showApiError("registerApiError", error.message);
+            }
+          }
+        });
+
+      // Back button from Verify Key to Login Info
+      document
+        .getElementById("backToLoginBtn")
+        .addEventListener("click", function () {
+          const loginTab = new bootstrap.Tab(
+            document.getElementById("login-tab")
+          );
+          loginTab.show();
+        });
+
+      // Verify Key button functionality
+      document
+        .getElementById("verifyKeyBtn")
+        .addEventListener("click", async function () {
+          const email = document
+            .getElementById("verifyEmailInput")
+            .value.trim();
+          const key = document.getElementById("verifyKeyInput").value.trim();
+
+          hideError("verifyEmailError");
+          hideError("verifyKeyError");
+          hideError("verifyApiError");
+
+          let isValid = true;
+
+          if (!email) {
+            showError("verifyEmailError", "Please enter your email");
+            isValid = false;
+          } else if (!isValidEmail(email)) {
+            showError("verifyEmailError", "Please enter a valid email");
+            isValid = false;
+          }
+
+          if (!key) {
+            showError("verifyKeyError", "Please enter your verification key");
+            isValid = false;
+          }
+
+          if (isValid) {
+            try {
+              const command = { email, key };
+              const response = await fetch("http://localhost:8080/verify-key", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(command),
+              });
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(
+                  errorData.message ||
+                    "Verification failed. Please check your key and try again."
+                );
+              }
+
+              // On success, redirect to login
+              window.location.href = "login.html";
+            } catch (error) {
+              showApiError("verifyApiError", error.message);
             }
           }
         });
