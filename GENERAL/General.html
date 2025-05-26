@@ -55,7 +55,7 @@
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-title">
         <div class="sidebar-brand">
-          <span class="material-icons-outlined"></span> MENU
+          <span class="material-icons-outlined"></span> <span id="parish-name">MENU</span>
         </div>
         <span class="material-icons-outlined" onclick="closeSidebar()"
           >close</span
@@ -155,6 +155,82 @@
     <!-- End Sidebar -->
 
     <script>
+      // Function to extract user email from JWT token
+      function getUserEmailFromToken(token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.sub || payload.email; // 'sub' is common in JWT, adjust based on your token structure
+        } catch (error) {
+          console.error('Error parsing JWT token:', error);
+          return null;
+        }
+      }
+
+      // Function to fetch and display parish name
+      async function loadParishName() {
+        try {
+          const authToken = localStorage.getItem('authToken');
+          if (!authToken) {
+            console.error('No auth token found');
+            return;
+          }
+
+          // Extract user email from JWT token
+          const userEmail = getUserEmailFromToken(authToken);
+          if (!userEmail) {
+            console.error('User email not found in token');
+            return;
+          }
+
+          // First, get current user info to retrieve parish ID
+          const userResponse = await fetch(`http://localhost:8080/user?email=${encodeURIComponent(userEmail)}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!userResponse.ok) {
+            console.error('Failed to fetch user data:', userResponse.status);
+            return;
+          }
+
+          const userData = await userResponse.json();
+          const parishId = userData.parishId;
+
+          if (!parishId) {
+            console.error('Parish ID not found in user data');
+            return;
+          }
+
+          // Now fetch parish data using the parish ID
+          const parishResponse = await fetch(`http://localhost:8080/parish/${parishId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (parishResponse.ok) {
+            const parish = await parishResponse.json();
+            // Update the sidebar brand with parish name
+            document.getElementById('parish-name').textContent = parish.name || 'PARISH';
+          } else {
+            console.error('Failed to fetch parish data:', parishResponse.status);
+          }
+        } catch (error) {
+          console.error('Error loading parish name:', error);
+        }
+      }
+
+      // Load parish name when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        loadParishName();
+      });
+
+      // Existing logout functionality
       document.querySelectorAll(".logout").forEach((item) => {
         item.addEventListener("click", function (event) {
           event.preventDefault();

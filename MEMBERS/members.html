@@ -146,6 +146,34 @@
           </div>
         </div>
 
+        <!-- Import Modal -->
+        <div id="importModal" class="dialog-overlay">
+          <div class="dialog-box">
+            <h3>Import Members from Excel</h3>
+            <div class="import-instructions">
+              <p>Please upload an Excel file with the following columns:</p>
+              <ul>
+                <li>Name (required)</li>
+                <li>Email (required)</li>
+                <li>Password (required)</li>
+                <li>Phone</li>
+                <li>Address</li>
+                <li>Birth Date (YYYY-MM-DD format)</li>
+                <li>Gender (exactly "Male" or "Female" - case sensitive)</li>
+                <li>Marital Status (Single, Married, Divorced)</li>
+                <li>Parish ID</li>
+              </ul>
+            </div>
+            <form id="importForm">
+              <input type="file" id="excelFile" accept=".xlsx, .xls" required />
+              <div class="dialog-buttons">
+                <button type="submit" id="importSubmit">Import</button>
+                <button type="button" id="importCancel">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <div id="member-message" style="margin-top: 10px; color: green"></div>
       </main>
     </div>
@@ -168,6 +196,7 @@
         setupSearch();
         setupForm();
         setupDeleteModal();
+        setupImport();
       });
 
       // Function to load members from the database
@@ -590,7 +619,7 @@
 
       // Add new report to localStorage
       function addNewReport(filename, type) {
-        const reports = JSON.parse(localStorage.getItem("reports") || []);
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
 
         // Check if report already exists
         const exists = reports.some(report => report.filename === filename);
@@ -603,6 +632,162 @@
           });
           localStorage.setItem("reports", JSON.stringify(reports));
         }
+      }
+
+      // Setup import functionality
+      function setupImport() {
+        const importBtn = document.getElementById("importBtn");
+        const importModal = document.getElementById("importModal");
+        const importForm = document.getElementById("importForm");
+        const importCancel = document.getElementById("importCancel");
+        const excelFile = document.getElementById("excelFile");
+
+        // Show import modal when import button is clicked
+        importBtn.addEventListener("click", () => {
+          importForm.reset();
+          importModal.style.display = "flex";
+        });
+
+        // Hide import modal when cancel button is clicked
+        importCancel.addEventListener("click", () => {
+          importModal.style.display = "none";
+        });
+
+        // Handle form submission
+        importForm.addEventListener("submit", function(e) {
+          e.preventDefault();
+
+          if (!excelFile.files.length) {
+            showMessage("Please select an Excel file", "error");
+            return;
+          }
+
+          const file = excelFile.files[0];
+          const reader = new FileReader();
+
+          reader.onload = function(e) {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+
+              // Get the first sheet
+              const firstSheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[firstSheetName];
+
+              // Convert to JSON
+              const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+              if (jsonData.length === 0) {
+                showMessage("The Excel file is empty", "error");
+                return;
+              }
+
+              // Validate and transform data
+              const users = validateAndTransformData(jsonData);
+
+              if (users.length === 0) {
+                showMessage("No valid user data found in the Excel file", "error");
+                return;
+              }
+
+              // Send data to server
+              importUsers(users);
+            } catch (error) {
+              console.error("Error processing Excel file:", error);
+              showMessage("Error processing Excel file: " + error.message, "error");
+            }
+          };
+
+          reader.onerror = function() {
+            showMessage("Error reading the file", "error");
+          };
+
+          reader.readAsArrayBuffer(file);
+        });
+      }
+
+      // Validate and transform Excel data to match User entity
+      function validateAndTransformData(jsonData) {
+        const validUsers = [];
+        const requiredFields = ['name', 'email', 'password'];
+
+        jsonData.forEach((row, index) => {
+          // Check if all required fields are present
+          const missingFields = requiredFields.filter(field => !row[field]);
+
+          if (missingFields.length > 0) {
+            console.warn(`Row ${index + 1} is missing required fields: ${missingFields.join(', ')}`);
+            return; // Skip this row
+          }
+
+          // Create user object with proper field mapping
+          const user = {
+            name: row.name,
+            email: row.email,
+            password: row.password,
+            phone: row.phone || null,
+            address: row.address || null,
+            birthDate: row.birthDate || row['birthDate'] || null,
+            gender: row.gender ? (row.gender.charAt(0).toUpperCase() + row.gender.slice(1).toLowerCase()) : null,
+            maritalStatus: row.maritalStatus || row['marital status'] ? (row.maritalStatus || row['marital status']).toUpperCase() : null,
+            parishId: row.parishId || row['parish id'] || null
+          };
+
+          // Convert birthDate to proper format if it exists
+          if (user.birthDate) {
+            try {
+              // Handle different date formats
+              const date = new Date(user.birthDate);
+              if (!isNaN(date.getTime())) {
+                user.birthDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+              } else {
+                user.birthDate = null;
+              }
+            } catch (e) {
+              user.birthDate = null;
+            }
+          }
+
+          validUsers.push(user);
+        });
+
+        return validUsers;
+      }
+
+      // Send users to server
+      function importUsers(users) {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          showMessage("Please login first", "error");
+          return;
+        }
+
+        // Show loading message
+        showMessage("Importing users, please wait...", "info");
+
+        fetch("http://localhost:8080/users", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(users)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Import failed with status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById("importModal").style.display = "none";
+          showMessage(`Successfully imported ${data.length} users`, "success");
+          loadMembers(); // Refresh the member list
+        })
+        .catch(error => {
+          console.error("Error importing users:", error);
+          showMessage("Error importing users: " + error.message, "error");
+        });
       }
     </script>
 

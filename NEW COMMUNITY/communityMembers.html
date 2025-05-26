@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Community Members</title>
-  
+
   <!-- Montserrat Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -427,23 +427,23 @@
         width: 95%;
         padding: 10px;
       }
-      
+
       .members-table th, 
       .members-table td {
         padding: 8px 10px;
         font-size: 0.9em;
       }
-      
+
       .table-actions {
         flex-direction: column;
         gap: 5px;
       }
-      
+
       .btn {
         padding: 5px;
         justify-content: center;
       }
-      
+
       .search-container {
         flex-direction: column;
       }
@@ -584,7 +584,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const communityId = urlParams.get('communityId');
       const communityName = urlParams.get('communityName');
-      
+
       // Store community info globally
       window.currentCommunity = {
         id: communityId,
@@ -619,7 +619,7 @@
       const cancelConfirmationBtn = document.getElementById("cancelConfirmationBtn");
       const confirmActionBtn = document.getElementById("confirmActionBtn");
       const contributionDate = document.getElementById("contributionDate");
-      
+
       // Set default date to today
       const today = new Date();
       const formattedDate = today.toISOString().substr(0, 10);
@@ -627,6 +627,20 @@
 
       // Store the action callback for confirmation dialog
       let confirmCallback = null;
+
+      // Debounce function to limit how often a function is called
+      function debounce(func, delay) {
+        let timeoutId;
+        return function(...args) {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            func.apply(this, args);
+          }, delay);
+        };
+      }
+
+      // Debounced search function
+      const debouncedSearch = debounce(performSearch, 300);
 
       // Event Listeners
       addMemberBtn.addEventListener("click", () => {
@@ -639,23 +653,23 @@
         `;
         searchModal.classList.add("active");
       });
-      
+
       closeSearchBtn.addEventListener("click", () => searchModal.classList.remove("active"));
       searchBtn.addEventListener("click", performSearch);
-      searchInput.addEventListener("keyup", (e) => {
-        if (e.key === "Enter") performSearch();
+      searchInput.addEventListener("keyup", () => {
+        debouncedSearch();
       });
-      
+
       closeDetailsBtn.addEventListener("click", () => detailsModal.classList.remove("active"));
       addContributionBtn.addEventListener("click", () => {
         const memberId = addContributionBtn.getAttribute('data-member-id');
         openContributionForm(memberId);
       });
-      
+
       closeContributionBtn.addEventListener("click", () => contributionModal.classList.remove("active"));
       cancelContributionBtn.addEventListener("click", () => contributionModal.classList.remove("active"));
       saveContributionBtn.addEventListener("click", saveContribution);
-      
+
       cancelConfirmationBtn.addEventListener("click", () => confirmationDialog.classList.remove("active"));
       confirmActionBtn.addEventListener("click", () => {
         if (confirmCallback) {
@@ -681,14 +695,14 @@
           </span>
           <div>${message}</div>
         `;
-        
+
         notificationContainer.appendChild(notification);
-        
+
         // Show notification
         setTimeout(() => {
           notification.classList.add('show');
         }, 10);
-        
+
         // Remove notification after 3 seconds
         setTimeout(() => {
           notification.classList.remove('show');
@@ -786,7 +800,7 @@
                 const memberName = member.name || 'Unknown';
                 const memberEmail = member.email || 'N/A';
                 const memberPhone = member.phone || 'N/A';
-                
+
                 return `
                   <tr>
                     <td>${index + 1}</td>
@@ -843,7 +857,15 @@
       // Perform search for members
       function performSearch() {
         const searchTerm = searchInput.value.trim();
-        if (!searchTerm) return;
+        if (!searchTerm) {
+          searchResults.innerHTML = `
+            <div class="empty-search-state">
+              <span class="material-icons-outlined">search</span>
+              <p>Enter a name to search for members</p>
+            </div>
+          `;
+          return;
+        }
 
         searchResults.innerHTML = `
           <div class="empty-search-state">
@@ -976,10 +998,10 @@
           })
           .then(member => {
             detailsModalTitle.textContent = `${member.name}'s Details`;
-            
+
             // Set member ID for add contribution button
             addContributionBtn.setAttribute('data-member-id', member.id);
-            
+
             detailsModalBody.innerHTML = `
               <div class="detail-row">
                 <div class="detail-label">Full Name:</div>
@@ -1008,9 +1030,9 @@
                 </div>
               </div>
             `;
-            
+
             detailsModal.classList.add('active');
-            
+
             // Fetch contributions for this member
             fetchMemberContributions(memberId);
           })
@@ -1019,7 +1041,7 @@
             showNotification("Error loading member details", "error");
           });
       }
-      
+
       // Fetch member contributions
       function fetchMemberContributions(memberId) {
         fetch(`http://localhost:8080/contributions?memberId=${memberId}`)
@@ -1089,13 +1111,13 @@
         const amount = document.getElementById("contributionAmount").value;
         const date = document.getElementById("contributionDate").value;
         const notes = document.getElementById("contributionNotes").value;
-        
+
         // Form validation
         if (!type || !amount || !date) {
           showNotification("Please fill in all required fields", "warning");
           return;
         }
-        
+
         // Create contribution object
         const contribution = {
           memberId: memberId,
@@ -1104,7 +1126,7 @@
           date: date,
           notes: notes
         };
-        
+
         // Send contribution to API
         fetch('http://localhost:8080/contributions', {
           method: 'POST',

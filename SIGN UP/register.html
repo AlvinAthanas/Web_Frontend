@@ -103,7 +103,7 @@
       }
 
       .form-section {
-        margin-bottom: 20px;
+        margin-bottom: 5px;
         position: relative;
       }
 
@@ -186,6 +186,11 @@
         background: #e8f5e9;
         color: #2e7d32;
         border-radius: 8px;
+        transition: opacity 0.5s ease-out;
+      }
+
+      .alert-success.fade-out {
+        opacity: 0;
       }
 
       .autocomplete-items {
@@ -214,6 +219,7 @@
         color: #dc3545;
         font-size: 14px;
         margin-top: 5px;
+        margin-bottom: 15px;
         display: none;
       }
 
@@ -294,9 +300,9 @@
         <li class="nav-item" role="presentation">
           <button
             class="nav-link disabled"
-            id="login-tab"
+            id="personal-tab"
             data-bs-toggle="tab"
-            data-bs-target="#login"
+            data-bs-target="#personal"
             type="button"
             role="tab"
             aria-disabled="true"
@@ -304,9 +310,23 @@
             2. Personal Info
           </button>
         </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link disabled"
+            id="login-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#login"
+            type="button"
+            role="tab"
+            aria-disabled="true"
+          >
+            3. Login Info
+          </button>
+        </li>
       </ul>
 
       <div class="tab-content" id="registerTabContent">
+        <!-- Church Info Tab -->
         <div
           class="tab-pane fade show active"
           id="church"
@@ -330,9 +350,7 @@
 
           <div class="form-section">
             <label for="parishInput" class="form-label">Parish Name</label>
-            <span class="material-icons-outlined input-icon"
-              >location_city</span
-            >
+            <span class="material-icons-outlined input-icon">location_city</span>
             <input
               type="text"
               class="form-control"
@@ -361,15 +379,15 @@
           <div id="churchApiError" class="api-error"></div>
         </div>
 
+        <!-- Personal Info Tab -->
         <div
           class="tab-pane fade"
-          id="login"
+          id="personal"
           role="tabpanel"
-          aria-labelledby="login-tab"
+          aria-labelledby="personal-tab"
         >
-          <div class="alert alert-success">
-            Church information submitted successfully! Please provide your
-            personal details.
+          <div class="alert alert-success" id="personalSuccessAlert">
+            Church information submitted successfully! Please provide your personal details.
           </div>
 
           <div class="form-section">
@@ -434,9 +452,7 @@
 
           <div class="form-section">
             <label for="birthdateInput" class="form-label">Birth Date</label>
-            <span class="material-icons-outlined input-icon"
-              >calendar_today</span
-            >
+            <span class="material-icons-outlined input-icon">calendar_today</span>
             <input
               type="date"
               class="form-control"
@@ -477,6 +493,32 @@
             </div>
           </div>
 
+          <div class="d-flex justify-content-between mt-4">
+            <button
+              type="button"
+              class="btn btn-outline btn-action"
+              id="backToChurchBtn"
+            >
+              Back
+            </button>
+            <button type="button" class="btn btn-action" id="continueToLoginBtn">
+              Save & Continue
+            </button>
+          </div>
+          <div id="personalApiError" class="api-error"></div>
+        </div>
+
+        <!-- Login Info Tab -->
+        <div
+          class="tab-pane fade"
+          id="login"
+          role="tabpanel"
+          aria-labelledby="login-tab"
+        >
+          <div class="alert alert-success" id="loginSuccessAlert">
+            Personal information submitted successfully! Please create your login credentials.
+          </div>
+
           <div class="form-section">
             <label for="passwordInput" class="form-label">Password</label>
             <span class="material-icons-outlined input-icon">lock</span>
@@ -509,13 +551,22 @@
             </div>
           </div>
 
-          <button
-            type="button"
-            class="btn btn-action w-100 mt-3"
-            id="registerBtn"
-          >
-            Complete Registration
-          </button>
+          <div class="d-flex justify-content-between mt-4">
+            <button
+              type="button"
+              class="btn btn-outline btn-action"
+              id="backToPersonalBtn"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="btn btn-action"
+              id="registerBtn"
+            >
+              Complete Registration
+            </button>
+          </div>
           <div id="registerApiError" class="api-error"></div>
         </div>
       </div>
@@ -544,6 +595,7 @@
     <script>
       // Track if church info is submitted
       let churchInfoSubmitted = false;
+      let personalInfoSubmitted = false;
       let selectedParishId = null;
 
       // Show error message
@@ -569,6 +621,17 @@
         }, 5000);
       }
 
+      // Fade out success message
+      function fadeOutSuccessMessage(elementId) {
+        const element = document.getElementById(elementId);
+        setTimeout(() => {
+          element.classList.add('fade-out');
+          setTimeout(() => {
+            element.style.display = 'none';
+          }, 500);
+        }, 3000);
+      }
+
       // Validate email format
       function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -586,7 +649,7 @@
 
         // Redirect after 3 seconds
         setTimeout(() => {
-          window.location.href = "indexx.html";
+          window.location.href = "login.html";
         }, 3000);
       }
 
@@ -733,7 +796,7 @@
           hideError("churchApiError");
         });
 
-      // Continue button functionality
+      // Continue button functionality (Church Info to Personal Info)
       document
         .getElementById("continueBtn")
         .addEventListener("click", function () {
@@ -753,12 +816,105 @@
 
           if (isValid) {
             churchInfoSubmitted = true;
+            document.getElementById("personal-tab").classList.remove("disabled");
+            const personalTab = new bootstrap.Tab(
+              document.getElementById("personal-tab")
+            );
+            personalTab.show();
+            // Start fading out success message after showing
+            fadeOutSuccessMessage('personalSuccessAlert');
+          }
+        });
+
+      // Back button from Personal Info to Church Info
+      document
+        .getElementById("backToChurchBtn")
+        .addEventListener("click", function () {
+          const churchTab = new bootstrap.Tab(
+            document.getElementById("church-tab")
+          );
+          churchTab.show();
+        });
+
+      // Continue button from Personal Info to Login Info
+      document
+        .getElementById("continueToLoginBtn")
+        .addEventListener("click", function () {
+          const name = document.getElementById("name").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const phone = document.getElementById("phone").value.trim();
+          const address = document.getElementById("address").value.trim();
+          const birthDate = document.getElementById("birthDate").value;
+          const gender = document.querySelector('input[name="gender"]:checked');
+
+          // Hide all errors first
+          hideError("fullnameError");
+          hideError("emailError");
+          hideError("phoneError");
+          hideError("addressError");
+          hideError("birthdateError");
+          hideError("genderError");
+          hideError("personalApiError");
+
+          let isValid = true;
+
+          // Validate all fields
+          if (!name) {
+            showError("fullnameError", "Please enter your full name");
+            isValid = false;
+          }
+
+          if (!email) {
+            showError("emailError", "Please enter your email");
+            isValid = false;
+          } else if (!isValidEmail(email)) {
+            showError("emailError", "Please enter a valid email");
+            isValid = false;
+          }
+
+          if (!phone) {
+            showError("phoneError", "Please enter your phone number");
+            isValid = false;
+          } else if (!isValidPhone(phone)) {
+            showError("phoneError", "Please enter a valid phone number");
+            isValid = false;
+          }
+
+          if (!address) {
+            showError("addressError", "Please enter your address");
+            isValid = false;
+          }
+
+          if (!birthDate) {
+            showError("birthdateError", "Please select your birth date");
+            isValid = false;
+          }
+
+          if (!gender) {
+            showError("genderError", "Please select your gender");
+            isValid = false;
+          }
+
+          if (isValid) {
+            personalInfoSubmitted = true;
             document.getElementById("login-tab").classList.remove("disabled");
             const loginTab = new bootstrap.Tab(
               document.getElementById("login-tab")
             );
             loginTab.show();
+            // Start fading out success message after showing
+            fadeOutSuccessMessage('loginSuccessAlert');
           }
+        });
+
+      // Back button from Login Info to Personal Info
+      document
+        .getElementById("backToPersonalBtn")
+        .addEventListener("click", function () {
+          const personalTab = new bootstrap.Tab(
+            document.getElementById("personal-tab")
+          );
+          personalTab.show();
         });
 
       // Register button functionality
@@ -904,7 +1060,7 @@
         .getElementById("signInLink")
         .addEventListener("click", function (e) {
           e.preventDefault();
-          window.location.href = "indexx.html";
+          window.location.href = "login.html";
         });
     </script>
   </body>

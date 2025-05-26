@@ -96,6 +96,16 @@ function setupEventListeners() {
       searchUsers(searchTerm);
     }
   });
+
+  // Real-time search as user types
+  searchInput.addEventListener("input", function() {
+    const searchTerm = this.value.trim();
+    if (searchTerm) {
+      searchUsers(searchTerm);
+    } else {
+      searchResults.innerHTML = "";
+    }
+  });
 }
 
 function closeSearchDialog() {
@@ -108,7 +118,17 @@ function closeSearchDialog() {
 // Fetch all participants (using existing users endpoint)
 async function fetchParticipants() {
   try {
-    const response = await fetch("/users");
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("No authentication token found");
+      return;
+    }
+
+    const response = await fetch("/users", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
     const allUsers = await response.json();
 
     // Filter users based on sacrament type
@@ -130,8 +150,20 @@ async function fetchParticipants() {
 // Search users in the system
 async function searchUsers(name) {
   try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("No authentication token found");
+      searchResults.innerHTML = '<div class="search-result-item">Authentication error</div>';
+      return;
+    }
+
     const response = await fetch(
-      `http://localhost:8080/user/search?name=${encodeURIComponent(name)}`
+      `http://localhost:8080/user/search?name=${encodeURIComponent(name)}`,
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
     );
     const users = await response.json();
 
@@ -194,10 +226,18 @@ function displaySearchResults(users) {
 // Add participant to training list using updateUser endpoint
 async function addParticipant(user) {
   try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("No authentication token found");
+      alert("Authentication error. Please login again.");
+      return;
+    }
+
     const response = await fetch(`/user/${user.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         [`${sacramentType}Status`]: "training",
@@ -229,10 +269,18 @@ async function addParticipant(user) {
 // Move participant to completed using updateUser endpoint
 async function completeTraining(participantId) {
   try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("No authentication token found");
+      alert("Authentication error. Please login again.");
+      return;
+    }
+
     const response = await fetch(`/user/${participantId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         [`${sacramentType}Status`]: "completed",

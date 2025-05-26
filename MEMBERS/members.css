@@ -150,6 +150,42 @@ body {
   color: white;
 }
 
+/* Import Modal Styles */
+.import-instructions {
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  border-left: 4px solid #3498db;
+}
+
+.import-instructions p {
+  margin-top: 0;
+  font-weight: 500;
+}
+
+.import-instructions ul {
+  margin-bottom: 0;
+  padding-left: 20px;
+}
+
+.import-instructions li {
+  margin-bottom: 5px;
+}
+
+#excelFile {
+  margin: 15px 0;
+  padding: 10px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#importSubmit {
+  background-color: #3498db;
+}
+
 
 /* Table container for horizontal scroll on mobile */
 .table-container {

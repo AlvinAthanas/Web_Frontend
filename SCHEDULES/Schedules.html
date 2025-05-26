@@ -10,28 +10,61 @@
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <style>
+      /* Tab styling */
+      .tab-container {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+      }
+      
+      .tab {
+        padding: 12px 24px;
+        cursor: pointer;
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+      
+      .tab.active {
+        background-color: #fff;
+        border-bottom: 1px solid #fff;
+        color: #4CAF50;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
       /* Enhance table styling */
-      #tableBody {
+      .schedule-table {
         border-collapse: collapse;
         width: 100%;
         margin-top: 20px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
-      #tableBody th,
-      #tableBody td {
+      .schedule-table th,
+      .schedule-table td {
         padding: 12px 15px;
         text-align: left;
         border-bottom: 1px solid #ddd;
       }
 
-      #tableBody th {
+      .schedule-table th {
         background-color: #f4f4f4;
         font-weight: bold;
         color: #333;
       }
 
-      #tableBody tr:hover {
+      .schedule-table tr:hover {
         background-color: #f9f9f9;
       }
 
@@ -61,10 +94,101 @@
         color: #da190b;
       }
 
-      /* Form button styling for consistency */
-      #scheduleForm button {
+      /* Add button styling */
+      .add-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 20px;
+      }
+
+      .add-button:hover {
+        background-color: #45a049;
+      }
+
+      /* Modal dialog styling */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        width: 400px;
+        max-width: 90%;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        color: #333;
+      }
+
+      .close-button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #777;
+      }
+
+      .modal-body {
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .modal-footer button {
         padding: 8px 16px;
-        margin: 5px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
@@ -72,75 +196,233 @@
         transition: background-color 0.3s ease;
       }
 
-      #scheduleForm button[type="submit"] {
+      .modal-footer .save-button {
         background-color: #4CAF50;
         color: white;
       }
 
-      #scheduleForm button[type="submit"]:hover {
+      .modal-footer .save-button:hover {
         background-color: #45a049;
       }
 
-      #downloadPDF {
-        background-color: #2196F3;
+      .modal-footer .cancel-button {
+        background-color: #f44336;
         color: white;
       }
 
-      #downloadPDF:hover {
+      .modal-footer .cancel-button:hover {
+        background-color: #da190b;
+      }
+
+      /* Download button styling */
+      .download-button {
+        background-color: #2196F3;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 20px;
+        margin-left: 10px;
+      }
+
+      .download-button:hover {
         background-color: #1976D2;
+      }
+
+      .action-buttons {
+        display: flex;
+        align-items: center;
       }
     </style>
   </head>
   <body>
     <div class="grid-container" id="containerId">
       <main class="main-container">
-        <div class="divider"><span>Enter Mass Schedule</span></div>
-        <form id="scheduleForm">
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Mass Name"
-            required
-          />
-          <input type="time" id="dateTime" name="dateTime" required />
-          <button type="submit">Add Schedule</button>
-          <button id="downloadPDF">Download PDF</button>
-        </form>
-
-        <table id="tableBody">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Mass Name</th>
-              <th>Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="scheduleTableBody"></tbody>
-        </table>
+        <div class="divider"><span>Mass Schedules</span></div>
+        
+        <div class="tab-container">
+          <div class="tab active" onclick="switchTab('mass')">Mass Schedules</div>
+          <div class="tab" onclick="switchTab('weekly')">Weekly Mass Schedules</div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="add-button" onclick="openAddModal()">
+            <i class="fas fa-plus"></i> Add Schedule
+          </button>
+          <button class="download-button" id="downloadPDF">
+            <i class="fas fa-download"></i> Download PDF
+          </button>
+        </div>
+        
+        <!-- Mass Schedules Tab Content -->
+        <div id="mass-tab" class="tab-content active">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Mass Name</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="massTableBody"></tbody>
+          </table>
+        </div>
+        
+        <!-- Weekly Mass Schedules Tab Content -->
+        <div id="weekly-tab" class="tab-content">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Mass Name</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="weeklyTableBody"></tbody>
+          </table>
+        </div>
       </main>
     </div>
     <div id="response"></div>
+    
+    <!-- Add/Edit Schedule Modal -->
+    <div id="scheduleModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add Schedule</h2>
+          <button class="close-button" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="scheduleForm">
+            <input type="hidden" id="scheduleId">
+            <input type="hidden" id="scheduleType" value="mass">
+            
+            <div class="form-group">
+              <label for="name">Mass Name</label>
+              <input type="text" id="name" name="name" placeholder="Enter mass name" required>
+            </div>
+            
+            <div class="form-group" id="dayGroup" style="display: none;">
+              <label for="day">Day of Week</label>
+              <select id="day" name="day">
+                <option value="Sunday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="dateTime">Time</label>
+              <input type="time" id="dateTime" name="dateTime" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-button" onclick="closeModal()">Cancel</button>
+          <button class="save-button" onclick="submitSchedule()">Save</button>
+        </div>
+      </div>
+    </div>
 
     <script>
       const apiUrl = "http://localhost:8080"; // change if needed
-      const form = document.getElementById("scheduleForm");
-      const nameInput = document.getElementById("name");
-      const timeInput = document.getElementById("dateTime");
-      const tableBody = document.getElementById("scheduleTableBody");
-
+      const massTableBody = document.getElementById("massTableBody");
+      const weeklyTableBody = document.getElementById("weeklyTableBody");
+      let currentTab = 'mass';
       let editingId = null;
       let editingEvent = null;
 
-      // Fetch and display Mass schedules
+      // Switch between tabs
+      function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        document.querySelectorAll('.tab').forEach(t => {
+          if (t.textContent.includes(tab === 'mass' ? 'Mass Schedules' : 'Weekly Mass Schedules')) {
+            t.classList.add('active');
+          }
+        });
+        
+        document.getElementById(`${tab}-tab`).classList.add('active');
+        
+        // Refresh data for the active tab
+        fetchSchedules();
+      }
+
+      // Open modal for adding new schedule
+      function openAddModal() {
+        document.getElementById('modalTitle').textContent = `Add ${currentTab === 'mass' ? 'Mass' : 'Weekly Mass'} Schedule`;
+        document.getElementById('scheduleType').value = currentTab;
+        document.getElementById('dayGroup').style.display = currentTab === 'weekly' ? 'block' : 'none';
+        document.getElementById('scheduleForm').reset();
+        document.getElementById('scheduleId').value = '';
+        editingId = null;
+        editingEvent = null;
+        document.getElementById('scheduleModal').style.display = 'block';
+      }
+
+      // Close modal
+      function closeModal() {
+        document.getElementById('scheduleModal').style.display = 'none';
+      }
+
+      // Fetch and display schedules based on current tab
       async function fetchSchedules() {
         try {
-          const response = await fetch(`${apiUrl}/event/schedules?description=Mass`);
+          const authToken = localStorage.getItem('authToken');
+          const description = currentTab === 'mass' ? 'Mass' : 'Weekly Mass';
+          const response = await fetch(`${apiUrl}/event/schedules?description=${description}`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
           const schedules = await response.json();
           renderTable(schedules);
         } catch (error) {
           console.error("Failed to fetch schedules:", error);
+        }
+      }
+
+      // Fetch all schedules (for both tabs)
+      async function fetchAllSchedules() {
+        try {
+          const authToken = localStorage.getItem('authToken');
+          
+          // Fetch Mass schedules
+          const massResponse = await fetch(`${apiUrl}/event/schedules?description=Mass`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          const massSchedules = await massResponse.json();
+          
+          // Fetch Weekly Mass schedules
+          const weeklyResponse = await fetch(`${apiUrl}/event/schedules?description=Weekly Mass`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          const weeklySchedules = await weeklyResponse.json();
+          
+          // Render both tables
+          renderMassTable(massSchedules);
+          renderWeeklyTable(weeklySchedules);
+        } catch (error) {
+          console.error("Failed to fetch all schedules:", error);
         }
       }
 
@@ -153,9 +435,15 @@
         return `${displayHour}:${minutes} ${period}`;
       }
 
-      // Render table
-      function renderTable(schedules) {
-        tableBody.innerHTML = "";
+      function formatDay(dateTimeString) {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const date = new Date(dateTimeString);
+        return days[date.getDay()];
+      }
+
+      // Render Mass table
+      function renderMassTable(schedules) {
+        massTableBody.innerHTML = "";
         schedules.forEach((schedule, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
@@ -163,109 +451,190 @@
             <td>${schedule.name}</td>
             <td>${formatTime(schedule.dateTime)}</td>
             <td>
-              <button class="action-icon edit-icon" onclick="editSchedule(${schedule.id})" title="Edit">
+              <button class="action-icon edit-icon" onclick="editSchedule('${schedule.id}', 'mass')" title="Edit">
                 <i class="fas fa-pencil-alt"></i>
               </button>
-              <button class="action-icon delete-icon" onclick="deleteSchedule(${schedule.id})" title="Delete">
+              <button class="action-icon delete-icon" onclick="deleteSchedule('${schedule.id}')" title="Delete">
                 <i class="fas fa-trash"></i>
               </button>
             </td>
           `;
-          tableBody.appendChild(row);
+          massTableBody.appendChild(row);
         });
       }
 
-      // Handle form submission (add or update)
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name = nameInput.value.trim();
-        const time = timeInput.value;
+      // Render Weekly table
+      function renderWeeklyTable(schedules) {
+        weeklyTableBody.innerHTML = "";
+        schedules.forEach((schedule, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${schedule.name}</td>
+            <td>${formatDay(schedule.dateTime)}</td>
+            <td>${formatTime(schedule.dateTime)}</td>
+            <td>
+              <button class="action-icon edit-icon" onclick="editSchedule('${schedule.id}', 'weekly')" title="Edit">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button class="action-icon delete-icon" onclick="deleteSchedule('${schedule.id}')" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          `;
+          weeklyTableBody.appendChild(row);
+        });
+      }
+
+      // Render table based on current tab
+      function renderTable(schedules) {
+        if (currentTab === 'mass') {
+          renderMassTable(schedules);
+        } else {
+          renderWeeklyTable(schedules);
+        }
+      }
+
+      // Submit schedule form (add or update)
+      async function submitSchedule() {
+        const name = document.getElementById('name').value.trim();
+        const time = document.getElementById('dateTime').value;
+        const scheduleType = document.getElementById('scheduleType').value;
+        const day = scheduleType === 'weekly' ? document.getElementById('day').value : null;
 
         if (!name || !time) return;
 
-        const timeParts = time.split(":");
-        const now = new Date();
-        const nextSunday = new Date();
-        nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7)); // find next Sunday
-        nextSunday.setHours(timeParts[0]);
-        nextSunday.setMinutes(timeParts[1]);
-        nextSunday.setSeconds(0);
+        let dateTime;
+        if (scheduleType === 'mass') {
+          // For Mass schedules, set to next occurrence of the time
+          const timeParts = time.split(":");
+          const now = new Date();
+          const nextSunday = new Date();
+          nextSunday.setDate(now.getDate() + ((7 - now.getDay()) % 7 || 7)); // find next Sunday
+          nextSunday.setHours(timeParts[0]);
+          nextSunday.setMinutes(timeParts[1]);
+          nextSunday.setSeconds(0);
+          dateTime = nextSunday;
+        } else {
+          // For Weekly Mass schedules, set to next occurrence of the selected day and time
+          const timeParts = time.split(":");
+          const now = new Date();
+          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const targetDay = days.indexOf(day);
+          let daysToAdd = (targetDay - now.getDay() + 7) % 7;
+          if (daysToAdd === 0 && (now.getHours() > parseInt(timeParts[0]) || 
+              (now.getHours() === parseInt(timeParts[0]) && now.getMinutes() >= parseInt(timeParts[1])))) {
+            daysToAdd = 7;
+          }
+          const nextDay = new Date();
+          nextDay.setDate(now.getDate() + daysToAdd);
+          nextDay.setHours(timeParts[0]);
+          nextDay.setMinutes(timeParts[1]);
+          nextDay.setSeconds(0);
+          dateTime = nextDay;
+        }
 
-        const localDateTime = `${nextSunday.getFullYear()}-${String(nextSunday.getMonth() + 1).padStart(2, '0')}-${String(nextSunday.getDate()).padStart(2, '0')}T${String(nextSunday.getHours()).padStart(2, '0')}:${String(nextSunday.getMinutes()).padStart(2, '0')}:00`;
+        const localDateTime = `${dateTime.getFullYear()}-${String(dateTime.getMonth() + 1).padStart(2, '0')}-${String(dateTime.getDate()).padStart(2, '0')}T${String(dateTime.getHours()).padStart(2, '0')}:${String(dateTime.getMinutes()).padStart(2, '0')}:00`;
 
         try {
+          const authToken = localStorage.getItem('authToken');
+          const description = scheduleType === 'mass' ? 'Mass' : 'Weekly Mass';
+
           if (editingId) {
-            // Update the fetched event object
+            // Update existing schedule
             editingEvent.name = name;
             editingEvent.dateTime = localDateTime;
+            editingEvent.description = description;
 
             const response = await fetch(`${apiUrl}/event/${editingId}`, {
               method: "PUT",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${authToken}`
+              },
               body: JSON.stringify(editingEvent),
             });
 
             if (!response.ok) throw new Error("Failed to update schedule");
-
-            editingId = null;
-            editingEvent = null;
-            form.querySelector("button").textContent = "Add Schedule";
           } else {
-            // New schedule creation
+            // Create new schedule
             const scheduleData = {
               name,
-              dateTime: localDateTime
+              dateTime: localDateTime,
+              description
             };
 
             const response = await fetch(`${apiUrl}/event/schedule`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${authToken}`
+              },
               body: JSON.stringify(scheduleData),
             });
 
             if (!response.ok) throw new Error("Failed to add schedule");
           }
 
-          form.reset();
-          fetchSchedules();
+          closeModal();
+          // Refresh both tables after adding/editing
+          fetchAllSchedules();
         } catch (error) {
           console.error("Submit error:", error);
         }
-      });
+      }
 
-      // Prepare form for editing
-      async function editSchedule(id) {
+      // Edit schedule
+      async function editSchedule(id, type) {
         try {
-          const response = await fetch(`${apiUrl}/event/${id}`);
+          const authToken = localStorage.getItem('authToken');
+          const response = await fetch(`${apiUrl}/event/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
           if (!response.ok) throw new Error("Failed to fetch event for editing");
           const event = await response.json();
 
-          nameInput.value = event.name;
+          document.getElementById('modalTitle').textContent = `Edit ${type === 'mass' ? 'Mass' : 'Weekly Mass'} Schedule`;
+          document.getElementById('scheduleType').value = type;
+          document.getElementById('dayGroup').style.display = type === 'weekly' ? 'block' : 'none';
+          document.getElementById('name').value = event.name;
 
           const dateObj = new Date(event.dateTime);
           const hours = String(dateObj.getHours()).padStart(2, "0");
           const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-          timeInput.value = `${hours}:${minutes}`;
+          document.getElementById('dateTime').value = `${hours}:${minutes}`;
 
+          if (type === 'weekly') {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            document.getElementById('day').value = days[dateObj.getDay()];
+          }
+
+          document.getElementById('scheduleId').value = id;
           editingId = id;
           editingEvent = event;
-
-          form.querySelector("button").textContent = "Update Schedule";
+          document.getElementById('scheduleModal').style.display = 'block';
         } catch (error) {
           console.error("Edit fetch error:", error);
         }
       }
 
-      // Delete with confirmation
+      // Delete schedule with confirmation
       async function deleteSchedule(id) {
         if (confirm("Are you sure you want to delete this schedule?")) {
           try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`${apiUrl}/event/${id}`, {
               method: "DELETE",
+              headers: {
+                'Authorization': `Bearer ${authToken}`
+              }
             });
 
             if (!response.ok) throw new Error("Failed to delete schedule");
-            fetchSchedules();
+            // Refresh both tables after deletion
+            fetchAllSchedules();
           } catch (error) {
             console.error("Delete error:", error);
           }
@@ -273,38 +642,47 @@
       }
 
       // Initial fetch
-      fetchSchedules();
+      fetchAllSchedules();
+
+      // Close modal when clicking outside
+      window.onclick = function(event) {
+        const modal = document.getElementById('scheduleModal');
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
       document.getElementById("downloadPDF").addEventListener("click", () => {
-        const table = document.getElementById("tableBody");
-        const cloneTable = table.cloneNode(true);
+        const activeTable = currentTab === 'mass' ? 
+          document.getElementById("massTableBody").parentNode : 
+          document.getElementById("weeklyTableBody").parentNode;
+          
+        const cloneTable = activeTable.cloneNode(true);
 
-        // Remove all <td> from the last column
+        // Remove all <td> from the last column (Actions)
         cloneTable.querySelectorAll("tr").forEach(row => {
           const cells = row.querySelectorAll("td, th");
-          if (cells.length > 3) {
-            cells[cells.length - 1].remove(); // Remove last column (Actions)
+          if (cells.length > (currentTab === 'mass' ? 3 : 4)) {
+            cells[cells.length - 1].remove();
           }
         });
 
         // Wrap table in a new element with a title
         const wrapper = document.createElement("div");
-
         const title = document.createElement("h2");
-        title.textContent = "Mass Schedules";
+        title.textContent = currentTab === 'mass' ? "Mass Schedules" : "Weekly Mass Schedules";
         title.style.textAlign = "center";
         wrapper.appendChild(title);
-
         wrapper.appendChild(cloneTable);
 
         // Generate PDF
         html2pdf().from(wrapper).set({
           margin: 0.5,
-          filename: 'Mass-Schedules.pdf',
+          filename: currentTab === 'mass' ? 'Mass-Schedules.pdf' : 'Weekly-Mass-Schedules.pdf',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2 },
           jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
