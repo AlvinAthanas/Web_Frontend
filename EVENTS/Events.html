@@ -35,19 +35,19 @@
         --accent-color: #4caf50; /* Green for buttons */
         --text-color: #333333;
       }
-      
+
       body {
         background-color: var(--secondary-color);
         color: var(--text-color);
-        font-family: 'Montserrat', sans-serif;
+        font-family: "Montserrat", sans-serif;
       }
-      
+
       .main-title {
         font-size: 30px;
         font-weight: 600;
         color: var(--text-color);
       }
-      
+
       .events-header {
         display: flex;
         justify-content: space-between;
@@ -267,22 +267,22 @@
           align-items: flex-start;
           gap: 15px;
         }
-        
+
         .top {
           width: 100%;
           flex-direction: column;
           gap: 15px;
         }
-        
+
         .import {
           display: flex;
           gap: 10px;
         }
-        
+
         .calendar-container {
           padding: 10px 5px;
         }
-        
+
         .event-details {
           grid-template-columns: 1fr;
         }
@@ -371,7 +371,12 @@
           </div>
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" name="description" rows="3" required></textarea>
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              required
+            ></textarea>
           </div>
           <div class="dialog-actions">
             <button type="button" class="dialog-btn cancel" id="cancelBtn">
@@ -431,42 +436,47 @@
 
         // Initialize calendar
         function initCalendar() {
-          const calendarEl = document.getElementById('calendar');
-          
+          const calendarEl = document.getElementById("calendar");
+
           calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
+            initialView: "dayGridMonth",
             headerToolbar: {
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+              left: "prev,next today",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay",
             },
-            events: function(fetchInfo, successCallback, failureCallback) {
-              fetch("http://localhost:8080/events")
+            events: function (fetchInfo, successCallback, failureCallback) {
+              fetch("http://localhost:8080/events", {
+                headers: {
+                  Authorization: `Bearer ${authToken}`,
+                  "Content-Type": "application/json",
+                },
+              })
                 .then((res) => res.json())
                 .then((data) => {
                   // Filter out events where description is exactly "mass" (case-insensitive)
                   const filteredEvents = data.filter(
                     (event) => event.description?.toLowerCase() !== "mass"
                   );
-                  
-                  const calendarEvents = filteredEvents.map(event => {
+
+                  const calendarEvents = filteredEvents.map((event) => {
                     // Handle multi-day events
                     if (event.duration > 1) {
                       const startDate = new Date(event.dateTime);
                       const endDate = new Date(startDate);
                       endDate.setDate(endDate.getDate() + (event.duration - 1));
-                      
+
                       return {
                         id: event.id,
                         title: event.name,
                         start: event.dateTime,
-                        end: endDate.toISOString().split('T')[0],
+                        end: endDate.toISOString().split("T")[0],
                         allDay: false,
                         extendedProps: {
                           description: event.description,
                           location: event.location,
-                          duration: event.duration
-                        }
+                          duration: event.duration,
+                        },
                       };
                     } else {
                       return {
@@ -476,8 +486,8 @@
                         extendedProps: {
                           description: event.description,
                           location: event.location,
-                          duration: event.duration || 1
-                        }
+                          duration: event.duration || 1,
+                        },
                       };
                     }
                   });
@@ -485,55 +495,62 @@
                 })
                 .catch(failureCallback);
             },
-            eventClick: function(info) {
+            eventClick: function (info) {
               // When an event is clicked in the calendar, scroll to it in the list
-              const eventItem = document.querySelector(`.event-item[data-id="${info.event.id}"]`);
+              const eventItem = document.querySelector(
+                `.event-item[data-id="${info.event.id}"]`
+              );
               if (eventItem) {
-                eventItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                
+                eventItem.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                });
+
                 // Add highlight effect
-                eventItem.style.backgroundColor = 'rgba(66, 165, 245, 0.3)';
+                eventItem.style.backgroundColor = "rgba(66, 165, 245, 0.3)";
                 setTimeout(() => {
-                  eventItem.style.backgroundColor = '';
+                  eventItem.style.backgroundColor = "";
                 }, 2000);
               }
-            }
+            },
           });
-          
+
           calendar.render();
         }
 
         // Duration selection handler
-        durationSelect.addEventListener('change', function() {
+        durationSelect.addEventListener("change", function () {
           if (this.value > 1) {
-            endDateGroup.style.display = 'block';
+            endDateGroup.style.display = "block";
             calculateEndDate();
           } else {
-            endDateGroup.style.display = 'none';
+            endDateGroup.style.display = "none";
           }
         });
 
         // Calculate end date based on duration
         function calculateEndDate() {
-          const startDate = document.getElementById('eventDate').value;
+          const startDate = document.getElementById("eventDate").value;
           const duration = parseInt(durationSelect.value);
-          
+
           if (startDate && duration > 1) {
             const start = new Date(startDate);
             const end = new Date(start);
             end.setDate(start.getDate() + (duration - 1));
-            
-            const endDateStr = end.toISOString().split('T')[0];
+
+            const endDateStr = end.toISOString().split("T")[0];
             endDateInput.value = endDateStr;
           }
         }
 
         // Update end date when start date changes
-        document.getElementById('eventDate').addEventListener('change', function() {
-          if (durationSelect.value > 1) {
-            calculateEndDate();
-          }
-        });
+        document
+          .getElementById("eventDate")
+          .addEventListener("change", function () {
+            if (durationSelect.value > 1) {
+              calculateEndDate();
+            }
+          });
 
         // Opening and closing the form dialog
         openDialogBtn.onclick = () => {
@@ -556,7 +573,12 @@
 
         // Loading and Displaying all events
         function loadEvents() {
-          fetch("http://localhost:8080/events")
+          fetch("http://localhost:8080/events", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          })
             .then((res) => res.json())
             .then((data) => {
               eventsContainer.innerHTML = "";
@@ -573,20 +595,26 @@
                 eventItem.setAttribute("data-id", event.id);
 
                 // Format duration display
-                let durationText = '';
+                let durationText = "";
                 if (event.duration > 1) {
                   const startDate = new Date(event.dateTime);
                   const endDate = new Date(startDate);
                   endDate.setDate(endDate.getDate() + (event.duration - 1));
-                  durationText = ` (${event.duration} days: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()})`;
+                  durationText = ` (${
+                    event.duration
+                  } days: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()})`;
                 }
 
                 eventItem.innerHTML = `
                   <div class="event-actions">
-                    <button class="action-btn edit-btn" data-id="${event.id}" title="Edit">
+                    <button class="action-btn edit-btn" data-id="${
+                      event.id
+                    }" title="Edit">
                       <span class="material-icons-outlined">edit</span>
                     </button>
-                    <button class="action-btn delete-btn" data-id="${event.id}" title="Delete">
+                    <button class="action-btn delete-btn" data-id="${
+                      event.id
+                    }" title="Delete">
                       <span class="material-icons-outlined">delete</span>
                     </button>
                   </div>
@@ -597,7 +625,11 @@
                     <div><strong>Venue:</strong></div>
                     <div>${event.location}</div>
                   </div>
-                  ${event.description ? `<div class="event-description"><strong>Description:</strong> ${event.description}</div>` : ''}
+                  ${
+                    event.description
+                      ? `<div class="event-description"><strong>Description:</strong> ${event.description}</div>`
+                      : ""
+                  }
                 `;
                 eventsContainer.appendChild(eventItem);
               });
@@ -614,7 +646,7 @@
                   showDeleteDialog(parseInt(this.getAttribute("data-id")));
                 });
               });
-              
+
               // Refresh calendar to show new events
               if (calendar) {
                 calendar.refetchEvents();
@@ -628,24 +660,35 @@
         // Helper to format date and time
         function formatDateTime(dateTimeStr) {
           if (!dateTimeStr) return "No date available";
-          
+
           try {
-            const [datePart, timePart] = dateTimeStr.split('T');
+            const [datePart, timePart] = dateTimeStr.split("T");
             if (!datePart) return "Invalid date";
-            
-            const dateObj = new Date(datePart + (timePart ? 'T' + timePart : ''));
-            
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            let formattedStr = dateObj.toLocaleDateString(undefined, dateOptions);
-            
+
+            const dateObj = new Date(
+              datePart + (timePart ? "T" + timePart : "")
+            );
+
+            const dateOptions = {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            };
+            let formattedStr = dateObj.toLocaleDateString(
+              undefined,
+              dateOptions
+            );
+
             if (timePart) {
-              const timeOptions = { hour: '2-digit', minute: '2-digit' };
-              formattedStr += ' at ' + dateObj.toLocaleTimeString(undefined, timeOptions);
+              const timeOptions = { hour: "2-digit", minute: "2-digit" };
+              formattedStr +=
+                " at " + dateObj.toLocaleTimeString(undefined, timeOptions);
             }
-            
+
             return formattedStr;
           } catch (e) {
-            return dateTimeStr.replace('T', ' ');
+            return dateTimeStr.replace("T", " ");
           }
         }
 
@@ -661,12 +704,12 @@
           const duration = parseInt(eventForm.duration.value);
           const dateTime = `${date}T${time}`;
 
-          let data = { 
-            name, 
-            description, 
-            location, 
+          let data = {
+            name,
+            description,
+            location,
             dateTime,
-            duration
+            duration,
           };
 
           // For multi-day events, include end date
@@ -676,7 +719,10 @@
 
           fetch("http://localhost:8080/event", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify(data),
           })
             .then((res) => res.json())
@@ -703,12 +749,12 @@
           const duration = parseInt(eventForm.duration.value);
           const dateTime = `${date}T${time}`;
 
-          let data = { 
-            name, 
-            description, 
-            location, 
+          let data = {
+            name,
+            description,
+            location,
             dateTime,
-            duration
+            duration,
           };
 
           // For multi-day events, include end date
@@ -718,7 +764,10 @@
 
           fetch(`http://localhost:8080/event/${editingId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify(data),
           })
             .then((res) => {
@@ -752,7 +801,7 @@
               editingId = id;
               dialogTitle.textContent = "Edit Event";
               submitBtn.innerText = "Update Event";
-              
+
               const [date, time] = (data.dateTime || "").split("T");
               eventForm.eventDate.value = date || "";
               eventForm.eventTime.value = time || "";
@@ -760,7 +809,7 @@
 
               // Show end date fields if duration > 1
               if (data.duration > 1) {
-                endDateGroup.style.display = 'block';
+                endDateGroup.style.display = "block";
                 if (data.endDate) {
                   eventForm.endDate.value = data.endDate;
                 } else {
@@ -768,10 +817,10 @@
                   const startDate = new Date(data.dateTime);
                   const endDate = new Date(startDate);
                   endDate.setDate(endDate.getDate() + (data.duration - 1));
-                  eventForm.endDate.value = endDate.toISOString().split('T')[0];
+                  eventForm.endDate.value = endDate.toISOString().split("T")[0];
                 }
               } else {
-                endDateGroup.style.display = 'none';
+                endDateGroup.style.display = "none";
               }
 
               eventForm.name.value = data.name;
@@ -793,6 +842,10 @@
         confirmDeleteBtn.addEventListener("click", function () {
           fetch(`http://localhost:8080/event/${deleteEventId}`, {
             method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
           })
             .then((res) => {
               if (res.ok) {
@@ -808,44 +861,51 @@
         });
 
         // Cancel delete
-        cancelDeleteBtn.addEventListener("click", function() {
-          deleteDialog.style.display = "none"; 
+        cancelDeleteBtn.addEventListener("click", function () {
+          deleteDialog.style.display = "none";
         });
 
         // Export to PDF
-        document.getElementById("exportPdfBtn").addEventListener("click", () => {
-          const { jsPDF } = window.jspdf;
-          const container = document.querySelector(".main-container");
+        document
+          .getElementById("exportPdfBtn")
+          .addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+            const container = document.querySelector(".main-container");
 
-          // Hide buttons temporarily
-          const buttons = container.querySelectorAll("button");
-          buttons.forEach((btn) => (btn.style.display = "none"));
+            // Hide buttons temporarily
+            const buttons = container.querySelectorAll("button");
+            buttons.forEach((btn) => (btn.style.display = "none"));
 
-          html2canvas(container, {
-            scale: 2,
-            useCORS: true,
-          }).then((canvas) => {
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
+            html2canvas(container, {
+              scale: 2,
+              useCORS: true,
+            }).then((canvas) => {
+              const imgData = canvas.toDataURL("image/png");
+              const pdf = new jsPDF("p", "mm", "a4");
 
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pageWidth - 20; // some margin
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+              const pageWidth = pdf.internal.pageSize.getWidth();
+              const imgProps = pdf.getImageProperties(imgData);
+              const pdfWidth = pageWidth - 20; // some margin
+              const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            // Add image of the entire content
-            pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
-            pdf.save("church-events.pdf");
+              // Add image of the entire content
+              pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
+              pdf.save("church-events.pdf");
 
-            // Show buttons again
-            buttons.forEach((btn) => (btn.style.display = ""));
+              // Show buttons again
+              buttons.forEach((btn) => (btn.style.display = ""));
+            });
           });
-        });
 
         // Import events handling
-        document.getElementById("importBtn").addEventListener("click", function() {
-          alert("Import functionality is not implemented in this version.");
-        });
+        document
+          .getElementById("importBtn")
+          .addEventListener("click", function () {
+            alert("Import functionality is not implemented in this version.");
+          });
+
+        // Auth token for API requests
+        const authToken = localStorage.getItem("authToken");
 
         // Initialize calendar and load events
         initCalendar();
