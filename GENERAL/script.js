@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     setupDropdowns();
     openSidebar();
     closeSidebar();
+    loadParishName(); // <-- Call after sidebar is loaded
+    setupLogout();    // <-- Add logout logic here
   });
 });
 
@@ -72,4 +74,62 @@ function closeSidebar() {
   if (sidebar) {
     sidebar.classList.remove("sidebar-responsive");
   }
+}
+
+// Function to extract user info from localStorage
+function getUserFromStorage() {
+  try {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Function to fetch and display parish name
+async function loadParishName() {
+  try {
+    const authToken = localStorage.getItem("authToken");
+    const user = getUserFromStorage();
+    if (!authToken || !user || !user.parishId) {
+      const el = document.getElementById("parish-name");
+      if (el) el.textContent = "PARISH";
+      return;
+    }
+
+    const parishResponse = await fetch(
+      `http://localhost:8080/parish/${user.parishId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (parishResponse.ok) {
+      const parish = await parishResponse.json();
+      const el = document.getElementById("parish-name");
+      if (el) el.textContent = parish.name || "PARISH";
+    } else {
+      const el = document.getElementById("parish-name");
+      if (el) el.textContent = "PARISH";
+    }
+  } catch (error) {
+    const el = document.getElementById("parish-name");
+    if (el) el.textContent = "PARISH";
+  }
+}
+
+// Move logout logic here
+function setupLogout() {
+  document.querySelectorAll(".logout").forEach((item) => {
+    item.addEventListener("click", function (event) {
+      event.preventDefault();
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      window.location.href = this.getAttribute("href");
+    });
+  });
 }

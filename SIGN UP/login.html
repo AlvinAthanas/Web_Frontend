@@ -234,6 +234,58 @@
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
+      // Show error message (red alert)
+      function showAlertMessage(message, targetId = "login-content") {
+        // Remove any existing alert
+        const oldAlert = document.getElementById("customAlert");
+        if (oldAlert) oldAlert.remove();
+
+        const alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-danger";
+        alertDiv.id = "customAlert";
+        alertDiv.style.marginBottom = "20px";
+        alertDiv.textContent = message;
+
+        // Insert at the top of the login content
+        const target = document.querySelector(".login-content");
+        if (target) target.prepend(alertDiv);
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+          if (alertDiv) alertDiv.remove();
+        }, 5000);
+      }
+
+      // Show green alert message (success)
+      function showSuccessAlertMessage(message) {
+        // Remove any existing alert
+        const oldAlert = document.getElementById("customSuccessAlert");
+        if (oldAlert) oldAlert.remove();
+
+        const alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-success";
+        alertDiv.id = "customSuccessAlert";
+        alertDiv.style.marginBottom = "20px";
+        alertDiv.textContent = message;
+
+        // Insert at the top of the login content
+        const target = document.querySelector(".login-content");
+        if (target) target.prepend(alertDiv);
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+          if (alertDiv) alertDiv.remove();
+        }, 5000);
+      }
+
+      // On page load, check for msg param in URL and show green alert
+      document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("msg")) {
+          showSuccessAlertMessage(params.get("msg"));
+        }
+      });
+
       // Login button functionality
       document
         .getElementById("loginBtn")
@@ -271,8 +323,30 @@
               },
               body: JSON.stringify({ email, password }),
             })
-              .then((response) => {
-                if (!response.ok) throw new Error("Login failed");
+              .then(async (response) => {
+                if (!response.ok) {
+                  // Try to extract custom error message from backend
+                  let errorMsg = "Login failed. Please check your credentials.";
+                  try {
+                    const data = await response.json();
+                    if (data && data.message) errorMsg = data.message;
+                  } catch (e) {}
+                  // Special case: account not verified
+                  if (
+                    errorMsg ===
+                    "Account not verified, Please verify your account first"
+                  ) {
+                    // Redirect to register.html and pass email as query param
+                    window.location.href =
+                      "register.html?verify=" +
+                      encodeURIComponent(email) +
+                      "&msg=" +
+                      encodeURIComponent(errorMsg);
+                    return;
+                  }
+                  showAlertMessage(errorMsg);
+                  throw new Error(errorMsg);
+                }
                 return response.json();
               })
               .then((data) => {
@@ -282,8 +356,8 @@
                 window.location.href = "../DASHBOARD/dashboard.html";
               })
               .catch((error) => {
+                // Error already handled above
                 console.error("Login error:", error);
-                alert("Login failed. Please check your credentials.");
               });
           }
         });

@@ -276,6 +276,17 @@
         text-align: center;
         display: none;
       }
+
+      /* Add this to register.html style section for red alert */
+      .alert-danger {
+        background: #fdecea !important;
+        color: #b71c1c !important;
+        border-radius: 8px;
+        border: 1px solid #f5c6cb;
+        margin-bottom: 15px;
+        display: block;
+        transition: opacity 0.5s ease-out;
+      }
     </style>
   </head>
   <body>
@@ -1188,18 +1199,26 @@
                 body: JSON.stringify(command),
               });
 
+              // ...existing code...
               if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(
+                showVerifyTabAlert(
                   errorData.message ||
                     "Verification failed. Please check your key and try again."
                 );
+                return;
               }
 
-              // On success, redirect to login
-              window.location.href = "login.html";
+              // On success, get the message and redirect to login with it
+              const successMsg = await response.text();
+              window.location.href =
+                "login.html?msg=" + encodeURIComponent(successMsg);
+              // ...existing code...
             } catch (error) {
-              showApiError("verifyApiError", error.message);
+              showVerifyTabAlert(
+                error.message ||
+                  "Verification failed. Please check your key and try again."
+              );
             }
           }
         });
@@ -1211,6 +1230,39 @@
           e.preventDefault();
           window.location.href = "login.html";
         });
+
+      // Show red alert message in verification tab
+      function showVerifyTabAlert(message) {
+        const alert = document.getElementById("verifyInfoAlert");
+        if (alert) {
+          alert.textContent = message;
+          alert.classList.remove("alert-success");
+          alert.classList.add("alert-danger");
+          alert.style.display = "block";
+        }
+      }
+
+      // On page load, check for verify param in URL
+      document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("verify")) {
+          // Show verify tab
+          document.getElementById("verify-tab").classList.remove("disabled");
+          const verifyTab = new bootstrap.Tab(
+            document.getElementById("verify-tab")
+          );
+          verifyTab.show();
+          // Prefill email if present
+          const email = params.get("verify");
+          if (email) {
+            document.getElementById("verifyEmailInput").value = email;
+          }
+          // Show custom message if present
+          if (params.has("msg")) {
+            showVerifyTabAlert(params.get("msg"));
+          }
+        }
+      });
     </script>
   </body>
 </html>
