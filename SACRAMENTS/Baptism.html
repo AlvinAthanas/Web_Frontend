@@ -1,80 +1,910 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baptism Participants</title>
-     <!-- Montserrat Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-
+    
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
     <!-- Material Icons -->
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+<link rel="stylesheet" href="../GENERAL/style.css">
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="../GENERAL/style.css" />
-        <link rel="stylesheet" href="sacraments.css" />
-  </head>
-  <body>
+    <!-- CSS -->
+    <style>
+        /* sacraments.css - Shared styles for all sacrament pages */
+        .communion-container {
+          padding: 20px;
+          margin: 0 auto;
+          max-width: 1200px;
+        }
+        
+        .main-title {
+          font-size: 2rem;
+          margin-bottom: 20px;
+          color: #2c3e50;
+          text-align: center;
+        }
+        
+        .back-link {
+          display: flex;
+          align-items: center;
+          color: #3498db;
+          margin-bottom: 20px;
+          text-decoration: none;
+        }
+        
+        .back-link .material-icons-outlined {
+          margin-right: 5px;
+        }
+        
+        .tab-container {
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid #ecf0f1;
+          margin-bottom: 20px;
+          position: relative;
+          padding-right: 10px;
+        }
+        
+        .tab {
+          padding: 10px 20px;
+          cursor: pointer;
+          font-weight: 500;
+          color: #7f8c8d;
+          border-bottom: 3px solid transparent;
+          transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+          color: #3498db;
+          border-bottom: 3px solid #3498db;
+        }
+        
+        .add-member-btn {
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: #3498db;
+          cursor: pointer;
+          font-size: 0.9rem;
+          padding: 10px 20px;
+        }
+        
+        .add-member-btn .material-icons-outlined {
+          margin-right: 5px;
+        }
+        
+        /* Dialog Styles */
+        .overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0,0,0,0.5);
+          z-index: 999;
+        }
+        
+        .overlay.active {
+          display: block;
+        }
+        
+        .dialog {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+          width: 90%;
+          max-width: 600px;
+          max-height: 80vh;
+          z-index: 1000;
+          overflow-y: auto;
+        }
+        
+        .dialog.active {
+          display: block;
+        }
+        
+        .dialog-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #eee;
+        }
+        
+        .dialog-header h3 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #2c3e50;
+          margin: 0;
+        }
+        
+        .close-btn {
+          background: none;
+          border: none;
+          color: #7f8c8d;
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0;
+          line-height: 1;
+        }
+        
+        /* Dialog Tabs */
+        .dialog-tabs {
+          display: flex;
+          border-bottom: 1px solid #e0e0e0;
+          margin-bottom: 20px;
+        }
+        
+        .dialog-tab {
+          flex: 1;
+          padding: 12px 16px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          color: #666;
+          transition: all 0.2s ease;
+          border-bottom: 2px solid transparent;
+          font-family: 'Montserrat', sans-serif;
+        }
+        
+        .dialog-tab:hover {
+          background-color: #f5f5f5;
+          color: #333;
+        }
+        
+        .dialog-tab.active {
+          color: #3498db;
+          border-bottom-color: #3498db;
+          background-color: #f8f9ff;
+        }
+        
+        .dialog-content {
+          display: none;
+        }
+        
+        .dialog-content.active {
+          display: block;
+        }
+        
+        /* Search Form */
+        .search-form {
+          margin-bottom: 20px;
+        }
+        
+        .search-input-group {
+          position: relative;
+          display: flex;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+        
+        .search-input-group .material-icons-outlined {
+          position: absolute;
+          left: 12px;
+          color: #999;
+          font-size: 20px;
+          z-index: 1;
+        }
+        
+        .search-input-group input {
+          width: 100%;
+          padding: 12px 16px 12px 44px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 14px;
+          font-family: 'Montserrat', sans-serif;
+          transition: border-color 0.2s ease;
+          box-sizing: border-box;
+        }
+        
+        .search-input-group input:focus {
+          outline: none;
+          border-color: #3498db;
+          box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        .search-results {
+          max-height: 50vh;
+          overflow-y: auto;
+          border: 1px solid #eee;
+          border-radius: 4px;
+        }
+        
+        .search-result-item {
+          padding: 15px;
+          border-bottom: 1px solid #eee;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .search-result-info {
+          flex-grow: 1;
+        }
+        
+        .search-result-name {
+          font-weight: 500;
+          margin-bottom: 5px;
+          color: #2c3e50;
+        }
+        
+        .search-result-email, .search-result-phone {
+          font-size: 0.9rem;
+          color: #7f8c8d;
+        }
+        
+        .add-btn {
+          background-color: #27ae60;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 8px 15px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+        
+        /* Add Member Form */
+        .add-member-form {
+          max-width: 400px;
+        }
+        
+        .form-group {
+          margin-bottom: 20px;
+        }
+        
+        .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: #333;
+          font-size: 14px;
+          font-family: 'Montserrat', sans-serif;
+        }
+        
+        .form-group input {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 14px;
+          font-family: 'Montserrat', sans-serif;
+          transition: border-color 0.2s ease;
+          box-sizing: border-box;
+        }
+        
+        .form-actions {
+          display: flex;
+          gap: 12px;
+          justify-content: flex-end;
+          margin-top: 24px;
+          padding-top: 20px;
+          border-top: 1px solid #e0e0e0;
+        }
+        
+        .btn-secondary {
+          padding: 10px 20px;
+          border: 1px solid #ddd;
+          background: white;
+          color: #666;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-family: 'Montserrat', sans-serif;
+          transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+          padding: 10px 20px;
+          border: none;
+          background: #3498db;
+          color: white;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-family: 'Montserrat', sans-serif;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: background-color 0.2s ease;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+          display: none;
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+          padding: 20px;
+        }
+        
+        .tab-content.active {
+          display: block;
+        }
+        
+        .participant-count {
+          font-size: 1.5rem;
+          color: #3498db;
+          margin-bottom: 15px;
+          font-weight: 600;
+        }
+        
+        .participant-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        
+        .participant-item {
+          padding: 15px 0;
+          border-bottom: 1px solid #f5f5f5;
+          display: flex;
+          align-items: center;
+        }
+        
+        .participant-info {
+          flex-grow: 1;
+        }
+        
+        .participant-name {
+          font-weight: 500;
+          margin-bottom: 5px;
+          color: #2c3e50;
+        }
+        
+        .participant-email, .participant-phone {
+          font-size: 0.9rem;
+          color: #7f8c8d;
+        }
+        
+        .participant-status {
+          font-size: 0.8rem;
+          padding: 5px 10px;
+          border-radius: 12px;
+          background-color: #ecf0f1;
+          color: #7f8c8d;
+          margin-right: 10px;
+        }
+        
+        .status-in-training {
+          background-color: #fff4e5;
+          color: #e67e22;
+        }
+        
+        .status-completed {
+          background-color: #e8f8f5;
+          color: #27ae60;
+        }
+        
+        .complete-btn {
+          background-color: #3498db;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 8px 15px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 600px) {
+          .dialog-tab {
+            font-size: 12px;
+            padding: 10px 12px;
+          }
+          
+          .dialog {
+            width: 95%;
+            max-height: 90vh;
+            padding: 15px;
+          }
+        
+          .tab-container {
+            flex-direction: column;
+            align-items: stretch;
+            padding-right: 0;
+          }
+        
+          .add-member-btn {
+            margin-left: 0;
+            margin-top: 10px;
+            align-self: flex-end;
+          }
+          
+          .participant-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+          
+          .participant-status, .complete-btn {
+            align-self: flex-end;
+          }
+        }
+    </style>
+</head>
+<body>
     <div class="grid-container" id="containerId">
-      <main class="main-container">
-        <div class="communion-container">
-          <a href="sacraments.html" class="back-link">
-            <span class="material-icons-outlined">arrow_back</span>
-            Back to Sacraments
-          </a>
-          
-          <h1 class="main-title">Baptism Participants</h1>
-          
-          <div class="tab-container">
-            <div class="tab active" data-tab="training">In Preparation (<span id="training-count">0</span>)</div>
-            <div class="tab" data-tab="completed">Baptized (<span id="completed-count">0</span>)</div>
-            <button class="add-member-btn" id="addMemberBtn">
-              <span class="material-icons-outlined">person_add</span>
-              Add Candidate
-            </button>
-          </div>
-          
-          <div class="tab-content active" id="training-content">
-            <div class="participant-count"><span id="training-count-display">0</span> Candidates</div>
-            <ul class="participant-list" id="training-list"></ul>
-          </div>
-          
-          <div class="tab-content" id="completed-content">
-            <div class="participant-count"><span id="completed-count-display">0</span> Baptized</div>
-            <ul class="participant-list" id="completed-list"></ul>
-          </div>
-        </div>
-      </main>
+        <main class="main-container">
+            <div class="communion-container">
+                <a href="sacraments.html" class="back-link">
+                    <span class="material-icons-outlined">arrow_back</span>
+                    Back to Sacraments
+                </a>
+                
+                <h1 class="main-title">Baptism Participants</h1>
+                
+                <div class="tab-container">
+                    <div class="tab active" data-tab="training">In Preparation (<span id="training-count">0</span>)</div>
+                    <div class="tab" data-tab="completed">Baptized (<span id="completed-count">0</span>)</div>
+                    <button class="add-member-btn" id="addMemberBtn">
+                        <span class="material-icons-outlined">person_add</span>
+                        Add Candidate
+                    </button>
+                </div>
+                
+                <div class="tab-content active" id="training-content">
+                    <div class="participant-count"><span id="training-count-display">0</span> Candidates</div>
+                    <ul class="participant-list" id="training-list"></ul>
+                </div>
+                
+                <div class="tab-content" id="completed-content">
+                    <div class="participant-count"><span id="completed-count-display">0</span> Baptized</div>
+                    <ul class="participant-list" id="completed-list"></ul>
+                </div>
+            </div>
+            
+            <!-- Search/Add Member Dialog -->
+            <div id="overlay" class="overlay"></div>
+            <div id="searchDialog" class="dialog">
+                <div class="dialog-header">
+                    <h3>Add Member</h3>
+                    <button id="closeDialogBtn" class="close-btn">
+                        <span class="material-icons-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="dialog-tabs">
+                    <button id="searchTab" class="dialog-tab active" data-tab="search">
+                        <span class="material-icons-outlined">search</span>
+                        Search Members
+                    </button>
+                    <button id="addTab" class="dialog-tab" data-tab="add">
+                        <span class="material-icons-outlined">person_add</span>
+                        Add New Member
+                    </button>
+                </div>
+                
+                <div id="searchContent" class="dialog-content active">
+                    <form id="searchForm" class="search-form">
+                        <div class="search-input-group">
+                            <span class="material-icons-outlined">search</span>
+                            <input type="text" id="searchInput" placeholder="Search by name..." autocomplete="off">
+                        </div>
+                    </form>
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+                
+                <div id="addContent" class="dialog-content">
+                    <form id="addMemberForm" class="add-member-form">
+                        <div class="form-group">
+                            <label for="newMemberName">Full Name</label>
+                            <input type="text" id="newMemberName" name="name" required placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="newMemberEmail">Email Address</label>
+                            <input type="email" id="newMemberEmail" name="email" required placeholder="Enter email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="newMemberPhone">Phone Number</label>
+                            <input type="tel" id="newMemberPhone" name="phone" required placeholder="Enter phone number">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" id="cancelAddBtn">Cancel</button>
+                            <button type="submit" class="btn-primary">
+                                <span class="material-icons-outlined">person_add</span>
+                                Add Member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <div class="overlay" id="overlay"></div>
-    <div class="search-dialog" id="searchDialog">
-      <div class="search-dialog-header">
-        <h2 class="search-dialog-title">Search Members</h2>
-        <button class="close-dialog-btn" id="closeDialogBtn">&times;</button>
-      </div>
-      <form class="search-form" id="searchForm">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by name...">
-        <button type="submit" class="search-btn">Search</button>
-      </form>
-      <div class="search-hint">Enter a name to search for members</div>
-      <div class="search-results" id="searchResults"></div>
-    </div>
-
-    <script src="sacraments.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        initSacramentPage('baptism');
-      });
+        // sacraments.js - Shared functionality for all sacrament pages
+        let participants = {
+          training: [],
+          completed: [],
+        };
+        
+        let addMemberBtn, overlay, searchDialog, closeDialogBtn, searchForm, searchInput;
+        let searchResults, trainingList, completedList, trainingCount, completedCount;
+        let trainingCountDisplay, completedCountDisplay;
+        let sacramentType;
+        let addMemberForm, newMemberName, newMemberEmail, newMemberPhone;
+        let searchTab, addTab, searchContent, addContent;
+        
+        function initSacramentPage(type) {
+          sacramentType = type;
+        
+          // Get DOM elements
+          addMemberBtn = document.getElementById("addMemberBtn");
+          overlay = document.getElementById("overlay");
+          searchDialog = document.getElementById("searchDialog");
+          closeDialogBtn = document.getElementById("closeDialogBtn");
+          searchForm = document.getElementById("searchForm");
+          searchInput = document.getElementById("searchInput");
+          searchResults = document.getElementById("searchResults");
+          trainingList = document.getElementById("training-list");
+          completedList = document.getElementById("completed-list");
+          trainingCount = document.getElementById("training-count");
+          completedCount = document.getElementById("completed-count");
+          trainingCountDisplay = document.getElementById("training-count-display");
+          completedCountDisplay = document.getElementById("completed-count-display");
+          addMemberForm = document.getElementById("addMemberForm");
+          newMemberName = document.getElementById("newMemberName");
+          newMemberEmail = document.getElementById("newMemberEmail");
+          newMemberPhone = document.getElementById("newMemberPhone");
+          searchTab = document.getElementById("searchTab");
+          addTab = document.getElementById("addTab");
+          searchContent = document.getElementById("searchContent");
+          addContent = document.getElementById("addContent");
+          cancelAddBtn = document.getElementById("cancelAddBtn");
+        
+          // Set up event listeners
+          setupEventListeners();
+        
+          // Load initial data
+          fetchParticipants();
+        
+          // Show add member button
+          addMemberBtn.style.display = "flex";
+        }
+        
+        function setupEventListeners() {
+          // Main tab switching
+          document.querySelectorAll(".tab").forEach((tab) => {
+            tab.addEventListener("click", function() {
+              document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+              document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+              
+              this.classList.add("active");
+              const tabId = this.getAttribute("data-tab");
+              document.getElementById(tabId + "-content").classList.add("active");
+              
+              if (tabId === "completed") {
+                addMemberBtn.style.display = "none";
+              } else {
+                addMemberBtn.style.display = "flex";
+              }
+            });
+          });
+        
+          // Dialog tab switching
+          searchTab.addEventListener("click", function() {
+            switchDialogTab('search');
+          });
+        
+          addTab.addEventListener("click", function() {
+            switchDialogTab('add');
+          });
+        
+          // Add member button
+          addMemberBtn.addEventListener("click", function() {
+            overlay.classList.add("active");
+            searchDialog.classList.add("active");
+            switchDialogTab('search');
+            searchInput.focus();
+          });
+        
+          // Close dialog
+          closeDialogBtn.addEventListener("click", closeSearchDialog);
+          overlay.addEventListener("click", closeSearchDialog);
+          cancelAddBtn.addEventListener("click", closeSearchDialog);
+        
+          // Search form
+          searchForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+              searchUsers(searchTerm);
+            }
+          });
+        
+          // Real-time search
+          searchInput.addEventListener("input", function() {
+            const searchTerm = this.value.trim();
+            if (searchTerm) {
+              searchUsers(searchTerm);
+            } else {
+              searchResults.innerHTML = "";
+            }
+          });
+        
+          // Add member form
+          addMemberForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            addNewMember();
+          });
+        }
+        
+        function switchDialogTab(tabType) {
+          searchTab.classList.remove("active");
+          addTab.classList.remove("active");
+          searchContent.classList.remove("active");
+          addContent.classList.remove("active");
+        
+          if (tabType === 'search') {
+            searchTab.classList.add("active");
+            searchContent.classList.add("active");
+          } else if (tabType === 'add') {
+            addTab.classList.add("active");
+            addContent.classList.add("active");
+          }
+        }
+        
+        function closeSearchDialog() {
+          overlay.classList.remove("active");
+          searchDialog.classList.remove("active");
+          searchResults.innerHTML = "";
+          searchInput.value = "";
+          addMemberForm.reset();
+        }
+        
+        async function addNewMember() {
+          const name = newMemberName.value.trim();
+          const email = newMemberEmail.value.trim();
+          const phone = newMemberPhone.value.trim();
+        
+          if (!name || !email || !phone) {
+            alert("Please fill in all fields");
+            return;
+          }
+        
+          try {
+            // Simulate API call - replace with actual fetch
+            console.log("Adding new member:", { name, email, phone });
+            
+            // Add to local list
+            const newMember = {
+              id: Date.now().toString(),
+              name,
+              email,
+              phone,
+              status: "training"
+            };
+            
+            participants.training.push(newMember);
+            updateParticipantsList();
+            updateCounts();
+            closeSearchDialog();
+            
+            alert(`${name} has been added successfully!`);
+          } catch (error) {
+            console.error("Error adding new member:", error);
+            alert("Error adding new member");
+          }
+        }
+        
+        async function fetchParticipants() {
+          try {
+            // Simulate API call - replace with actual fetch
+            console.log("Fetching participants for:", sacramentType);
+            
+            // Mock data - replace with actual API response
+            const mockData = [
+              {
+                id: "1",
+                name: "John Doe",
+                email: "john@example.com",
+                phone: "123-456-7890",
+                baptismStatus: "training"
+              },
+              {
+                id: "2",
+                name: "Jane Smith",
+                email: "jane@example.com",
+                phone: "987-654-3210",
+                baptismStatus: "completed"
+              }
+            ];
+            
+            participants.training = mockData.filter(user => user[`${sacramentType}Status`] === "training");
+            participants.completed = mockData.filter(user => user[`${sacramentType}Status`] === "completed");
+            
+            updateParticipantsList();
+            updateCounts();
+          } catch (error) {
+            console.error("Error fetching participants:", error);
+          }
+        }
+        
+        async function searchUsers(name) {
+          try {
+            // Simulate API call - replace with actual fetch
+            console.log("Searching for:", name);
+            
+            // Mock data - replace with actual API response
+            const mockResults = [
+              {
+                id: "3",
+                name: "Michael Johnson",
+                email: "michael@example.com",
+                phone: "555-123-4567"
+              },
+              {
+                id: "4",
+                name: "Sarah Williams",
+                email: "sarah@example.com",
+                phone: "555-987-6543"
+              }
+            ].filter(user => 
+              user.name.toLowerCase().includes(name.toLowerCase())
+            );
+            
+            displaySearchResults(mockResults);
+          } catch (error) {
+            console.error("Error searching users:", error);
+            searchResults.innerHTML = '<div class="search-result-item">Error searching users</div>';
+          }
+        }
+        
+        function displaySearchResults(users) {
+          if (users.length === 0) {
+            searchResults.innerHTML = '<div class="search-result-item">No users found</div>';
+            return;
+          }
+        
+          searchResults.innerHTML = users.map(user => `
+            <div class="search-result-item">
+              <div class="search-result-info">
+                <div class="search-result-name">${user.name}</div>
+                <div class="search-result-email">${user.email}</div>
+                <div class="search-result-phone">${user.phone}</div>
+              </div>
+              <button class="add-btn" data-user-id="${user.id}">
+                <span class="material-icons-outlined">add</span>
+                Add
+              </button>
+            </div>
+          `).join("");
+        
+          document.querySelectorAll(".add-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+              const userId = this.getAttribute("data-user-id");
+              const user = users.find(u => u.id == userId);
+              addParticipant(user);
+              closeSearchDialog();
+            });
+          });
+        }
+        
+        async function addParticipant(user) {
+          try {
+            // Simulate API call - replace with actual fetch
+            console.log("Adding participant:", user);
+            
+            participants.training.push({
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              status: "training"
+            });
+            
+            updateParticipantsList();
+            updateCounts();
+          } catch (error) {
+            console.error("Error adding participant:", error);
+            alert("Error adding participant");
+          }
+        }
+        
+        async function completeTraining(participantId) {
+          try {
+            // Simulate API call - replace with actual fetch
+            console.log("Completing training for:", participantId);
+            
+            const participantIndex = participants.training.findIndex(p => p.id == participantId);
+            if (participantIndex !== -1) {
+              const participant = participants.training[participantIndex];
+              participant.status = "completed";
+        
+              participants.training.splice(participantIndex, 1);
+              participants.completed.push(participant);
+        
+              updateParticipantsList();
+              updateCounts();
+            }
+          } catch (error) {
+            console.error("Error completing training:", error);
+            alert("Error updating status");
+          }
+        }
+        
+        function updateParticipantsList() {
+          // Training list
+          trainingList.innerHTML = participants.training.map(participant => `
+            <li class="participant-item">
+              <div class="participant-info">
+                <div class="participant-name">${participant.name}</div>
+                <div class="participant-email">${participant.email}</div>
+                <div class="participant-phone">${participant.phone}</div>
+              </div>
+              <span class="participant-status status-in-training">In Training</span>
+              <button class="complete-btn" data-participant-id="${participant.id}">
+                <span class="material-icons-outlined">check</span>
+                Complete
+              </button>
+            </li>
+          `).join("");
+        
+          document.querySelectorAll(".complete-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+              const participantId = this.getAttribute("data-participant-id");
+              if (confirm(`Mark ${participantId} as completed?`)) {
+                completeTraining(participantId);
+              }
+            });
+          });
+        
+          // Completed list
+          completedList.innerHTML = participants.completed.map(participant => `
+            <li class="participant-item">
+              <div class="participant-info">
+                <div class="participant-name">${participant.name}</div>
+                <div class="participant-email">${participant.email}</div>
+                <div class="participant-phone">${participant.phone}</div>
+              </div>
+              <span class="participant-status status-completed">Completed</span>
+            </li>
+          `).join("");
+        }
+        
+        function updateCounts() {
+          const trainingCountValue = participants.training.length;
+          const completedCountValue = participants.completed.length;
+        
+          trainingCount.textContent = trainingCountValue;
+          completedCount.textContent = completedCountValue;
+          trainingCountDisplay.textContent = trainingCountValue;
+          completedCountDisplay.textContent = completedCountValue;
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+          initSacramentPage('baptism');
+        });
     </script>
+
     <script src="../GENERAL/script.js"></script>
-  </body>
+</body>
 </html>

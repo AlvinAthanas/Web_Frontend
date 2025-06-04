@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+    <style>
+        /* Additional styles specific to announcements page */
+        .announcements-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .new-announcement-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+        
+        .new-announcement-btn:hover {
+            background-color: #3e8e41;
+        }
+        
+        /* Table styles */
+        .announcements-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .announcements-table th {
+            background-color: #f5f5f5;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .announcements-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .announcements-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .announcements-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .announcement-number {
+            color: #666;
+            font-weight: 500;
+            width: 50px;
+        }
+        
+        .announcement-title {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .announcement-date {
+            color: #666;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .announcement-id {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .announcement-message {
+            color: #444;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+        
+        .announcement-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .edit-btn:hover {
+            color: #2196F3;
+        }
+        
+        .delete-btn:hover {
+            color: #f44336;
+        }
+        
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #3e8e41;
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1001;
+            transform: translateX(120%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.error {
+            background-color: #f44336;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .announcements-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .announcement-message {
+                white-space: normal;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container" id="containerId">
+        <main class="main-container">
+            <div class="announcements-container">
+                <div class="page-header">
+                    <h1 class="page-title">Announcements</h1>
+                    <button class="new-announcement-btn" id="newAnnouncementBtn">
+                        <span class="material-icons-outlined">add</span>
+                        New Announcement
+                    </button>
+                </div>
+                
+                <div id="announcementsTableContainer">
+                    <!-- Table will be dynamically inserted here -->
+                    <div class="empty-state">Loading announcements...</div>
+                </div>
+            </div>
+            
+            <!-- New Announcement Modal -->
+            <div class="modal-overlay" id="announcementModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="modalTitle">Create New Announcement</h2>
+                        <button class="close-modal" id="closeModal">&times;</button>
+                    </div>
+                    <form id="announcementForm">
+                        <input type="hidden" id="announcementId">
+                        <div class="form-group">
+                            <label for="announcementTitle" class="form-label">Title</label>
+                            <input type="text" id="announcementTitle" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementMessage" class="form-label">Message</label>
+                            <textarea id="announcementMessage" class="form-textarea" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span id="submitBtnText">Send Announcement</span>
+                            <span class="spinner" id="submitSpinner" style="display: none;"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Confirmation Modal -->
+            <div class="modal-overlay" id="confirmModal">
+                <div class="modal-content" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Confirm Deletion</h2>
+                        <button class="close-modal" id="closeConfirmModal">&times;</button>
+                    </div>
+                    <p>Are you sure you want to delete this announcement? This action cannot be undone.</p>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="submit-btn" id="cancelDeleteBtn" style="background-color: #757575;">Cancel</button>
+                        <button class="submit-btn" id="confirmDeleteBtn" style="background-color: #f44336;">Delete</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification -->
+            <div class="notification" id="notification">
+                <span class="material-icons-outlined" id="notificationIcon">check_circle</span>
+                <span id="notificationMessage">Announcement sent successfully!</span>
+            </div>
+        </main>
+    </div>
+
+    <script src="../GENERAL/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const newAnnouncementBtn = document.getElementById('newAnnouncementBtn');
+            const announcementModal = document.getElementById('announcementModal');
+            const confirmModal = document.getElementById('confirmModal');
+            const closeModal = document.getElementById('closeModal');
+            const closeConfirmModal = document.getElementById('closeConfirmModal');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const announcementForm = document.getElementById('announcementForm');
+            const tableContainer = document.getElementById('announcementsTableContainer');
+            const notification = document.getElementById('notification');
+            const notificationIcon = document.getElementById('notificationIcon');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const modalTitle = document.getElementById('modalTitle');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            
+            // State variables
+            let currentNotificationId = null;
+            let isEditMode = false;
+            
+            // API Base URL - Update this to your actual backend URL
+            const API_BASE_URL = 'http://localhost:8080'; // Change to your actual API base URL
+            
+            // Initialize the page
+            fetchAnnouncements();
+            
+            // Fetch all announcements from the server
+            async function fetchAnnouncements() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/notifications`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch announcements');
+                    }
+                    const announcements = await response.json();
+                    displayAnnouncements(announcements);
+                } catch (error) {
+                    console.error('Error fetching announcements:', error);
+                    showNotification('Failed to load announcements', true);
+                    tableContainer.innerHTML = '<div class="empty-state">Failed to load announcements. Please try again later.</div>';
+                }
+            }
+            
+            // Display announcements in a table
+            function displayAnnouncements(announcements) {
+                if (announcements.length === 0) {
+                    tableContainer.innerHTML = '<div class="empty-state">No announcements found.</div>';
+                    return;
+                }
+                
+                const tableHTML = `
+                    <table class="announcements-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Announcement</th>
+                                <th style="width: 120px;">Date</th>
+                                <th style="width: 80px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${announcements.map((announcement, index) => `
+                                <tr>
+                                    <td class="announcement-number">${index + 1}</td>
+                                    <td>
+                                        <div class="announcement-title">${announcement.title}</div>
+                                        <div class="announcement-message">${announcement.message}</div>
+                                    </td>
+                                    <td class="announcement-date">${formatDate(announcement.date)}</td>
+                                    <td>
+                                        <div class="announcement-actions">
+                                            <button class="action-btn edit-btn" data-id="${announcement.id}">
+                                                <span class="material-icons-outlined">edit</span>
+                                            </button>
+                                            <button class="action-btn delete-btn" data-id="${announcement.id}">
+                                                <span class="material-icons-outlined">delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                
+                tableContainer.innerHTML = tableHTML;
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        editAnnouncement(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        confirmDelete(id);
+                    });
+                });
+            }
+            
+            // Format date to be more readable
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'Invalid date';
+                
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            
+            // Show modal for creating a new announcement
+            newAnnouncementBtn.addEventListener('click', () => {
+                isEditMode = false;
+                modalTitle.textContent = 'Create New Announcement';
+                document.getElementById('submitBtnText').textContent = 'Send Announcement';
+                document.getElementById('announcementForm').reset();
+                document.getElementById('announcementId').value = '';
+                announcementModal.classList.add('active');
+            });
+            
+            // Close modals
+            closeModal.addEventListener('click', () => {
+                announcementModal.classList.remove('active');
+            });
+            
+            closeConfirmModal.addEventListener('click', () => {
+                confirmModal.classList.remove('active');
+            });
+            
+            cancelDeleteBtn.addEventListener('click', () => {
+                confirmModal.classList.remove('active');
+            });
+            
+            // Handle form submission for create/update
+            announcementForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('announcementTitle').value;
+                const message = document.getElementById('announcementMessage').value;
+                const id = document.getElementById('announcementId').value;
+                
+                const notificationData = {
+                    title: title,
+                    message: message,
+                    date: new Date().toISOString()
+                };
+                
+                try {
+                    toggleSubmitButton(true);
+                    
+                    let response;
+                    if (isEditMode && id) {
+                        // Update existing announcement
+                        response = await fetch(`${API_BASE_URL}/notification/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(notificationData)
+                        });
+                    } else {
+                        // Create new announcement
+                        response = await fetch(`${API_BASE_URL}/notification`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(notificationData)
+                        });
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} announcement`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Refresh the announcements list
+                    await fetchAnnouncements();
+                    
+                    // Reset form and close modal
+                    announcementForm.reset();
+                    announcementModal.classList.remove('active');
+                    
+                    // Show success notification
+                    showNotification(`Announcement ${isEditMode ? 'updated' : 'created'} successfully!`);
+                } catch (error) {
+                    console.error(`Error ${isEditMode ? 'updating' : 'creating'} announcement:`, error);
+                    showNotification(`Failed to ${isEditMode ? 'update' : 'create'} announcement`, true);
+                } finally {
+                    toggleSubmitButton(false);
+                }
+            });
+            
+            // Edit an existing announcement
+            async function editAnnouncement(id) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/notification/${id}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch announcement');
+                    }
+                    
+                    const announcement = await response.json();
+                    
+                    // Populate the form with the announcement data
+                    document.getElementById('announcementId').value = announcement.id;
+                    document.getElementById('announcementTitle').value = announcement.title;
+                    document.getElementById('announcementMessage').value = announcement.message;
+                    
+                    // Update UI for edit mode
+                    isEditMode = true;
+                    modalTitle.textContent = 'Edit Announcement';
+                    document.getElementById('submitBtnText').textContent = 'Update Announcement';
+                    announcementModal.classList.add('active');
+                } catch (error) {
+                    console.error('Error fetching announcement:', error);
+                    showNotification('Failed to load announcement for editing', true);
+                }
+            }
+            
+            // Confirm deletion of an announcement
+            function confirmDelete(id) {
+                currentNotificationId = id;
+                confirmModal.classList.add('active');
+            }
+            
+            // Handle delete confirmation
+            confirmDeleteBtn.addEventListener('click', async () => {
+                if (!currentNotificationId) return;
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/notification/${currentNotificationId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to delete announcement');
+                    }
+                    
+                    // Refresh the announcements list
+                    await fetchAnnouncements();
+                    
+                    // Close confirmation modal
+                    confirmModal.classList.remove('active');
+                    
+                    // Show success notification
+                    showNotification('Announcement deleted successfully!');
+                } catch (error) {
+                    console.error('Error deleting announcement:', error);
+                    showNotification('Failed to delete announcement', true);
+                } finally {
+                    currentNotificationId = null;
+                }
+            });
+            
+            // Show notification
+            function showNotification(message, isError = false) {
+                notificationMessage.textContent = message;
+                notification.className = isError ? 'notification error show' : 'notification show';
+                notificationIcon.textContent = isError ? 'error' : 'check_circle';
+                
+                setTimeout(() => {
+                    notification.className = 'notification';
+                }, 3000);
+            }
+            
+            // Toggle submit button loading state
+            function toggleSubmitButton(isLoading) {
+                if (isLoading) {
+                    submitBtnText.style.display = 'none';
+                    submitSpinner.style.display = 'inline-block';
+                    document.getElementById('submitBtn').disabled = true;
+                } else {
+                    submitBtnText.style.display = 'inline';
+                    submitSpinner.style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            }
+            
+            // Close modal when clicking outside
+            announcementModal.addEventListener('click', (e) => {
+                if (e.target === announcementModal) {
+                    announcementModal.classList.remove('active');
+                }
+            });
+            
+            confirmModal.addEventListener('click', (e) => {
+                if (e.target === confirmModal) {
+                    confirmModal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

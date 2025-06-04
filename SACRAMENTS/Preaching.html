@@ -56,19 +56,93 @@
       </main>
     </div>
 
-    <div class="overlay" id="overlay"></div>
-    <div class="search-dialog" id="searchDialog">
-      <div class="search-dialog-header">
-        <h2 class="search-dialog-title">Search Members</h2>
-        <button class="close-dialog-btn" id="closeDialogBtn">&times;</button>
+   <!-- Enhanced Search Dialog with both Search and Add New Member functionality -->
+<div id="overlay" class="overlay"></div>
+
+<div id="searchDialog" class="dialog">
+  <div class="dialog-header">
+    <h3>Add Member</h3>
+    <button id="closeDialogBtn" class="close-btn">
+      <span class="material-icons-outlined">close</span>
+    </button>
+  </div>
+
+  <!-- Dialog Tabs -->
+  <div class="dialog-tabs">
+    <button id="searchTab" class="dialog-tab active" data-tab="search">
+      <span class="material-icons-outlined">search</span>
+      Search Members
+    </button>
+    <button id="addTab" class="dialog-tab" data-tab="add">
+      <span class="material-icons-outlined">person_add</span>
+      Add New Member
+    </button>
+  </div>
+
+  <!-- Search Content -->
+  <div id="searchContent" class="dialog-content active">
+    <form id="searchForm" class="search-form">
+      <div class="search-input-group">
+        <span class="material-icons-outlined">search</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name..."
+          autocomplete="off"
+        />
       </div>
-      <form class="search-form" id="searchForm">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by name...">
-        <button type="submit" class="search-btn">Search</button>
-      </form>
-      <div class="search-hint">Enter a name to search for members</div>
-      <div class="search-results" id="searchResults"></div>
-    </div>
+    </form>
+    <div id="searchResults" class="search-results"></div>
+  </div>
+
+  <!-- Add New Member Content -->
+  <div id="addContent" class="dialog-content">
+    <form id="addMemberForm" class="add-member-form">
+      <div class="form-group">
+        <label for="newMemberName">Full Name</label>
+        <input
+          type="text"
+          id="newMemberName"
+          name="name"
+          required
+          placeholder="Enter full name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="newMemberEmail">Email Address</label>
+        <input
+          type="email"
+          id="newMemberEmail"
+          name="email"
+          required
+          placeholder="Enter email address"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="newMemberPhone">Phone Number</label>
+        <input
+          type="tel"
+          id="newMemberPhone"
+          name="phone"
+          required
+          placeholder="Enter phone number"
+        />
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" onclick="closeSearchDialog()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary">
+          <span class="material-icons-outlined">person_add</span>
+          Add Member
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
     <script src="sacraments.js"></script>
     <script>

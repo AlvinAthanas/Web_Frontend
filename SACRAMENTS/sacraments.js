@@ -17,11 +17,15 @@ let searchResults, trainingList, completedList, trainingCount, completedCount;
 let trainingCountDisplay, completedCountDisplay;
 let sacramentType; // Will be set by each page
 
+// New DOM elements for add member functionality
+let addMemberForm, newMemberName, newMemberEmail, newMemberPhone;
+let searchTab, addTab, searchContent, addContent;
+
 // Initialize the page
 function initSacramentPage(type) {
   sacramentType = type;
 
-  // Get DOM elements
+  // Get existing DOM elements
   addMemberBtn = document.getElementById("addMemberBtn");
   overlay = document.getElementById("overlay");
   searchDialog = document.getElementById("searchDialog");
@@ -36,6 +40,16 @@ function initSacramentPage(type) {
   trainingCountDisplay = document.getElementById("training-count-display");
   completedCountDisplay = document.getElementById("completed-count-display");
 
+  // Get new DOM elements for add member functionality
+  addMemberForm = document.getElementById("addMemberForm");
+  newMemberName = document.getElementById("newMemberName");
+  newMemberEmail = document.getElementById("newMemberEmail");
+  newMemberPhone = document.getElementById("newMemberPhone");
+  searchTab = document.getElementById("searchTab");
+  addTab = document.getElementById("addTab");
+  searchContent = document.getElementById("searchContent");
+  addContent = document.getElementById("addContent");
+
   // Set up event listeners
   setupEventListeners();
 
@@ -47,7 +61,7 @@ function initSacramentPage(type) {
 }
 
 function setupEventListeners() {
-  // Tab switching functionality
+  // Tab switching functionality (for main page tabs)
   const tabs = document.querySelectorAll(".tab");
 
   tabs.forEach((tab) => {
@@ -77,10 +91,24 @@ function setupEventListeners() {
     });
   });
 
+  // Dialog tab switching functionality
+  if (searchTab && addTab) {
+    searchTab.addEventListener("click", function() {
+      switchDialogTab('search');
+    });
+
+    addTab.addEventListener("click", function() {
+      switchDialogTab('add');
+    });
+  }
+
   // Add member button click handler
   addMemberBtn.addEventListener("click", function () {
     overlay.classList.add("active");
     searchDialog.classList.add("active");
+    
+    // Default to search tab
+    switchDialogTab('search');
     searchInput.focus();
   });
 
@@ -106,6 +134,34 @@ function setupEventListeners() {
       searchResults.innerHTML = "";
     }
   });
+
+  // Add member form submission
+  if (addMemberForm) {
+    addMemberForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      addNewMember();
+    });
+  }
+}
+
+// Switch between dialog tabs
+function switchDialogTab(tabType) {
+  // Remove active class from all dialog tabs
+  if (searchTab) searchTab.classList.remove("active");
+  if (addTab) addTab.classList.remove("active");
+  
+  // Hide all dialog content
+  if (searchContent) searchContent.classList.remove("active");
+  if (addContent) addContent.classList.remove("active");
+
+  // Activate selected tab and content
+  if (tabType === 'search') {
+    if (searchTab) searchTab.classList.add("active");
+    if (searchContent) searchContent.classList.add("active");
+  } else if (tabType === 'add') {
+    if (addTab) addTab.classList.add("active");
+    if (addContent) addContent.classList.add("active");
+  }
 }
 
 function closeSearchDialog() {
@@ -113,6 +169,73 @@ function closeSearchDialog() {
   searchDialog.classList.remove("active");
   searchResults.innerHTML = "";
   searchInput.value = "";
+  
+  // Clear add member form
+  if (addMemberForm) {
+    addMemberForm.reset();
+  }
+}
+
+// Add new member to the system and then to training
+async function addNewMember() {
+  const name = newMemberName.value.trim();
+  const email = newMemberEmail.value.trim();
+  const phone = newMemberPhone.value.trim();
+
+  if (!name || !email || !phone) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("No authentication token found");
+      alert("Authentication error. Please login again.");
+      return;
+    }
+
+    // First create the new user
+    const createResponse = await fetch("/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        phone: phone,
+        [`${sacramentType}Status`]: "training"
+      }),
+    });
+
+    if (createResponse.ok) {
+      const newUser = await createResponse.json();
+      
+      // Add to local training list
+      participants.training.push({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        phone: newUser.phone,
+        status: "training",
+      });
+
+      updateParticipantsList();
+      updateCounts();
+      closeSearchDialog();
+      
+      alert(`${name} has been added successfully!`);
+    } else {
+      const errorText = await createResponse.text();
+      console.error("Error creating user:", errorText);
+      alert("Failed to add new member. " + errorText);
+    }
+  } catch (error) {
+    console.error("Error adding new member:", error);
+    alert("Error adding new member");
+  }
 }
 
 // Fetch all participants (using existing users endpoint)
