@@ -25,7 +25,7 @@
         /* Additional styles specific to announcements page */
         .announcements-container {
             padding: 20px;
-            max-width: 1200px;
+            /* max-width: 1200px; */
             margin: 0 auto;
         }
         
@@ -698,8 +698,25 @@
                 }
             });
         });
+        
+        // Example: fetch with Authorization header
+        const token = localStorage.getItem('auth_token'); // or sessionStorage
 
-                const authToken = localStorage.getItem("authToken");
+        fetch('YOUR_API_ENDPOINT', {
+          method: 'GET', // or 'POST', etc.
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          // body: JSON.stringify(data) // if needed
+        })
+        .then(response => response.json())
+        .then(data => {
+          // handle response
+        })
+        .catch(error => {
+          // handle error
+        });
 
     </script>
 </body>
