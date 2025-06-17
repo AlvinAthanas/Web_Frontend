@@ -548,6 +548,9 @@
           addNewReport(filename, "Members");
 
           showMessage("Excel exported successfully!", "success");
+
+          // No redirect to report.html
+
         } catch (error) {
           console.error("Error exporting to Excel:", error);
           showMessage("Error exporting to Excel: " + error.message, "error");
@@ -611,6 +614,12 @@
           addNewReport(filename, "Members");
 
           showMessage("PDF exported successfully!", "success");
+
+          // // Redirect to report.html after export
+          // setTimeout(() => {
+          //   window.location.href = "../REPORTS/report.html";
+          // }, 1000);
+
         } catch (error) {
           console.error("Error exporting to PDF:", error);
           showMessage("Error exporting to PDF: " + error.message, "error");
@@ -621,17 +630,13 @@
       function addNewReport(filename, type) {
         const reports = JSON.parse(localStorage.getItem("reports") || "[]");
 
-        // Check if report already exists
-        const exists = reports.some(report => report.filename === filename);
-
-        if (!exists) {
-          reports.push({
-            filename: filename,
-            type: type || (filename.includes("members") ? "Members" : filename.includes("contributions") ? "Contributions" : "Other"),
-            date: new Date().toLocaleString()
-          });
-          localStorage.setItem("reports", JSON.stringify(reports));
-        }
+        // Always add a new report entry, even if filename/type already exists
+        reports.push({
+          filename: filename,
+          type: type || (filename.includes("members") ? "Members" : filename.includes("contributions") ? "Contributions" : "Other"),
+          date: new Date().toLocaleString()
+        });
+        localStorage.setItem("reports", JSON.stringify(reports));
       }
 
       // Setup import functionality
