@@ -279,6 +279,7 @@
     const attendance = {};
     let members = []; // Will be populated from API
     const locations = {}; // { "2025-5": { "2025-06-01": "Hall A", ... } }
+    let attendanceRecords = []; // fetched from backend
 
     // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
@@ -321,7 +322,8 @@
       // Replace this URL with your actual API endpoint
       const url = `http://localhost:8080/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
       
-      fetch(url)
+      fetch(url,
+      )
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -340,8 +342,8 @@
           } else {
             // Initialize attendance for these members
             initializeAttendance();
-            // Render the table
-            renderTable();
+            // Fetch attendances and then render the table
+            fetchAttendances();
           }
         })
         .catch(error => {
@@ -354,6 +356,15 @@
           // Fallback to empty members array
           members = [];
           initializeAttendance();
+          renderTable();
+        });
+    }
+    
+    function fetchAttendances() {
+      fetch('http://localhost:8080/attendances')
+        .then(res => res.json())
+        .then(data => {
+          attendanceRecords = data;
           renderTable();
         });
     }
@@ -387,6 +398,10 @@
     function formatDate(date) {
       const options = { month: 'short', day: 'numeric' };
       return date.toLocaleDateString(undefined, options);
+    }
+    
+    function getAttendanceRecord(userId, date) {
+      return attendanceRecords.find(a => a.userId === userId && a.date === date);
     }
     
     function renderTable() {
@@ -438,17 +453,14 @@
         // Attendance cells
         saturdays.forEach(saturday => {
           const dateKey = saturday.toISOString().split('T')[0];
-
-          if (!attendance[monthKey][member.id]) {
-            attendance[monthKey][member.id] = {};
-          }
-
-          const isPresent = attendance[monthKey][member.id][dateKey] || false;
+          const record = getAttendanceRecord(member.id, dateKey);
+          const isPresent = record ? record.isPresent : false;
           const cell = document.createElement('td');
           cell.className = isPresent ? 'status-cell present' : 'status-cell absent';
           cell.textContent = isPresent ? 'Present' : 'Absent';
           cell.dataset.memberId = member.id;
           cell.dataset.date = dateKey;
+          if (record) cell.dataset.attendanceId = record.id;
           cell.addEventListener('click', toggleAttendance);
           row.appendChild(cell);
         });
@@ -461,17 +473,48 @@
     }
     
     function toggleAttendance(event) {
-      const memberId = event.target.dataset.memberId;
-      const dateKey = event.target.dataset.date;
-      const monthKey = `${currentYear}-${currentMonth}`;
-      
-      // Toggle attendance status
-      attendance[monthKey][memberId][dateKey] = !attendance[monthKey][memberId][dateKey];
-      
-      // Update UI
-      const isPresent = attendance[monthKey][memberId][dateKey];
-      event.target.className = isPresent ? 'status-cell present' : 'status-cell absent';
-      event.target.textContent = isPresent ? 'Present' : 'Absent';
+      const cell = event.target;
+      const memberId = Number(cell.dataset.memberId);
+      const dateKey = cell.dataset.date;
+      const attendanceId = cell.dataset.attendanceId;
+      const record = getAttendanceRecord(memberId, dateKey);
+      const newStatus = !(record ? record.isPresent : false);
+
+      if (!attendanceId) {
+        // Create new attendance
+        fetch('http://localhost:8080/attendance', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            isPresent: newStatus,
+            date: dateKey,
+            userId: memberId,
+            eventId: null // set if you have eventId
+          })
+        })
+        .then(res => res.json())
+        .then(newRecord => {
+          attendanceRecords.push(newRecord);
+          renderTable();
+        });
+      } else {
+        // Update existing attendance
+        fetch(`http://localhost:8080/attendance/${attendanceId}`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            ...record,
+            isPresent: newStatus
+          })
+        })
+        .then(res => res.json())
+        .then(updatedRecord => {
+          // Update local record
+          const idx = attendanceRecords.findIndex(a => a.id === updatedRecord.id);
+          if (idx !== -1) attendanceRecords[idx] = updatedRecord;
+          renderTable();
+        });
+      }
     }
     
     function changeMonth(delta) {
@@ -538,6 +581,8 @@
       locations[monthKey][dateKey] = input.value.trim();
       renderTable();
     }
+
+    
 </script>
 <script src="../GENERAL/script.js"></script>
 

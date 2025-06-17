@@ -427,7 +427,13 @@
             // Fetch all announcements from the server
             async function fetchAnnouncements() {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/notifications`);
+                    const response = await fetch(`${API_BASE_URL}/notifications`,
+                        {
+                            headers :{
+                                Authorization : `Bearer ${authToken}`
+                            }
+                        }
+                    );
                     if (!response.ok) {
                         throw new Error('Failed to fetch announcements');
                     }
@@ -556,6 +562,7 @@
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json'
+
                             },
                             body: JSON.stringify(notificationData)
                         });
@@ -691,6 +698,9 @@
                 }
             });
         });
+
+                const authToken = localStorage.getItem("authToken");
+
     </script>
 </body>
 </html>
