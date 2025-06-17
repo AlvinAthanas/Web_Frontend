@@ -168,6 +168,33 @@
       opacity: 0.8;
     }
     
+    .location-display {
+      display: inline-block;
+      background: #e3f0fc;
+      color: #2563a6;
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-top: 4px;
+      font-size: 12px;
+      min-width: 60px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .location-display:hover {
+      background: #d0e7fa;
+    }
+    .location-input-edit {
+      width: 90%;
+      margin-top: 4px;
+      font-size: 12px;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+      padding: 2px 6px;
+      outline: none;
+      background: #fafdff;
+      color: #2563a6;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       body {
@@ -251,6 +278,7 @@
     let currentYear = new Date().getFullYear();
     const attendance = {};
     let members = []; // Will be populated from API
+    const locations = {}; // { "2025-5": { "2025-06-01": "Hall A", ... } }
 
     // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
@@ -364,36 +392,57 @@
     function renderTable() {
       const saturdays = getSaturdaysInMonth(currentYear, currentMonth);
       const tableHeader = document.getElementById("tableHeader");
-      
+      const monthKey = `${currentYear}-${currentMonth}`;
+
+      // Ensure locations object for this month
+      if (!locations[monthKey]) locations[monthKey] = {};
+
+      // Add a row for dates
       let headerHTML = `<tr><th>Member Name</th>`;
-      saturdays.forEach(saturday => {
-        headerHTML += `<th>${formatDate(saturday)}</th>`;
+      saturdays.forEach((saturday, idx) => {
+        const dateKey = saturday.toISOString().split('T')[0];
+        const location = locations[monthKey][dateKey] || "";
+        headerHTML += `<th>
+          ${formatDate(saturday)}<br>
+          <span class="location-display" data-date="${dateKey}" tabindex="0">
+            ${location ? escapeHtml(location) : "Location"}
+          </span>
+        </th>`;
       });
       headerHTML += `</tr>`;
       tableHeader.innerHTML = headerHTML;
-      
+
+      // Add event listeners for location editing
+      tableHeader.querySelectorAll('.location-display').forEach(span => {
+        span.addEventListener('click', handleLocationEdit);
+        span.addEventListener('keydown', function(e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleLocationEdit.call(this, e);
+          }
+        });
+      });
+
       const tableBody = document.getElementById("membersList");
       tableBody.innerHTML = '';
-      
-      const monthKey = `${currentYear}-${currentMonth}`;
-      
+
       members.forEach(member => {
         const row = document.createElement('tr');
-        
+
         // Member name
         const nameCell = document.createElement('td');
         nameCell.className = 'member-name';
         nameCell.textContent = member.name || 'Unknown Member';
         row.appendChild(nameCell);
-        
+
         // Attendance cells
         saturdays.forEach(saturday => {
           const dateKey = saturday.toISOString().split('T')[0];
-          
+
           if (!attendance[monthKey][member.id]) {
             attendance[monthKey][member.id] = {};
           }
-          
+
           const isPresent = attendance[monthKey][member.id][dateKey] || false;
           const cell = document.createElement('td');
           cell.className = isPresent ? 'status-cell present' : 'status-cell absent';
@@ -403,10 +452,10 @@
           cell.addEventListener('click', toggleAttendance);
           row.appendChild(cell);
         });
-        
+
         tableBody.appendChild(row);
       });
-      
+
       // Update month display
       updateMonthDisplay();
     }
@@ -437,6 +486,56 @@
       }
       
       initializeAttendance();
+      renderTable();
+    }
+
+    // Helper to escape HTML for safe display
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[m];
+      });
+    }
+
+    // Handle click to edit location
+    function handleLocationEdit(e) {
+      const span = e.target;
+      const dateKey = span.dataset.date;
+      const monthKey = `${currentYear}-${currentMonth}`;
+      const currentValue = locations[monthKey][dateKey] || "";
+
+      // Create input
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'location-input-edit';
+      input.value = currentValue;
+      input.setAttribute('data-date', dateKey);
+
+      // Replace span with input
+      span.replaceWith(input);
+      input.focus();
+      input.select();
+
+      // Save on blur or Enter
+      input.addEventListener('blur', saveLocationEdit);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          input.blur();
+        } else if (e.key === "Escape") {
+          // Cancel edit
+          renderTable();
+        }
+      });
+    }
+
+    // Save location and re-render
+    function saveLocationEdit(e) {
+      const input = e.target;
+      const dateKey = input.dataset.date;
+      const monthKey = `${currentYear}-${currentMonth}`;
+      locations[monthKey][dateKey] = input.value.trim();
       renderTable();
     }
 </script>
