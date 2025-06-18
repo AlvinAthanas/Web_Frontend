@@ -328,6 +328,95 @@
           padding: 20px;
         }
       }
+    
+      /* Search and recipient selection styles */
+      .radio-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+      }
+
+      .radio-group input[type="radio"] {
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .search-results-container {
+        position: absolute;
+        width: 100%;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+        display: none;
+        margin-top: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      .search-result-item {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      }
+
+      .search-result-item:hover {
+        background-color: #f5f5f5;
+      }
+
+      .search-result-item .email {
+        font-size: 12px;
+        color: #888;
+      }
+
+      .selected-recipient-container {
+        display: none;
+        margin-top: 10px;
+      }
+
+      .selected-recipient-container > div {
+        background: #f5f5f5;
+        padding: 8px 12px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .remove-recipient-btn {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .remove-recipient-btn:hover {
+        color: #f44336;
+      }
+
+      /* Loading indicator for search */
+      .search-loading {
+        padding: 10px;
+        text-align: center;
+        color: #666;
+      }
+
+      /* Error message for search */
+      .search-error {
+        padding: 10px;
+        color: #f44336;
+      }
     </style>
   </head>
   <body>
@@ -377,6 +466,43 @@
                   class="form-textarea"
                   required
                 ></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Recipient Type</label>
+                <div class="radio-group">
+                  <label>
+                    <input type="radio" name="recipientType" value="entire_parish" checked> 
+                    Entire Parish
+                  </label>
+                  <label>
+                    <input type="radio" name="recipientType" value="community"> 
+                    Community
+                  </label>
+                  <label>
+                    <input type="radio" name="recipientType" value="individual"> 
+                    Individual
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" id="recipientSearchGroup" style="display: none;">
+                <label for="recipientSearch" class="form-label" id="recipientSearchLabel">Search Individual</label>
+                <div style="position: relative;">
+                  <input
+                    type="text"
+                    id="recipientSearch"
+                    class="form-input"
+                    placeholder="Start typing to search..."
+                  />
+                  <div id="searchResults" class="search-results-container"></div>
+                </div>
+                <div id="selectedRecipient" class="selected-recipient-container">
+                  <div>
+                    <span id="selectedRecipientName"></span>
+                    <button id="removeRecipient" class="remove-recipient-btn">
+                      <span class="material-icons-outlined">close</span>
+                    </button>
+                  </div>
+                </div>
               </div>
               <button type="submit" class="submit-btn" id="submitBtn">
                 <span id="submitBtnText">Send Announcement</span>
@@ -436,8 +562,7 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // DOM Elements
-        const newAnnouncementBtn =
-          document.getElementById("newAnnouncementBtn");
+        const newAnnouncementBtn = document.getElementById("newAnnouncementBtn");
         const announcementModal = document.getElementById("announcementModal");
         const confirmModal = document.getElementById("confirmModal");
         const closeModal = document.getElementById("closeModal");
@@ -445,21 +570,27 @@
         const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
         const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
         const announcementForm = document.getElementById("announcementForm");
-        const tableContainer = document.getElementById(
-          "announcementsTableContainer"
-        );
+        const tableContainer = document.getElementById("announcementsTableContainer");
         const notification = document.getElementById("notification");
         const notificationIcon = document.getElementById("notificationIcon");
-        const notificationMessage = document.getElementById(
-          "notificationMessage"
-        );
+        const notificationMessage = document.getElementById("notificationMessage");
         const modalTitle = document.getElementById("modalTitle");
         const submitBtnText = document.getElementById("submitBtnText");
         const submitSpinner = document.getElementById("submitSpinner");
+        const recipientTypeRadios = document.querySelectorAll('input[name="recipientType"]');
+        const recipientSearchGroup = document.getElementById("recipientSearchGroup");
+        const recipientSearchInput = document.getElementById("recipientSearch");
+        const searchResults = document.getElementById("searchResults");
+        const selectedRecipient = document.getElementById("selectedRecipient");
+        const selectedRecipientName = document.getElementById("selectedRecipientName");
+        const removeRecipientBtn = document.getElementById("removeRecipient");
+        const recipientSearchLabel = document.getElementById("recipientSearchLabel");
 
         // State variables
         let currentNotificationId = null;
         let isEditMode = false;
+        let selectedRecipientData = null;
+        let searchTimeout = null;
 
         // API Base URL
         const API_BASE_URL = "http://localhost:8080";
@@ -528,6 +659,9 @@
                                         <div class="announcement-message">${
                                           announcement.message
                                         }</div>
+                                        <div class="announcement-id" style="margin-top: 5px; font-size: 12px; color: #666;">
+                                            To: ${formatRecipientInfo(announcement)}
+                                        </div>
                                     </td>
                                     <td class="announcement-date">${formatDate(
                                       announcement.date
@@ -572,6 +706,18 @@
           });
         }
 
+        // Format recipient information for display
+        function formatRecipientInfo(announcement) {
+          if (announcement.recipientType === "entire_parish") {
+            return "Entire Parish";
+          } else if (announcement.recipientType === "community") {
+            return announcement.communityName || "Community";
+          } else if (announcement.recipientType === "individual") {
+            return announcement.recipientName || "Individual";
+          }
+          return "N/A";
+        }
+
         // Format date to be more readable
         function formatDate(dateString) {
           if (!dateString) return "N/A";
@@ -593,6 +739,9 @@
             "Send Announcement";
           document.getElementById("announcementForm").reset();
           document.getElementById("announcementId").value = "";
+          selectedRecipientData = null;
+          selectedRecipient.style.display = "none";
+          recipientSearchGroup.style.display = "none";
           announcementModal.classList.add("active");
         });
 
@@ -609,6 +758,146 @@
           confirmModal.classList.remove("active");
         });
 
+        // Handle recipient type change
+        recipientTypeRadios.forEach(radio => {
+          radio.addEventListener("change", (e) => {
+            const type = e.target.value;
+            selectedRecipientData = null;
+            selectedRecipient.style.display = "none";
+            recipientSearchInput.value = "";
+            searchResults.style.display = "none";
+
+            if (type === "individual") {
+              recipientSearchGroup.style.display = "block";
+              recipientSearchLabel.textContent = "Search Individual";
+            } else if (type === "community") {
+              recipientSearchGroup.style.display = "block";
+              recipientSearchLabel.textContent = "Search Community";
+            } else {
+              recipientSearchGroup.style.display = "none";
+            }
+          });
+        });
+
+        // Handle recipient search
+        recipientSearchInput.addEventListener("input", (e) => {
+          clearTimeout(searchTimeout);
+          const query = e.target.value.trim();
+          
+          if (query.length < 2) {
+            searchResults.style.display = "none";
+            return;
+          }
+          
+          searchTimeout = setTimeout(() => {
+            const recipientType = document.querySelector('input[name="recipientType"]:checked').value;
+            if (recipientType === "individual") {
+              searchUsers(query);
+            } else if (recipientType === "community") {
+              searchCommunities(query);
+            }
+          }, 300);
+        });
+
+        // Search users function
+        async function searchUsers(query) {
+          try {
+            searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+            searchResults.style.display = "block";
+            
+            const response = await fetch(`${API_BASE_URL}/user/search?name=${encodeURIComponent(query)}`, {
+              headers: authHeaders()
+            });
+            
+            if (!response.ok) throw new Error("Search failed");
+            
+            const users = await response.json();
+            displaySearchResults(users, "user");
+          } catch (error) {
+            console.error("Search error:", error);
+            searchResults.innerHTML = '<div class="search-error">Failed to search. Please try again.</div>';
+            searchResults.style.display = "block";
+          }
+        }
+
+        // Search communities function
+        async function searchCommunities(query) {
+          try {
+            searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+            searchResults.style.display = "block";
+            
+            const response = await fetch(`${API_BASE_URL}/groupsNameByDescription/search?name=${encodeURIComponent(query)}&description=${encodeURIComponent(query)}`, {
+              headers: authHeaders()
+            });
+            
+            if (!response.ok) throw new Error("Search failed");
+            
+            const communities = await response.json();
+            displaySearchResults(communities, "community");
+          } catch (error) {
+            console.error("Search error:", error);
+            searchResults.innerHTML = '<div class="search-error">Failed to search. Please try again.</div>';
+            searchResults.style.display = "block";
+          }
+        }
+
+        // Display search results
+        function displaySearchResults(items, type) {
+          if (items.length === 0) {
+            searchResults.innerHTML = '<div style="padding: 10px; color: #666;">No results found</div>';
+            searchResults.style.display = "block";
+            return;
+          }
+          
+          const resultsHTML = items.map(item => {
+            if (type === "user") {
+              return `
+                <div class="search-result-item" 
+                     data-id="${item.id}"
+                     data-name="${item.name}"
+                     data-type="user">
+                  ${item.name} 
+                  <div class="email">${item.email}</div>
+                </div>
+              `;
+            } else {
+              return `
+                <div class="search-result-item" 
+                     data-id="${item.id}"
+                     data-name="${item.name}"
+                     data-type="community">
+                  ${item.name}
+                  <div class="email">${item.description || 'Community'}</div>
+                </div>
+              `;
+            }
+          }).join("");
+          
+          searchResults.innerHTML = resultsHTML;
+          searchResults.style.display = "block";
+          
+          // Add click handlers to search results
+          document.querySelectorAll(".search-result-item").forEach(item => {
+            item.addEventListener("click", (e) => {
+              selectedRecipientData = {
+                id: item.getAttribute("data-id"),
+                name: item.getAttribute("data-name"),
+                type: item.getAttribute("data-type")
+              };
+              selectedRecipientName.textContent = selectedRecipientData.name;
+              selectedRecipient.style.display = "block";
+              recipientSearchInput.value = "";
+              searchResults.style.display = "none";
+            });
+          });
+        }
+
+        // Handle remove recipient
+        removeRecipientBtn.addEventListener("click", () => {
+          selectedRecipientData = null;
+          selectedRecipient.style.display = "none";
+        });
+
         // Handle form submission for create/update
         announcementForm.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -616,12 +905,23 @@
           const title = document.getElementById("announcementTitle").value;
           const message = document.getElementById("announcementMessage").value;
           const id = document.getElementById("announcementId").value;
+          const recipientType = document.querySelector('input[name="recipientType"]:checked').value;
 
           const notificationData = {
             title: title,
             message: message,
             date: new Date().toISOString(),
+            recipientType: recipientType
           };
+
+          // Add recipient data if applicable
+          if (recipientType === "individual" && selectedRecipientData) {
+            notificationData.recipientId = selectedRecipientData.id;
+            notificationData.recipientName = selectedRecipientData.name;
+          } else if (recipientType === "community" && selectedRecipientData) {
+            notificationData.communityId = selectedRecipientData.id;
+            notificationData.communityName = selectedRecipientData.name;
+          }
 
           try {
             toggleSubmitButton(true);
@@ -656,6 +956,8 @@
             // Reset form and close modal
             announcementForm.reset();
             announcementModal.classList.remove("active");
+            selectedRecipientData = null;
+            selectedRecipient.style.display = "none";
 
             // Show success notification
             showNotification(
@@ -690,6 +992,37 @@
               announcement.title;
             document.getElementById("announcementMessage").value =
               announcement.message;
+
+            // Set recipient type
+            const recipientType = announcement.recipientType || "entire_parish";
+            document.querySelector(`input[name="recipientType"][value="${recipientType}"]`).checked = true;
+
+            // Handle recipient data if applicable
+            if (recipientType === "individual" && announcement.recipientId) {
+              selectedRecipientData = {
+                id: announcement.recipientId,
+                name: announcement.recipientName || "Individual",
+                type: "user"
+              };
+              selectedRecipientName.textContent = selectedRecipientData.name;
+              selectedRecipient.style.display = "block";
+              recipientSearchGroup.style.display = "block";
+              recipientSearchLabel.textContent = "Search Individual";
+            } else if (recipientType === "community" && announcement.communityId) {
+              selectedRecipientData = {
+                id: announcement.communityId,
+                name: announcement.communityName || "Community",
+                type: "community"
+              };
+              selectedRecipientName.textContent = selectedRecipientData.name;
+              selectedRecipient.style.display = "block";
+              recipientSearchGroup.style.display = "block";
+              recipientSearchLabel.textContent = "Search Community";
+            } else {
+              selectedRecipientData = null;
+              selectedRecipient.style.display = "none";
+              recipientSearchGroup.style.display = "none";
+            }
 
             // Update UI for edit mode
             isEditMode = true;
@@ -778,6 +1111,13 @@
         confirmModal.addEventListener("click", (e) => {
           if (e.target === confirmModal) {
             confirmModal.classList.remove("active");
+          }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener("click", (e) => {
+          if (!recipientSearchGroup.contains(e.target)) {
+            searchResults.style.display = "none";
           }
         });
 

@@ -2,502 +2,381 @@
 
 // Global variables
 let participants = {
-  training: [],
-  completed: [],
+    training: [],
+    completed: []
 };
 
 // DOM Elements
-let addMemberBtn,
-  overlay,
-  searchDialog,
-  closeDialogBtn,
-  searchForm,
-  searchInput;
+let addMemberBtn, overlay, searchDialog, closeDialogBtn, searchForm, searchInput;
 let searchResults, trainingList, completedList, trainingCount, completedCount;
 let trainingCountDisplay, completedCountDisplay;
-let sacramentType; // Will be set by each page
-
-// New DOM elements for add member functionality
+let sacramentType;
 let addMemberForm, newMemberName, newMemberEmail, newMemberPhone;
 let searchTab, addTab, searchContent, addContent;
 
+// Base URL for API endpoints
+const API_BASE_URL = "http://localhost:8080";
+
 // Initialize the page
 function initSacramentPage(type) {
-  sacramentType = type;
+    sacramentType = type;
 
-  // Get existing DOM elements
-  addMemberBtn = document.getElementById("addMemberBtn");
-  overlay = document.getElementById("overlay");
-  searchDialog = document.getElementById("searchDialog");
-  closeDialogBtn = document.getElementById("closeDialogBtn");
-  searchForm = document.getElementById("searchForm");
-  searchInput = document.getElementById("searchInput");
-  searchResults = document.getElementById("searchResults");
-  trainingList = document.getElementById("training-list");
-  completedList = document.getElementById("completed-list");
-  trainingCount = document.getElementById("training-count");
-  completedCount = document.getElementById("completed-count");
-  trainingCountDisplay = document.getElementById("training-count-display");
-  completedCountDisplay = document.getElementById("completed-count-display");
+    // Get DOM elements
+    addMemberBtn = document.getElementById("addMemberBtn");
+    overlay = document.getElementById("overlay");
+    searchDialog = document.getElementById("searchDialog");
+    closeDialogBtn = document.getElementById("closeDialogBtn");
+    searchForm = document.getElementById("searchForm");
+    searchInput = document.getElementById("searchInput");
+    searchResults = document.getElementById("searchResults");
+    trainingList = document.getElementById("training-list");
+    completedList = document.getElementById("completed-list");
+    trainingCount = document.getElementById("training-count");
+    completedCount = document.getElementById("completed-count");
+    trainingCountDisplay = document.getElementById("training-count-display");
+    completedCountDisplay = document.getElementById("completed-count-display");
+    addMemberForm = document.getElementById("addMemberForm");
+    newMemberName = document.getElementById("newMemberName");
+    newMemberEmail = document.getElementById("newMemberEmail");
+    newMemberPhone = document.getElementById("newMemberPhone");
+    searchTab = document.getElementById("searchTab");
+    addTab = document.getElementById("addTab");
+    searchContent = document.getElementById("searchContent");
+    addContent = document.getElementById("addContent");
 
-  // Get new DOM elements for add member functionality
-  addMemberForm = document.getElementById("addMemberForm");
-  newMemberName = document.getElementById("newMemberName");
-  newMemberEmail = document.getElementById("newMemberEmail");
-  newMemberPhone = document.getElementById("newMemberPhone");
-  searchTab = document.getElementById("searchTab");
-  addTab = document.getElementById("addTab");
-  searchContent = document.getElementById("searchContent");
-  addContent = document.getElementById("addContent");
+    // Set up event listeners
+    setupEventListeners();
 
-  // Set up event listeners
-  setupEventListeners();
-
-  // Load initial data
-  fetchParticipants();
-
-  // Set initial state of add member button
-  addMemberBtn.style.display = "flex"; // Show by default
+    // Load initial data
+    fetchParticipants();
 }
 
 function setupEventListeners() {
-  // Tab switching functionality (for main page tabs)
-  const tabs = document.querySelectorAll(".tab");
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", function () {
-      // Remove active class from all tabs and content
-      document
-        .querySelectorAll(".tab")
-        .forEach((t) => t.classList.remove("active"));
-      document
-        .querySelectorAll(".tab-content")
-        .forEach((c) => c.classList.remove("active"));
-
-      // Add active class to clicked tab
-      this.classList.add("active");
-
-      // Show corresponding content
-      const tabId = this.getAttribute("data-tab");
-      document.getElementById(tabId + "-content").classList.add("active");
-
-      // Show/hide add member button based on active tab
-      const addMemberBtn = document.getElementById("addMemberBtn");
-      if (tabId === "completed") {
-        addMemberBtn.style.display = "none";
-      } else {
-        addMemberBtn.style.display = "flex"; // Or 'block' depending on your CSS
-      }
-    });
-  });
-
-  // Dialog tab switching functionality
-  if (searchTab && addTab) {
-    searchTab.addEventListener("click", function() {
-      switchDialogTab('search');
+    // Tab switching functionality
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.addEventListener("click", function() {
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            this.classList.add("active");
+            document.getElementById(this.getAttribute("data-tab") + "-content").classList.add("active");
+            addMemberBtn.style.display = this.getAttribute("data-tab") === "completed" ? "none" : "flex";
+        });
     });
 
-    addTab.addEventListener("click", function() {
-      switchDialogTab('add');
+    // Dialog tab switching
+    searchTab.addEventListener("click", () => switchDialogTab("search"));
+    addTab.addEventListener("click", () => switchDialogTab("add"));
+
+    // Add member button
+    addMemberBtn.addEventListener("click", () => {
+        overlay.classList.add("active");
+        searchDialog.classList.add("active");
+        switchDialogTab("search");
+        searchInput.focus();
     });
-  }
 
-  // Add member button click handler
-  addMemberBtn.addEventListener("click", function () {
-    overlay.classList.add("active");
-    searchDialog.classList.add("active");
-    
-    // Default to search tab
-    switchDialogTab('search');
-    searchInput.focus();
-  });
+    // Close dialog
+    closeDialogBtn.addEventListener("click", closeSearchDialog);
+    overlay.addEventListener("click", closeSearchDialog);
 
-  // Close dialog button
-  closeDialogBtn.addEventListener("click", closeSearchDialog);
-  overlay.addEventListener("click", closeSearchDialog);
-
-  // Search form submission
-  searchForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const searchTerm = searchInput.value.trim();
-    if (searchTerm) {
-      searchUsers(searchTerm);
-    }
-  });
-
-  // Real-time search as user types
-  searchInput.addEventListener("input", function() {
-    const searchTerm = this.value.trim();
-    if (searchTerm) {
-      searchUsers(searchTerm);
-    } else {
-      searchResults.innerHTML = "";
-    }
-  });
-
-  // Add member form submission
-  if (addMemberForm) {
-    addMemberForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      addNewMember();
+    // Search form
+    searchForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) searchUsers(searchTerm);
     });
-  }
+
+    // Real-time search
+    searchInput.addEventListener("input", function() {
+        const searchTerm = this.value.trim();
+        searchResults.innerHTML = searchTerm ? "" : "";
+        if (searchTerm) searchUsers(searchTerm);
+    });
+
+    // Add member form
+    addMemberForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        await addNewMember();
+    });
 }
 
-// Switch between dialog tabs
 function switchDialogTab(tabType) {
-  // Remove active class from all dialog tabs
-  if (searchTab) searchTab.classList.remove("active");
-  if (addTab) addTab.classList.remove("active");
-  
-  // Hide all dialog content
-  if (searchContent) searchContent.classList.remove("active");
-  if (addContent) addContent.classList.remove("active");
+    searchTab.classList.remove("active");
+    addTab.classList.remove("active");
+    searchContent.classList.remove("active");
+    addContent.classList.remove("active");
 
-  // Activate selected tab and content
-  if (tabType === 'search') {
-    if (searchTab) searchTab.classList.add("active");
-    if (searchContent) searchContent.classList.add("active");
-  } else if (tabType === 'add') {
-    if (addTab) addTab.classList.add("active");
-    if (addContent) addContent.classList.add("active");
-  }
+    if (tabType === "search") {
+        searchTab.classList.add("active");
+        searchContent.classList.add("active");
+    } else {
+        addTab.classList.add("active");
+        addContent.classList.add("active");
+    }
 }
 
 function closeSearchDialog() {
-  overlay.classList.remove("active");
-  searchDialog.classList.remove("active");
-  searchResults.innerHTML = "";
-  searchInput.value = "";
-  
-  // Clear add member form
-  if (addMemberForm) {
+    overlay.classList.remove("active");
+    searchDialog.classList.remove("active");
+    searchResults.innerHTML = "";
+    searchInput.value = "";
     addMemberForm.reset();
-  }
 }
 
-// Add new member to the system and then to training
 async function addNewMember() {
-  const name = newMemberName.value.trim();
-  const email = newMemberEmail.value.trim();
-  const phone = newMemberPhone.value.trim();
+    const name = newMemberName.value.trim();
+    const email = newMemberEmail.value.trim();
+    const phone = newMemberPhone.value.trim();
 
-  if (!name || !email || !phone) {
-    alert("Please fill in all fields");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No authentication token found");
-      alert("Authentication error. Please login again.");
-      return;
+    if (!name || !email || !phone) {
+        alert("Please fill in all fields");
+        return;
     }
 
-    // First create the new user
-    const createResponse = await fetch("/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        name: name,
-        email: email,
-        phone: phone,
-        [`${sacramentType}Status`]: "training"
-      }),
-    });
-
-    if (createResponse.ok) {
-      const newUser = await createResponse.json();
-      
-      // Add to local training list
-      participants.training.push({
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        phone: newUser.phone,
-        status: "training",
-      });
-
-      updateParticipantsList();
-      updateCounts();
-      closeSearchDialog();
-      
-      alert(`${name} has been added successfully!`);
-    } else {
-      const errorText = await createResponse.text();
-      console.error("Error creating user:", errorText);
-      alert("Failed to add new member. " + errorText);
-    }
-  } catch (error) {
-    console.error("Error adding new member:", error);
-    alert("Error adding new member");
-  }
-}
-
-// Fetch all participants (using existing users endpoint)
-async function fetchParticipants() {
-  try {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No authentication token found");
-      return;
-    }
-
-    const response = await fetch("/users", {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    const allUsers = await response.json();
-
-    // Filter users based on sacrament type
-    participants.training = allUsers.filter(
-      (user) => user[`${sacramentType}Status`] === "training"
-    );
-    participants.completed = allUsers.filter(
-      (user) => user[`${sacramentType}Status`] === "completed"
-    );
-
-    // Update UI
-    updateParticipantsList();
-    updateCounts();
-  } catch (error) {
-    console.error("Error fetching participants:", error);
-  }
-}
-
-// Search users in the system
-async function searchUsers(name) {
-  try {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No authentication token found");
-      searchResults.innerHTML = '<div class="search-result-item">Authentication error</div>';
-      return;
-    }
-
-    const response = await fetch(
-      `http://localhost:8080/user/search?name=${encodeURIComponent(name)}`,
-      {
-        headers: {
-          "Authorization": `Bearer ${token}`
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("Authentication error. Please login again.");
+            return;
         }
-      }
-    );
-    const users = await response.json();
 
-    // Filter out users already in the lists
-    const existingIds = [
-      ...participants.training.map((p) => p.id),
-      ...participants.completed.map((p) => p.id),
-    ];
+        // Create new user
+        const response = await fetch(`${API_BASE_URL}/user`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                name,
+                email,
+                phone,
+                baptismStatus: "training"
+            })
+        });
 
-    const availableUsers = users.filter(
-      (user) => !existingIds.includes(user.id)
-    );
+        if (response.ok) {
+            const newUser = await response.json();
+            participants.training.push({
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                phone: newUser.phone,
+                status: "training"
+            });
 
-    // Display results
-    displaySearchResults(availableUsers);
-  } catch (error) {
-    console.error("Error searching users:", error);
-    searchResults.innerHTML =
-      '<div class="search-result-item">Error searching users</div>';
-  }
+            updateParticipantsList();
+            updateCounts();
+            closeSearchDialog();
+            alert(`${name} has been added successfully!`);
+        } else {
+            alert("Failed to add new member: " + await response.text());
+        }
+    } catch (error) {
+        console.error("Error adding new member:", error);
+        alert("Error adding new member");
+    }
 }
 
-// Display search results
+async function fetchParticipants() {
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            console.error("No authentication token found");
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/users`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const allUsers = await response.json();
+            participants.training = allUsers.filter(user => user.baptismStatus === "training");
+            participants.completed = allUsers.filter(user => user.baptismStatus === "completed");
+            updateParticipantsList();
+            updateCounts();
+        } else {
+            console.error("Error fetching participants:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error fetching participants:", error);
+    }
+}
+
+async function searchUsers(name) {
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            searchResults.innerHTML = '<div class="search-result-item">Authentication error</div>';
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/user/search?name=${encodeURIComponent(name)}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const users = await response.json();
+            const existingIds = [...participants.training, ...participants.completed].map(p => p.id);
+            const availableUsers = users.filter(user => !existingIds.includes(user.id));
+            displaySearchResults(availableUsers);
+        } else {
+            searchResults.innerHTML = '<div class="search-result-item">Error searching users</div>';
+        }
+    } catch (error) {
+        console.error("Error searching users:", error);
+        searchResults.innerHTML = '<div class="search-result-item">Error searching users</div>';
+    }
+}
+
 function displaySearchResults(users) {
-  if (users.length === 0) {
-    searchResults.innerHTML =
-      '<div class="search-result-item">No users found</div>';
-    return;
-  }
+    searchResults.innerHTML = users.length === 0
+        ? '<div class="search-result-item">No users found</div>'
+        : users.map(user => `
+            <div class="search-result-item">
+                <div class="search-result-info">
+                    <div class="search-result-name">${user.name}</div>
+                    <div class="search-result-email">${user.email}</div>
+                    <div class="search-result-phone">${user.phone}</div>
+                </div>
+                <button class="add-btn" data-user-id="${user.id}">
+                    <span class="material-icons-outlined">add</span>
+                    Add
+                </button>
+            </div>
+        `).join("");
 
-  searchResults.innerHTML = users
-    .map(
-      (user) => `
-    <div class="search-result-item">
-      <div class="search-result-info">
-        <div class="search-result-name">${user.name}</div>
-        <div class="search-result-email">${user.email}</div>
-        <div class="search-result-phone">${user.phone}</div>
-      </div>
-      <button class="add-btn" data-user-id="${user.id}">
-        <span class="material-icons-outlined">add</span>
-        Add
-      </button>
-    </div>
-  `
-    )
-    .join("");
-
-  // Add event listeners to add buttons
-  document.querySelectorAll(".add-btn").forEach((btn) => {
-    btn.addEventListener("click", async function () {
-      const userId = this.getAttribute("data-user-id");
-      const user = users.find((u) => u.id == userId);
-      await addParticipant(user);
-      closeSearchDialog();
+    document.querySelectorAll(".add-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const userId = btn.getAttribute("data-user-id");
+            const user = users.find(u => u.id == userId);
+            await addParticipant(user);
+            closeSearchDialog();
+        });
     });
-  });
 }
 
-// Add participant to training list using updateUser endpoint
 async function addParticipant(user) {
-  try {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No authentication token found");
-      alert("Authentication error. Please login again.");
-      return;
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("Authentication error. Please login again.");
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/user/${user.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ baptismStatus: "training" })
+        });
+
+        if (response.ok) {
+            participants.training.push({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                status: "training"
+            });
+            updateParticipantsList();
+            updateCounts();
+        } else {
+            alert("Failed to add participant: " + await response.text());
+        }
+    } catch (error) {
+        console.error("Error adding participant:", error);
+        alert("Error adding participant");
     }
-
-    const response = await fetch(`/user/${user.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        [`${sacramentType}Status`]: "training",
-      }),
-    });
-
-    if (response.ok) {
-      // Add to local list and update UI
-      participants.training.push({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        status: "training",
-      });
-
-      updateParticipantsList();
-      updateCounts();
-    } else {
-      console.error("Error adding participant:", await response.text());
-      alert("Failed to add participant");
-    }
-  } catch (error) {
-    console.error("Error adding participant:", error);
-    alert("Error adding participant");
-  }
 }
 
-// Move participant to completed using updateUser endpoint
 async function completeTraining(participantId) {
-  try {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No authentication token found");
-      alert("Authentication error. Please login again.");
-      return;
+    try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("Authentication error. Please login again.");
+            return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/user/${participantId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ baptismStatus: "completed" })
+        });
+
+        if (response.ok) {
+            const participantIndex = participants.training.findIndex(p => p.id == participantId);
+            if (participantIndex !== -1) {
+                const participant = participants.training[participantIndex];
+                participant.status = "completed";
+                participants.training.splice(participantIndex, 1);
+                participants.completed.push(participant);
+                updateParticipantsList();
+                updateCounts();
+            }
+        } else {
+            alert("Failed to update status: " + await response.text());
+        }
+    } catch (error) {
+        console.error("Error completing training:", error);
+        alert("Error updating status");
     }
-
-    const response = await fetch(`/user/${participantId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        [`${sacramentType}Status`]: "completed",
-      }),
-    });
-
-    if (response.ok) {
-      // Find and move the participant
-      const participantIndex = participants.training.findIndex(
-        (p) => p.id == participantId
-      );
-      if (participantIndex !== -1) {
-        const participant = participants.training[participantIndex];
-        participant.status = "completed";
-
-        participants.training.splice(participantIndex, 1);
-        participants.completed.push(participant);
-
-        updateParticipantsList();
-        updateCounts();
-      }
-    } else {
-      console.error("Error completing training:", await response.text());
-      alert("Failed to update status");
-    }
-  } catch (error) {
-    console.error("Error completing training:", error);
-    alert("Error updating status");
-  }
 }
 
-// Update participants lists in UI
 function updateParticipantsList() {
-  // Training list
-  trainingList.innerHTML = participants.training
-    .map(
-      (participant) => `
-    <li class="participant-item">
-      <div class="participant-info">
-        <div class="participant-name">${participant.name}</div>
-        <div class="participant-email">${participant.email}</div>
-        <div class="participant-phone">${participant.phone}</div>
-      </div>
-      <span class="participant-status status-in-training">In Training</span>
-      <button class="complete-btn" data-participant-id="${participant.id}">
-        <span class="material-icons-outlined">check</span>
-        Complete
-      </button>
-    </li>
-  `
-    )
-    .join("");
+    trainingList.innerHTML = participants.training.map(participant => `
+        <li class="participant-item">
+            <div class="participant-info">
+                <div class="participant-name">${participant.name}</div>
+                <div class="participant-email">${participant.email}</div>
+                <div class="participant-phone">${participant.phone}</div>
+            </div>
+            <span class="participant-status status-in-training">In Training</span>
+            <button class="complete-btn" data-participant-id="${participant.id}">
+                <span class="material-icons-outlined">check</span>
+                Complete
+            </button>
+        </li>
+    `).join("");
 
-  // Add event listeners to complete buttons
-  document.querySelectorAll(".complete-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const participantId = this.getAttribute("data-participant-id");
-      if (
-        confirm(
-          `Mark ${
-            this.closest(".participant-item").querySelector(".participant-name")
-              .textContent
-          } as completed?`
-        )
-      ) {
-        completeTraining(participantId);
-      }
+    document.querySelectorAll(".complete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const participantId = btn.getAttribute("data-participant-id");
+            const name = btn.closest(".participant-item").querySelector(".participant-name").textContent;
+            if (confirm(`Mark ${name} as completed?`)) {
+                completeTraining(participantId);
+            }
+        });
     });
-  });
 
-  // Completed list
-  completedList.innerHTML = participants.completed
-    .map(
-      (participant) => `
-    <li class="participant-item">
-      <div class="participant-info">
-        <div class="participant-name">${participant.name}</div>
-        <div class="participant-email">${participant.email}</div>
-        <div class="participant-phone">${participant.phone}</div>
-      </div>
-      <span class="participant-status status-completed">Completed</span>
-    </li>
-  `
-    )
-    .join("");
+    completedList.innerHTML = participants.completed.map(participant => `
+        <li class="participant-item">
+            <div class="participant-info">
+                <div class="participant-name">${participant.name}</div>
+                <div class="participant-email">${participant.email}</div>
+                <div class="participant-phone">${participant.phone}</div>
+            </div>
+            <span class="participant-status status-completed">Completed</span>
+        </li>
+    `).join("");
 }
 
-// Update counts in UI
 function updateCounts() {
-  const trainingCountValue = participants.training.length;
-  const completedCountValue = participants.completed.length;
+    const trainingCountValue = participants.training.length;
+    const completedCountValue = participants.completed.length;
 
-  trainingCount.textContent = trainingCountValue;
-  completedCount.textContent = completedCountValue;
-  trainingCountDisplay.textContent = trainingCountValue;
-  completedCountDisplay.textContent = completedCountValue;
+    trainingCount.textContent = trainingCountValue;
+    completedCount.textContent = completedCountValue;
+    trainingCountDisplay.textContent = trainingCountValue;
+    completedCountDisplay.textContent = completedCountValue;
 }
