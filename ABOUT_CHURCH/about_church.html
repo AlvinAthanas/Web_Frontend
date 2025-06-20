@@ -689,7 +689,7 @@
       }
 
       // Replace with your actual parish ID logic
-      const parishId = localStorage.getItem("parishId") || 1;
+      const parishId = localStorage.getItem("parishId");
 
       document.addEventListener("DOMContentLoaded", async function () {
         const data = await loadParishFromServer(parishId);

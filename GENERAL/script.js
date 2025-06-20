@@ -133,3 +133,9 @@ function setupLogout() {
     });
   });
 }
+
+// After getting the logged-in user info
+const user = getUserFromStorage();
+if (user && user.parishId) {
+    localStorage.setItem('parishId', user.parishId);
+}
