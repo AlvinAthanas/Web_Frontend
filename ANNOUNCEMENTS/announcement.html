@@ -694,9 +694,13 @@
         // Fetch all announcements
         async function fetchAnnouncements() {
           try {
-            const response = await fetch(`${API_BASE_URL}/notifications`, {
-              headers: authHeaders(),
-            });
+            // Use the parish notifications endpoint
+            const response = await fetch(
+              `${API_BASE_URL}/notifications/parish`,
+              {
+                headers: authHeaders(),
+              }
+            );
             if (!response.ok) throw new Error("Failed to fetch announcements");
             const announcements = await response.json();
             displayAnnouncements(announcements);
