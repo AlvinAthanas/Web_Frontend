@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Preaching Ministry</title>
-       <!-- Montserrat Font -->
+    <!-- Montserrat Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -20,134 +20,326 @@
 
     <!-- External CSS -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
-        <link rel="stylesheet" href="sacraments.css" />
-
+    <link rel="stylesheet" href="sacraments.css" />
   </head>
   <body>
     <div class="grid-container" id="containerId">
       <main class="main-container">
+        <!-- Session Navigation Header -->
+        <style>
+          .session-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px 20px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+          }
+          .session-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          .session-arrow {
+            background: #eaf1fb;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1.5rem;
+            color: #3498db;
+          }
+          .session-arrow:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+          .session-arrow:hover:not(:disabled) {
+            background: #d6eaff;
+          }
+          .session-dates {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            color: #2c3e50;
+          }
+          .session-dates input[type="date"] {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            background: #fff;
+            color: #2c3e50;
+            outline: none;
+            transition: border 0.2s;
+          }
+          .session-dates input[type="date"]:focus {
+            border: 1.5px solid #3498db;
+          }
+          .new-session-btn {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(39, 174, 96, 0.08);
+            transition: background 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+          }
+          .new-session-btn:hover {
+            background: #219150;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.13);
+          }
+          @media (max-width: 600px) {
+            .session-header {
+              flex-direction: column;
+              align-items: stretch;
+              gap: 12px;
+              padding: 10px 6px;
+            }
+            .new-session-btn {
+              width: 100%;
+              justify-content: center;
+            }
+          }
+        </style>
+        <div class="session-header">
+          <div class="session-nav">
+            <button
+              class="session-arrow"
+              id="prevSessionBtn"
+              title="Previous Session"
+            >
+              <span class="material-icons-outlined">chevron_left</span>
+            </button>
+            <div class="session-dates">
+              <input type="date" id="startDate" />
+              <span style="font-size: 1.2rem; color: #95a5a6">&#8212;</span>
+              <input type="date" id="endDate" />
+            </div>
+            <button
+              class="session-arrow"
+              id="nextSessionBtn"
+              title="Next Session"
+            >
+              <span class="material-icons-outlined">chevron_right</span>
+            </button>
+          </div>
+          <button class="new-session-btn" id="newSessionBtn">
+            <span class="material-icons-outlined" style="font-size: 1.2rem"
+              >add_circle</span
+            >
+            New Session
+          </button>
+        </div>
         <div class="communion-container">
           <a href="sacraments.html" class="back-link">
             <span class="material-icons-outlined">arrow_back</span>
             Back to Sacraments
           </a>
-          
+
           <h1 class="main-title">Preaching Ministry</h1>
-          
+
           <div class="tab-container">
-            <div class="tab active" data-tab="training">In Training (<span id="training-count">0</span>)</div>
-            <div class="tab" data-tab="completed">Certified (<span id="completed-count">0</span>)</div>
+            <div class="tab active" data-tab="training">
+              In Training (<span id="training-count">0</span>)
+            </div>
+            <div class="tab" data-tab="completed">
+              Certified (<span id="completed-count">0</span>)
+            </div>
             <button class="add-member-btn" id="addMemberBtn">
               <span class="material-icons-outlined">person_add</span>
               Add Member
             </button>
           </div>
-          
+
           <div class="tab-content active" id="training-content">
-            <div class="participant-count"><span id="training-count-display">0</span> Members</div>
+            <div class="participant-count">
+              <span id="training-count-display">0</span> Members
+            </div>
             <ul class="participant-list" id="training-list"></ul>
           </div>
-          
+
           <div class="tab-content" id="completed-content">
-            <div class="participant-count"><span id="completed-count-display">0</span> Members</div>
+            <div class="participant-count">
+              <span id="completed-count-display">0</span> Members
+            </div>
             <ul class="participant-list" id="completed-list"></ul>
           </div>
         </div>
       </main>
     </div>
 
-   <!-- Enhanced Search Dialog with both Search and Add New Member functionality -->
-<div id="overlay" class="overlay"></div>
+    <!-- Enhanced Search Dialog with both Search and Add New Member functionality -->
+    <div id="overlay" class="overlay"></div>
 
-<div id="searchDialog" class="dialog">
-  <div class="dialog-header">
-    <h3>Add Member</h3>
-    <button id="closeDialogBtn" class="close-btn">
-      <span class="material-icons-outlined">close</span>
-    </button>
-  </div>
-
-  <!-- Dialog Tabs -->
-  <div class="dialog-tabs">
-    <button id="searchTab" class="dialog-tab active" data-tab="search">
-      <span class="material-icons-outlined">search</span>
-      Search Members
-    </button>
-    <button id="addTab" class="dialog-tab" data-tab="add">
-      <span class="material-icons-outlined">person_add</span>
-      Add New Member
-    </button>
-  </div>
-
-  <!-- Search Content -->
-  <div id="searchContent" class="dialog-content active">
-    <form id="searchForm" class="search-form">
-      <div class="search-input-group">
-        <span class="material-icons-outlined">search</span>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search by name..."
-          autocomplete="off"
-        />
-      </div>
-    </form>
-    <div id="searchResults" class="search-results"></div>
-  </div>
-
-  <!-- Add New Member Content -->
-  <div id="addContent" class="dialog-content">
-    <form id="addMemberForm" class="add-member-form">
-      <div class="form-group">
-        <label for="newMemberName">Full Name</label>
-        <input
-          type="text"
-          id="newMemberName"
-          name="name"
-          required
-          placeholder="Enter full name"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="newMemberEmail">Email Address</label>
-        <input
-          type="email"
-          id="newMemberEmail"
-          name="email"
-          required
-          placeholder="Enter email address"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="newMemberPhone">Phone Number</label>
-        <input
-          type="tel"
-          id="newMemberPhone"
-          name="phone"
-          required
-          placeholder="Enter phone number"
-        />
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" onclick="closeSearchDialog()">
-          Cancel
+    <div id="searchDialog" class="dialog">
+      <div class="dialog-header">
+        <h3>Add Member</h3>
+        <button id="closeDialogBtn" class="close-btn">
+          <span class="material-icons-outlined">close</span>
         </button>
-        <button type="submit" class="btn-primary">
+      </div>
+
+      <!-- Dialog Tabs -->
+      <div class="dialog-tabs">
+        <button id="searchTab" class="dialog-tab active" data-tab="search">
+          <span class="material-icons-outlined">search</span>
+          Search Members
+        </button>
+        <button id="addTab" class="dialog-tab" data-tab="add">
           <span class="material-icons-outlined">person_add</span>
-          Add Member
+          Add New Member
         </button>
       </div>
-    </form>
-  </div>
-</div>
+
+      <!-- Search Content -->
+      <div id="searchContent" class="dialog-content active">
+        <form id="searchForm" class="search-form">
+          <div class="search-input-group">
+            <span class="material-icons-outlined">search</span>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name..."
+              autocomplete="off"
+            />
+          </div>
+        </form>
+        <div id="searchResults" class="search-results"></div>
+      </div>
+
+      <!-- Add New Member Content -->
+      <div id="addContent" class="dialog-content">
+        <form id="addMemberForm" class="add-member-form">
+          <div class="form-group">
+            <label for="newMemberName">Full Name</label>
+            <input
+              type="text"
+              id="newMemberName"
+              name="name"
+              required
+              placeholder="Enter full name"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newMemberEmail">Email Address</label>
+            <input
+              type="email"
+              id="newMemberEmail"
+              name="email"
+              required
+              placeholder="Enter email address"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newMemberPhone">Phone Number</label>
+            <input
+              type="tel"
+              id="newMemberPhone"
+              name="phone"
+              required
+              placeholder="Enter phone number"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="closeSearchDialog()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary">
+              <span class="material-icons-outlined">person_add</span>
+              Add Member
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script src="sacraments.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        initSacramentPage('preaching');
+      // Session navigation logic
+      let sessions = [
+        { start: "2025-01-01", end: "2025-03-31" },
+        { start: "2025-04-01", end: "2025-06-30" },
+        { start: "2025-07-01", end: "2025-09-30" },
+      ];
+      let currentSession = 0;
+
+      const startDateInput = document.getElementById("startDate");
+      const endDateInput = document.getElementById("endDate");
+      const prevBtn = document.getElementById("prevSessionBtn");
+      const nextBtn = document.getElementById("nextSessionBtn");
+      const newSessionBtn = document.getElementById("newSessionBtn");
+
+      function updateSessionFields() {
+        if (sessions.length === 0) {
+          startDateInput.value = "";
+          endDateInput.value = "";
+          startDateInput.disabled = true;
+          endDateInput.disabled = true;
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          return;
+        }
+        startDateInput.disabled = false;
+        endDateInput.disabled = false;
+        startDateInput.value = sessions[currentSession].start;
+        endDateInput.value = sessions[currentSession].end;
+        prevBtn.disabled = currentSession === 0;
+        nextBtn.disabled = currentSession === sessions.length - 1;
+      }
+
+      startDateInput.addEventListener("change", () => {
+        sessions[currentSession].start = startDateInput.value;
+      });
+      endDateInput.addEventListener("change", () => {
+        sessions[currentSession].end = endDateInput.value;
+      });
+      prevBtn.addEventListener("click", () => {
+        if (currentSession > 0) {
+          currentSession--;
+          updateSessionFields();
+        }
+      });
+      nextBtn.addEventListener("click", () => {
+        if (currentSession < sessions.length - 1) {
+          currentSession++;
+          updateSessionFields();
+        }
+      });
+      newSessionBtn.addEventListener("click", () => {
+        const today = new Date().toISOString().slice(0, 10);
+        sessions.push({ start: today, end: today });
+        currentSession = sessions.length - 1;
+        updateSessionFields();
+        startDateInput.focus();
+      });
+
+      // Initialize on load
+      updateSessionFields();
+
+      document.addEventListener("DOMContentLoaded", function () {
+        initSacramentPage("preaching");
       });
     </script>
     <script src="../GENERAL/script.js"></script>
