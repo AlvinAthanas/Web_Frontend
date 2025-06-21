@@ -269,28 +269,64 @@ async function addParticipant(user) {
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/user/${user.id}`, {
-            method: "PUT",
+        // Build CreateSacramentCandidateCommand payload
+        const candidatePayload = {
+            fullName: user.name,
+            gender: user.gender,
+            phoneNumber: user.phone,
+            guardianName: "",
+            userId: user.id
+        };
+
+        // 1. Create candidate
+        const candidateRes = await fetch("http://localhost:8080/sacrament/candidate", {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ baptismStatus: "training" })
+            body: JSON.stringify(candidatePayload)
         });
 
-        if (response.ok) {
-            participants.training.push({
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                status: "training"
-            });
-            updateParticipantsList();
-            updateCounts();
-        } else {
-            alert("Failed to add participant: " + await response.text());
+        if (!candidateRes.ok) {
+            alert("Failed to add candidate: " + await candidateRes.text());
+            return;
         }
+        const candidate = await candidateRes.json();
+
+        // --- Get session dates from the page context ---
+        const startDateInput = document.getElementById("startDate");
+        const endDateInput = document.getElementById("endDate");
+        const startDate = startDateInput ? startDateInput.value : "";
+        const completionDate = endDateInput ? endDateInput.value : "";
+
+        // 2. Register candidate for this sacrament
+        const registrationPayload = {
+            userId: candidate.id,
+            sacramentType: sacramentType,
+            registrationDate: new Date().toISOString().slice(0, 10),
+            startDate,
+            completionDate
+        };
+        const regRes = await fetch("http://localhost:8080/sacrament", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(registrationPayload)
+        });
+
+        if (!regRes.ok) {
+            alert("Failed to register candidate for sacrament: " + await regRes.text());
+            return;
+        }
+
+        // Optionally update UI here
+        updateParticipantsList();
+        updateCounts();
+        closeSearchDialog();
+        alert(`${user.name} has been added successfully!`);
     } catch (error) {
         console.error("Error adding participant:", error);
         alert("Error adding participant");
