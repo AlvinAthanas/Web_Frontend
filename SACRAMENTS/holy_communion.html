@@ -352,6 +352,7 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initSacramentPage("FIRST_COMMUNION");
+        loadAndDisplayCandidatesForSession();
       });
     </script>
     <script src="../GENERAL/script.js"></script>
@@ -392,6 +393,7 @@
           }));
           currentSession = 0;
           updateSessionFields();
+          loadAndDisplayCandidatesForSession();
         } catch (err) {
           sessions = [];
           updateSessionFields();
@@ -430,12 +432,14 @@
         if (currentSession > 0) {
           currentSession--;
           updateSessionFields();
+          loadAndDisplayCandidatesForSession();
         }
       });
       nextBtn.addEventListener("click", () => {
         if (currentSession < sessions.length - 1) {
           currentSession++;
           updateSessionFields();
+          loadAndDisplayCandidatesForSession();
         }
       });
 

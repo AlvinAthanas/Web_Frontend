@@ -416,3 +416,71 @@ function updateCounts() {
     trainingCountDisplay.textContent = trainingCountValue;
     completedCountDisplay.textContent = completedCountValue;
 }
+
+/**
+ * Fetch candidates for the current session and sacrament type,
+ * and display them under the "In Training" tab.
+ */
+async function loadAndDisplayCandidatesForSession() {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        alert("Authentication error. Please login again.");
+        return;
+    }
+
+    // Get session dates and sacrament type from page context
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+    const startDate = startDateInput ? startDateInput.value : "";
+    const endDate = endDateInput ? endDateInput.value : "";
+    const type = sacramentType;
+
+    if (!startDate || !endDate || !type) {
+        participants.training = [];
+        updateParticipantsList();
+        updateCounts();
+        return;
+    }
+
+    const url = `${API_BASE_URL}/sacrament-candidates-for-session?type=${encodeURIComponent(type)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            participants.training = [];
+            updateParticipantsList();
+            updateCounts();
+            return;
+        }
+        const candidates = await response.json();
+
+        // Map candidates to the format expected by updateParticipantsList
+        participants.training = candidates.map(candidate => ({
+            id: candidate.id,
+            name: candidate.fullName,
+            email: candidate.contactInfo || "",
+            phone: candidate.contactInfo || "",
+            guardian: candidate.guardianName || "",
+            gender: candidate.gender || "",
+            status: "training"
+        }));
+
+        // Optionally clear completed list if only showing current session
+        participants.completed = [];
+        updateParticipantsList();
+        updateCounts();
+    } catch (error) {
+        console.error("Error fetching candidates for session:", error);
+        participants.training = [];
+        updateParticipantsList();
+        updateCounts();
+    }
+}
+
+// Call this function after updating session fields or on page load
+// Example: after updateSessionFields() in your HTML script, add:
+// loadAndDisplayCandidatesForSession();
