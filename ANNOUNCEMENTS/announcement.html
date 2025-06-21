@@ -328,7 +328,7 @@
           padding: 20px;
         }
       }
-    
+
       /* Search and recipient selection styles */
       .radio-group {
         display: flex;
@@ -359,7 +359,7 @@
         z-index: 10;
         display: none;
         margin-top: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
 
       .search-result-item {
@@ -417,6 +417,43 @@
         padding: 10px;
         color: #f44336;
       }
+
+      /* User result specific styles */
+      .user-result {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #f0f0f0;
+        flex-shrink: 0;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .user-name {
+        font-weight: bold;
+        font-size: 16px;
+        color: #222;
+      }
+
+      .user-email {
+        font-size: 13px;
+        color: #888;
+        font-weight: 400;
+        margin-top: 2px;
+      }
     </style>
   </head>
   <body>
@@ -471,31 +508,63 @@
                 <label class="form-label">Recipient Type</label>
                 <div class="radio-group">
                   <label>
-                    <input type="radio" name="recipientType" value="entire_parish" checked> 
+                    <input
+                      type="radio"
+                      name="recipientType"
+                      value="entire_parish"
+                      checked
+                    />
                     Entire Parish
                   </label>
                   <label>
-                    <input type="radio" name="recipientType" value="community"> 
+                    <input type="radio" name="recipientType" value="kanda" />
+                    Kanda
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="recipientType"
+                      value="community"
+                    />
                     Community
                   </label>
                   <label>
-                    <input type="radio" name="recipientType" value="individual"> 
+                    <input
+                      type="radio"
+                      name="recipientType"
+                      value="individual"
+                    />
                     Individual
                   </label>
                 </div>
               </div>
-              <div class="form-group" id="recipientSearchGroup" style="display: none;">
-                <label for="recipientSearch" class="form-label" id="recipientSearchLabel">Search Individual</label>
-                <div style="position: relative;">
+              <div
+                class="form-group"
+                id="recipientSearchGroup"
+                style="display: none"
+              >
+                <label
+                  for="recipientSearch"
+                  class="form-label"
+                  id="recipientSearchLabel"
+                  >Search Individual</label
+                >
+                <div style="position: relative">
                   <input
                     type="text"
                     id="recipientSearch"
                     class="form-input"
                     placeholder="Start typing to search..."
                   />
-                  <div id="searchResults" class="search-results-container"></div>
+                  <div
+                    id="searchResults"
+                    class="search-results-container"
+                  ></div>
                 </div>
-                <div id="selectedRecipient" class="selected-recipient-container">
+                <div
+                  id="selectedRecipient"
+                  class="selected-recipient-container"
+                >
                   <div>
                     <span id="selectedRecipientName"></span>
                     <button id="removeRecipient" class="remove-recipient-btn">
@@ -562,7 +631,8 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // DOM Elements
-        const newAnnouncementBtn = document.getElementById("newAnnouncementBtn");
+        const newAnnouncementBtn =
+          document.getElementById("newAnnouncementBtn");
         const announcementModal = document.getElementById("announcementModal");
         const confirmModal = document.getElementById("confirmModal");
         const closeModal = document.getElementById("closeModal");
@@ -570,21 +640,33 @@
         const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
         const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
         const announcementForm = document.getElementById("announcementForm");
-        const tableContainer = document.getElementById("announcementsTableContainer");
+        const tableContainer = document.getElementById(
+          "announcementsTableContainer"
+        );
         const notification = document.getElementById("notification");
         const notificationIcon = document.getElementById("notificationIcon");
-        const notificationMessage = document.getElementById("notificationMessage");
+        const notificationMessage = document.getElementById(
+          "notificationMessage"
+        );
         const modalTitle = document.getElementById("modalTitle");
         const submitBtnText = document.getElementById("submitBtnText");
         const submitSpinner = document.getElementById("submitSpinner");
-        const recipientTypeRadios = document.querySelectorAll('input[name="recipientType"]');
-        const recipientSearchGroup = document.getElementById("recipientSearchGroup");
+        const recipientTypeRadios = document.querySelectorAll(
+          'input[name="recipientType"]'
+        );
+        const recipientSearchGroup = document.getElementById(
+          "recipientSearchGroup"
+        );
         const recipientSearchInput = document.getElementById("recipientSearch");
         const searchResults = document.getElementById("searchResults");
         const selectedRecipient = document.getElementById("selectedRecipient");
-        const selectedRecipientName = document.getElementById("selectedRecipientName");
+        const selectedRecipientName = document.getElementById(
+          "selectedRecipientName"
+        );
         const removeRecipientBtn = document.getElementById("removeRecipient");
-        const recipientSearchLabel = document.getElementById("recipientSearchLabel");
+        const recipientSearchLabel = document.getElementById(
+          "recipientSearchLabel"
+        );
 
         // State variables
         let currentNotificationId = null;
@@ -660,7 +742,9 @@
                                           announcement.message
                                         }</div>
                                         <div class="announcement-id" style="margin-top: 5px; font-size: 12px; color: #666;">
-                                            To: ${formatRecipientInfo(announcement)}
+                                            To: ${formatRecipientInfo(
+                                              announcement
+                                            )}
                                         </div>
                                     </td>
                                     <td class="announcement-date">${formatDate(
@@ -714,6 +798,8 @@
             return announcement.communityName || "Community";
           } else if (announcement.recipientType === "individual") {
             return announcement.recipientName || "Individual";
+          } else if (announcement.recipientType === "kanda") {
+            return announcement.kandaName || "Kanda";
           }
           return "N/A";
         }
@@ -759,7 +845,7 @@
         });
 
         // Handle recipient type change
-        recipientTypeRadios.forEach(radio => {
+        recipientTypeRadios.forEach((radio) => {
           radio.addEventListener("change", (e) => {
             const type = e.target.value;
             selectedRecipientData = null;
@@ -773,6 +859,9 @@
             } else if (type === "community") {
               recipientSearchGroup.style.display = "block";
               recipientSearchLabel.textContent = "Search Community";
+            } else if (type === "kanda") {
+              recipientSearchGroup.style.display = "block";
+              recipientSearchLabel.textContent = "Search Kanda";
             } else {
               recipientSearchGroup.style.display = "none";
             }
@@ -783,106 +872,170 @@
         recipientSearchInput.addEventListener("input", (e) => {
           clearTimeout(searchTimeout);
           const query = e.target.value.trim();
-          
+
           if (query.length < 2) {
             searchResults.style.display = "none";
             return;
           }
-          
+
           searchTimeout = setTimeout(() => {
-            const recipientType = document.querySelector('input[name="recipientType"]:checked').value;
+            const recipientType = document.querySelector(
+              'input[name="recipientType"]:checked'
+            ).value;
             if (recipientType === "individual") {
               searchUsers(query);
             } else if (recipientType === "community") {
               searchCommunities(query);
+            } else if (recipientType === "kanda") {
+              searchKandas(query);
             }
           }, 300);
         });
 
-        // Search users function
+        // Replace the searchUsers function with this:
         async function searchUsers(query) {
           try {
-            searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+            searchResults.innerHTML =
+              '<div class="search-loading">Searching...</div>';
             searchResults.style.display = "block";
-            
-            const response = await fetch(`${API_BASE_URL}/user/search?name=${encodeURIComponent(query)}`, {
-              headers: authHeaders()
-            });
-            
+
+            const response = await fetch(
+              `${API_BASE_URL}/user/search?name=${encodeURIComponent(query)}`,
+              {
+                headers: authHeaders(),
+              }
+            );
+
             if (!response.ok) throw new Error("Search failed");
-            
+
             const users = await response.json();
             displaySearchResults(users, "user");
           } catch (error) {
             console.error("Search error:", error);
-            searchResults.innerHTML = '<div class="search-error">Failed to search. Please try again.</div>';
+            searchResults.innerHTML =
+              '<div class="search-error">Failed to search. Please try again.</div>';
             searchResults.style.display = "block";
           }
         }
 
-        // Search communities function
+        // Add this function for searching kandas
+        async function searchKandas(query) {
+          try {
+            searchResults.innerHTML =
+              '<div class="search-loading">Searching...</div>';
+            searchResults.style.display = "block";
+
+            const response = await fetch(
+              `${API_BASE_URL}/kanda/search?name=${encodeURIComponent(query)}`,
+              {
+                headers: authHeaders(),
+              }
+            );
+
+            if (!response.ok) throw new Error("Search failed");
+
+            const kandas = await response.json();
+            displaySearchResults(kandas, "kanda");
+          } catch (error) {
+            console.error("Search error:", error);
+            searchResults.innerHTML =
+              '<div class="search-error">Failed to search. Please try again.</div>';
+            searchResults.style.display = "block";
+          }
+        }
+
+        // Replace the searchCommunities function with this:
         async function searchCommunities(query) {
           try {
-            searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+            searchResults.innerHTML =
+              '<div class="search-loading">Searching...</div>';
             searchResults.style.display = "block";
-            
-            const response = await fetch(`${API_BASE_URL}/groupsNameByDescription/search?name=${encodeURIComponent(query)}&description=${encodeURIComponent(query)}`, {
-              headers: authHeaders()
+
+            // Use the new endpoint, set description to "community"
+            const url = `${API_BASE_URL}/groupsNameByDescription/search?name=${encodeURIComponent(
+              query
+            )}&description=community`;
+
+            const response = await fetch(url, {
+              headers: authHeaders(),
             });
-            
+
             if (!response.ok) throw new Error("Search failed");
-            
+
             const communities = await response.json();
             displaySearchResults(communities, "community");
           } catch (error) {
             console.error("Search error:", error);
-            searchResults.innerHTML = '<div class="search-error">Failed to search. Please try again.</div>';
+            searchResults.innerHTML =
+              '<div class="search-error">Failed to search. Please try again.</div>';
             searchResults.style.display = "block";
           }
         }
 
-        // Display search results
+        // Update displaySearchResults to show user profile picture and styled info
         function displaySearchResults(items, type) {
           if (items.length === 0) {
-            searchResults.innerHTML = '<div style="padding: 10px; color: #666;">No results found</div>';
+            searchResults.innerHTML =
+              '<div style="padding: 10px; color: #666;">No results found</div>';
             searchResults.style.display = "block";
             return;
           }
-          
-          const resultsHTML = items.map(item => {
-            if (type === "user") {
-              return `
-                <div class="search-result-item" 
-                     data-id="${item.id}"
-                     data-name="${item.name}"
-                     data-type="user">
-                  ${item.name} 
-                  <div class="email">${item.email}</div>
-                </div>
-              `;
-            } else {
-              return `
-                <div class="search-result-item" 
-                     data-id="${item.id}"
-                     data-name="${item.name}"
-                     data-type="community">
-                  ${item.name}
-                  <div class="email">${item.description || 'Community'}</div>
-                </div>
-              `;
-            }
-          }).join("");
-          
+
+          const resultsHTML = items
+            .map((item) => {
+              if (type === "user") {
+                // Use a default avatar if no profilePicture is present
+                const avatar =
+                  item.profilePicture && item.profilePicture.length > 0
+                    ? `data:image/jpeg;base64,${item.profilePicture}`
+                    : "https://ui-avatars.com/api/?name=" +
+                      encodeURIComponent(item.name || "User");
+                return `
+          <div class="search-result-item user-result" 
+               data-id="${item.id}"
+               data-name="${item.name}"
+               data-type="user">
+            <img class="user-avatar" src="${avatar}" alt="Profile" />
+            <div class="user-info">
+              <div class="user-name">${item.name}</div>
+              <div class="user-email">${item.email || ""}</div>
+            </div>
+          </div>
+        `;
+              } else if (type === "community") {
+                return `
+          <div class="search-result-item" 
+               data-id="${item.id}"
+               data-name="${item.name}"
+               data-type="community">
+            ${item.name}
+            <div class="email">${item.description || "Community"}</div>
+          </div>
+        `;
+              } else if (type === "kanda") {
+                return `
+          <div class="search-result-item" 
+               data-id="${item.id}"
+               data-name="${item.name}"
+               data-type="kanda">
+            ${item.name}
+            <div class="email">${item.description || "Kanda"}</div>
+          </div>
+        `;
+              }
+            })
+            .join("");
+
           searchResults.innerHTML = resultsHTML;
           searchResults.style.display = "block";
-          
+
           // Add click handlers to search results
-          document.querySelectorAll(".search-result-item").forEach(item => {
+          document.querySelectorAll(".search-result-item").forEach((item) => {
             item.addEventListener("click", (e) => {
               selectedRecipientData = {
                 id: item.getAttribute("data-id"),
                 name: item.getAttribute("data-name"),
-                type: item.getAttribute("data-type")
+                type: item.getAttribute("data-type"),
               };
               selectedRecipientName.textContent = selectedRecipientData.name;
               selectedRecipient.style.display = "block";
@@ -905,29 +1058,35 @@
           const title = document.getElementById("announcementTitle").value;
           const message = document.getElementById("announcementMessage").value;
           const id = document.getElementById("announcementId").value;
-          const recipientType = document.querySelector('input[name="recipientType"]:checked').value;
+          const recipientType = document.querySelector(
+            'input[name="recipientType"]:checked'
+          ).value;
 
+          // Build Notification object for backend
           const notificationData = {
             title: title,
             message: message,
-            date: new Date().toISOString(),
-            recipientType: recipientType
+            date: new Date().toISOString().split("T")[0], // LocalDate format (yyyy-MM-dd)
           };
 
-          // Add recipient data if applicable
-          if (recipientType === "individual" && selectedRecipientData) {
-            notificationData.recipientId = selectedRecipientData.id;
-            notificationData.recipientName = selectedRecipientData.name;
+          if (recipientType === "entire_parish") {
+            notificationData.isGlobal = true;
+          } else if (recipientType === "individual" && selectedRecipientData) {
+            notificationData.userId = selectedRecipientData.id;
+            notificationData.isGlobal = false;
           } else if (recipientType === "community" && selectedRecipientData) {
-            notificationData.communityId = selectedRecipientData.id;
-            notificationData.communityName = selectedRecipientData.name;
+            notificationData.groupId = selectedRecipientData.id;
+            notificationData.isGlobal = false;
+          } else if (recipientType === "kanda" && selectedRecipientData) {
+            notificationData.kandaId = selectedRecipientData.id;
+            notificationData.isGlobal = false;
           }
 
           try {
             toggleSubmitButton(true);
             let response;
             if (isEditMode && id) {
-              // Update existing announcement
+              // Update existing announcement (if you have an update endpoint)
               response = await fetch(`${API_BASE_URL}/notification/${id}`, {
                 method: "PUT",
                 headers: authHeaders({ "Content-Type": "application/json" }),
@@ -995,24 +1154,29 @@
 
             // Set recipient type
             const recipientType = announcement.recipientType || "entire_parish";
-            document.querySelector(`input[name="recipientType"][value="${recipientType}"]`).checked = true;
+            document.querySelector(
+              `input[name="recipientType"][value="${recipientType}"]`
+            ).checked = true;
 
             // Handle recipient data if applicable
             if (recipientType === "individual" && announcement.recipientId) {
               selectedRecipientData = {
                 id: announcement.recipientId,
                 name: announcement.recipientName || "Individual",
-                type: "user"
+                type: "user",
               };
               selectedRecipientName.textContent = selectedRecipientData.name;
               selectedRecipient.style.display = "block";
               recipientSearchGroup.style.display = "block";
               recipientSearchLabel.textContent = "Search Individual";
-            } else if (recipientType === "community" && announcement.communityId) {
+            } else if (
+              recipientType === "community" &&
+              announcement.communityId
+            ) {
               selectedRecipientData = {
                 id: announcement.communityId,
                 name: announcement.communityName || "Community",
-                type: "community"
+                type: "community",
               };
               selectedRecipientName.textContent = selectedRecipientData.name;
               selectedRecipient.style.display = "block";
