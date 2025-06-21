@@ -1156,16 +1156,27 @@
             document.getElementById("announcementMessage").value =
               announcement.message;
 
-            // Set recipient type
-            const recipientType = announcement.recipientType || "entire_parish";
+            // Determine recipient type based on which ID is set
+            let recipientType = "entire_parish";
+            if (announcement.kandaId) {
+              recipientType = "kanda";
+            } else if (announcement.groupId) {
+              recipientType = "community";
+            } else if (announcement.userId) {
+              recipientType = "individual";
+            } else if (announcement.parishId) {
+              recipientType = "entire_parish";
+            }
+
+            // Set the radio button
             document.querySelector(
               `input[name="recipientType"][value="${recipientType}"]`
             ).checked = true;
 
             // Handle recipient data if applicable
-            if (recipientType === "individual" && announcement.recipientId) {
+            if (recipientType === "individual" && announcement.userId) {
               selectedRecipientData = {
-                id: announcement.recipientId,
+                id: announcement.userId,
                 name: announcement.recipientName || "Individual",
                 type: "user",
               };
@@ -1173,12 +1184,9 @@
               selectedRecipient.style.display = "block";
               recipientSearchGroup.style.display = "block";
               recipientSearchLabel.textContent = "Search Individual";
-            } else if (
-              recipientType === "community" &&
-              announcement.communityId
-            ) {
+            } else if (recipientType === "community" && announcement.groupId) {
               selectedRecipientData = {
-                id: announcement.communityId,
+                id: announcement.groupId,
                 name: announcement.communityName || "Community",
                 type: "community",
               };
@@ -1186,6 +1194,16 @@
               selectedRecipient.style.display = "block";
               recipientSearchGroup.style.display = "block";
               recipientSearchLabel.textContent = "Search Community";
+            } else if (recipientType === "kanda" && announcement.kandaId) {
+              selectedRecipientData = {
+                id: announcement.kandaId,
+                name: announcement.kandaName || "Kanda",
+                type: "kanda",
+              };
+              selectedRecipientName.textContent = selectedRecipientData.name;
+              selectedRecipient.style.display = "block";
+              recipientSearchGroup.style.display = "block";
+              recipientSearchLabel.textContent = "Search Kanda";
             } else {
               selectedRecipientData = null;
               selectedRecipient.style.display = "none";
