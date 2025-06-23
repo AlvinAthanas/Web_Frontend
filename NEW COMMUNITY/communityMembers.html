@@ -72,6 +72,11 @@
       background-color: #2980b9;
     }
 
+    .btn-import {
+      background-color: #2ecc71;
+      color: white;
+    }
+
     .btn-icon {
       background: none;
       padding: 5px;
@@ -460,9 +465,14 @@
           </button>
           <h1 id="communityTitle">Community Members</h1>
         </div>
-        <button id="addMemberBtn" class="btn btn-primary">
-          <span class="material-icons-outlined">add</span> Add Member
-        </button>
+         <div class="|">
+           <button id="importMemberBtn" class="btn btn-import">
+            <span class="material-icons-outlined">add</span> Import Members
+                   </button>
+                   <button id="addMemberBtn" class="btn btn-primary">
+            <span class="material-icons-outlined">add</span> Add Member
+                   </button>
+         </div>
       </div>
       <div class="members-table-container">
         <div id="membersList">

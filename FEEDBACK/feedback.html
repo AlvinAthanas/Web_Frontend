@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../DASHBOARD/dashboard.css" />
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+
+    <!-- FullCalendar CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+    />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      /* padding: 20px; */
+    }
+
+    .container {
+      /* max-width: 1200px; */
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .stat-info span {
+      display: block;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .stat-info p {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1f2937;
+    }
+
+    .filters {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      padding: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    .filter-button {
+      padding: 8px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .filter-button:hover {
+      background: #2563eb;
+    }
+
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .feedback-card {
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: white;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+
+    .feedback-card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .feedback-type {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .type-complaint { background: #fee2e2; color: #dc2626; }
+    .type-suggestion { background: #dbeafe; color: #1d4ed8; }
+    .type-compliment { background: #dcfce7; color: #15803d; }
+    .type-general { background: #f3f4f6; color: #4b5563; }
+
+    .feedback-date {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .feedback-message {
+      color: #4b5563;
+      font-size: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .rating {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star {
+      width: 16px;
+      height: 16px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      color: #1f2937;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .modal-body p {
+      margin-bottom: 10px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .modal-body strong {
+      color: #1f2937;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .loading svg {
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    .no-feedback {
+      text-align: center;
+      color: #6b7280;
+      padding: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      h1 { font-size: 20px; }
+      .filter-grid { grid-template-columns: 1fr; }
+      .feedback-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+    <h1>Feedback Management</h1>
+    <p class="subtitle">Monitor and respond to user feedback to improve your church management system</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <svg class="stat-icon" fill="none" stroke="#3b82f6" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <div class="stat-info">
+          <span>Total Feedback</span>
+          <p id="total-feedback">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <svg class="stat-icon" fill="none" stroke="#22c55e" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <div class="stat-info">
+          <span>This Week</span>
+          <p id="this-week">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <svg class="stat-icon" fill="none" stroke="#f97316" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div class="stat-info">
+          <span>Pending Review</span>
+          <p id="pending">0</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label for="filter-type">Filter by Type</label>
+          <select id="filter-type">
+            <option value="All Types">All Types</option>
+            <option value="Suggestion">Suggestion</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Compliment">Compliment</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="date-range">Date Range</label>
+          <select id="date-range">
+            <option value="All Time">All Time</option>
+            <option value="Today">Today</option>
+            <option value="This Week">This Week</option>
+            <option value="This Month">This Month</option>
+            <option value="Last 3 Months">Last 3 Months</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="search">Search</label>
+          <input type="text" id="search" placeholder="Search feedback...">
+        </div>
+        <div class="filter-group">
+          <button class="filter-button" onclick="fetchFeedbacks()">Apply Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feedback-grid" id="feedback-grid">
+      <div class="loading" id="loading">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
+          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"/>
+        </svg>
+        Loading feedback...
+      </div>
+    </div>
+
+    <div class="modal" id="feedback-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Feedback Details</h2>
+          <button class="close-button" onclick="closeModal()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let feedbacks = [];
+
+    async function fetchFeedbacks() {
+      const loading = document.getElementById('loading');
+      loading.style.display = 'flex';
+      const grid = document.getElementById('feedback-grid');
+      grid.innerHTML = '';
+
+      try {
+        const filterType = document.getElementById('filter-type').value;
+        const dateRange = document.getElementById('date-range').value;
+        const search = document.getElementById('search').value;
+
+        const response = await axios.get('/feedbacks', {
+          params: {
+            type: filterType !== 'All Types' ? filterType : undefined,
+            dateRange: dateRange !== 'All Time' ? dateRange : undefined,
+            search: search || undefined
+          }
+        });
+
+        feedbacks = response.data;
+        updateStats();
+        renderFeedbacks();
+      } catch (error) {
+        console.error('Error fetching feedbacks:', error);
+        grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    function updateStats() {
+      const total = feedbacks.length;
+      const thisWeek = feedbacks.filter(f => {
+        const date = new Date(f.createdAt);
+        const now = new Date();
+        const diff = (now - date) / (1000 * 60 * 60 * 24);
+        return diff <= 7;
+      }).length;
+      const avgRating = feedbacks.length
+        ? (feedbacks.reduce((sum, f) => sum + (f.rating || 0), 0) / feedbacks.length).toFixed(1)
+        : 0;
+      const pending = feedbacks.filter(f => f.status === 'PENDING').length;
+
+      document.getElementById('total-feedback').textContent = total;
+      document.getElementById('this-week').textContent = thisWeek;
+      document.getElementById('avg-rating').textContent = avgRating;
+      document.getElementById('pending').textContent = pending;
+    }
+
+    function renderFeedbacks() {
+      const grid = document.getElementById('feedback-grid');
+      grid.innerHTML = '';
+
+      if (feedbacks.length === 0) {
+        grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
+        return;
+      }
+
+      feedbacks.forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'feedback-card';
+        card.onclick = () => fetchFeedbackDetails(f.id);
+
+        const typeClass = `type-${f.type.toLowerCase()}`;
+        const ratingStars = f.rating ? Array(5).fill().map((_, i) => `
+          <svg class="star" fill="${i < f.rating ? '#eab308' : '#d1d5db'}" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+        `).join('') : '';
+
+        card.innerHTML = `
+          <div class="feedback-header">
+            <span class="feedback-type ${typeClass}">${f.type}</span>
+            <span class="feedback-date">${new Date(f.createdAt).toLocaleDateString()}</span>
+          </div>
+          <p class="feedback-message">${f.message}</p>
+          <div class="rating">${ratingStars}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    async function fetchFeedbackDetails(id) {
+      try {
+        const response = await axios.get(`/feedback/${id}`);
+        const f = response.data;
+        const modalBody = document.getElementById('modal-body');
+        modalBody.innerHTML = `
+          <p><strong>Type:</strong> ${f.type}</p>
+          <p><strong>Date:</strong> ${new Date(f.createdAt).toLocaleString()}</p>
+          <p><strong>Message:</strong> ${f.message}</p>
+          ${f.rating ? `<p><strong>Rating:</strong> ${f.rating} / 5</p>` : ''}
+          <p><strong>Status:</strong> ${f.status}</p>
+          ${f.user ? `<p><strong>Submitted by:</strong> ${f.user.name}</p>` : ''}
+        `;
+        document.getElement = document.querySelector('#feedback-modal')
+        document.getElementById('feedback-modal').style.display = 'flex';
+      } catch (error) {
+        console.error('Error fetching feedback details:', error);
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('feedback-modal').style.display = 'none';
+    }
+
+    // Initial load
+    fetchFeedbacks();
+  </script>
+</body>
+<script src="../GENERAL/script.js"></script>
+</html>

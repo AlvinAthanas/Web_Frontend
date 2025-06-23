@@ -15,6 +15,61 @@
   <!-- Styles -->
   <link rel="stylesheet" href="../GENERAL/style.css" />
   <link rel="stylesheet" href="community.css" />
+  <style>
+    /* Add these styles for the new buttons */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    .action-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .import-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .import-btn:hover {
+      background-color: #45a049;
+    }
+    .filter-btn {
+      background-color: #2196F3;
+      color: white;
+    }
+    .filter-btn:hover {
+      background-color: #0b7dda;
+    }
+    /* Style for the filter dropdown */
+    .filter-dropdown {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .filter-dropdown.show {
+      display: block;
+    }
+    .filter-dropdown input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 
 <body>
@@ -24,6 +79,27 @@
         <h2>Community List</h2>
         <input type="text" id="communityInput" placeholder="Enter community name" required>
         <button class="add-btn" onclick="addCommunity()">Add</button>
+        
+        <!-- Add these new action buttons -->
+        <div class="action-buttons">
+          <button class="action-btn import-btn" onclick="document.getElementById('fileInput').click()">
+            <span class="material-icons-outlined">upload</span>
+            Import
+          </button>
+          <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileImport(event)">
+          
+          <div style="position: relative;">
+            <button class="action-btn filter-btn" onclick="toggleFilterDropdown()">
+              <span class="material-icons-outlined">filter_alt</span>
+              Filter
+            </button>
+            <div id="filterDropdown" class="filter-dropdown">
+              <input type="text" id="kandaFilter" placeholder="Filter by Kanda name">
+              <button onclick="applyFilter()">Apply</button>
+            </div>
+          </div>
+        </div>
+        
         <ul class="community-list" id="communityList"></ul>
       </div>
     </main>
@@ -31,6 +107,7 @@
 
   <script>
     const apiUrl = "http://localhost:8080"; // adjust if needed
+    let allCommunities = []; // Store all communities for filtering
 
     // Fetch and display all communities
     async function fetchCommunities() {
@@ -41,8 +118,8 @@
             Authorization: `Bearer ${token}`
           }
         });
-        const communities = await response.json();
-        renderCommunityList(communities);
+        allCommunities = await response.json();
+        renderCommunityList(allCommunities);
       } catch (error) {
         console.error("Error fetching communities:", error);
       }
@@ -56,9 +133,8 @@
       communities.forEach((community) => {
         const li = document.createElement("li");
         const link = document.createElement("a");
-// Change this line in renderCommunityList():
-link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityName=${encodeURIComponent(community.name)}`;  
-      link.textContent = community.name;
+        link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityName=${encodeURIComponent(community.name)}`;  
+        link.textContent = community.name;
 
         const delButton = document.createElement("button");
         delButton.textContent = "Delete";
@@ -187,6 +263,52 @@ link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityNa
       }
 
       input.focus();
+    }
+
+    // New function to handle file import
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Here you would implement Excel file parsing
+      // For now, just show an alert
+      alert(`Selected file: ${file.name}\n\nExcel import functionality would be implemented here.`);
+      
+      // Reset the file input
+      event.target.value = '';
+    }
+
+    // New function to toggle filter dropdown
+    function toggleFilterDropdown() {
+      const dropdown = document.getElementById("filterDropdown");
+      dropdown.classList.toggle("show");
+    }
+
+    // New function to apply filter
+    function applyFilter() {
+      const filterValue = document.getElementById("kandaFilter").value.toLowerCase();
+      if (!filterValue) {
+        renderCommunityList(allCommunities);
+      } else {
+        const filtered = allCommunities.filter(community => 
+          community.name.toLowerCase().includes(filterValue)
+        );
+        renderCommunityList(filtered);
+      }
+      document.getElementById("filterDropdown").classList.remove("show");
+    }
+
+    // Close the filter dropdown if clicked outside
+    window.onclick = function(event) {
+      if (!event.target.matches('.filter-btn')) {
+        const dropdowns = document.getElementsByClassName("filter-dropdown");
+        for (let i = 0; i < dropdowns.length; i++) {
+          const openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
     }
 
     // Initial load

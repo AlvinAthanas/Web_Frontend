@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Church Sacraments</title>
+    <title>Baptism Participants</title>
 
     <!-- Montserrat Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,243 +24,341 @@
     <link rel="stylesheet" href="sacraments.css" />
   </head>
   <body>
-    <style>
-      .session-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 28px;
-        background: #f8fafc;
-        border-radius: 10px;
-        padding: 14px 20px;
-        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
-      }
-      .session-nav {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .session-arrow {
-        background: #eaf1fb;
-        border: none;
-        border-radius: 50%;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s;
-        font-size: 1.5rem;
-        color: #3498db;
-      }
-      .session-arrow:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .session-arrow:hover:not(:disabled) {
-        background: #d6eaff;
-      }
-      .session-dates {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1.08rem;
-        font-weight: 500;
-        color: #2c3e50;
-      }
-      .session-dates input[type="date"] {
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        padding: 5px 10px;
-        font-size: 1rem;
-        background: #fff;
-        color: #2c3e50;
-        outline: none;
-        transition: border 0.2s;
-      }
-      .session-dates input[type="date"]:focus {
-        border: 1.5px solid #3498db;
-      }
-      .new-session-btn {
-        background: #27ae60;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 9px 20px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(39, 174, 96, 0.08);
-        transition: background 0.2s, box-shadow 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-      }
-      .new-session-btn:hover {
-        background: #219150;
-        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.13);
-      }
-      @media (max-width: 600px) {
-        .session-header {
-          flex-direction: column;
-          align-items: stretch;
-          gap: 12px;
-          padding: 10px 6px;
-        }
-        .new-session-btn {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-    </style>
-    <div class="session-header">
-      <div class="session-nav">
-        <button
-          class="session-arrow"
-          id="prevSessionBtn"
-          title="Previous Session"
-        >
-          <span class="material-icons-outlined">chevron_left</span>
-        </button>
-        <div class="session-dates">
-          <input type="date" id="startDate" />
-          <span style="font-size: 1.2rem; color: #95a5a6">&#8212;</span>
-          <input type="date" id="endDate" />
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <!-- Add Session Header Here -->
+        <style>
+          .session-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px 20px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+          }
+          .session-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          .session-arrow {
+            background: #eaf1fb;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1.5rem;
+            color: #3498db;
+          }
+          .session-arrow:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+          .session-arrow:hover:not(:disabled) {
+            background: #d6eaff;
+          }
+          .session-dates {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            color: #2c3e50;
+          }
+          .session-dates input[type="date"] {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 1rem;
+            background: #fff;
+            color: #2c3e50;
+            outline: none;
+            transition: border 0.2s;
+          }
+          .session-dates input[type="date"]:focus {
+            border: 1.5px solid #3498db;
+          }
+          .new-session-btn {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(39, 174, 96, 0.08);
+            transition: background 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+          }
+          .new-session-btn:hover {
+            background: #219150;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.13);
+          }
+          @media (max-width: 600px) {
+            .session-header {
+              flex-direction: column;
+              align-items: stretch;
+              gap: 12px;
+              padding: 10px 6px;
+            }
+            .new-session-btn {
+              width: 100%;
+              justify-content: center;
+            }
+          }
+          .dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.13);
+            min-width: 320px;
+            max-width: 95vw;
+            padding: 24px 20px;
+            display: none;
+          }
+          .dialog.active {
+            display: block;
+          }
+          .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44, 62, 80, 0.18);
+            z-index: 1000;
+            display: none;
+          }
+          .overlay.active {
+            display: block;
+          }
+        </style>
+        <div class="session-header">
+          <div class="session-nav">
+            <button
+              class="session-arrow"
+              id="prevSessionBtn"
+              title="Previous Session"
+            >
+              <span class="material-icons-outlined">chevron_left</span>
+            </button>
+            <div class="session-dates">
+              <input type="date" id="startDate" />
+              <span style="font-size: 1.2rem; color: #95a5a6">&#8212;</span>
+              <input type="date" id="endDate" />
+            </div>
+            <button
+              class="session-arrow"
+              id="nextSessionBtn"
+              title="Next Session"
+            >
+              <span class="material-icons-outlined">chevron_right</span>
+            </button>
+          </div>
+          <button class="new-session-btn" id="newSessionBtn">
+            <span class="material-icons-outlined" style="font-size: 1.2rem"
+              >add_circle</span
+            >
+            New Batch
+          </button>
         </div>
-        <button class="session-arrow" id="nextSessionBtn" title="Next Session">
-          <span class="material-icons-outlined">chevron_right</span>
+
+        <div class="baptism-container">
+          <a href="sacraments.html" class="back-link">
+            <span class="material-icons-outlined">arrow_back</span>
+            Back to Sacraments
+          </a>
+
+          <h1 class="main-title">Baptism Participants</h1>
+
+          <div class="tab-container">
+            <div class="tab active" data-tab="training">
+              In Training (<span id="training-count">0</span>)
+            </div>
+            <div class="tab" data-tab="completed">
+              Completed (<span id="completed-count">0</span>)
+            </div>
+            <button class="add-member-btn" id="addMemberBtn">
+              <span class="material-icons-outlined">person_add</span>
+              Add Member
+            </button>
+          </div>
+
+          <!-- In Training Tab Content -->
+          <div class="tab-content active" id="training-content">
+            <div class="participant-count">
+              <span id="training-count-display">0</span> Participants
+            </div>
+            <ul class="participant-list" id="training-list"></ul>
+          </div>
+
+          <!-- Completed Tab Content -->
+          <div class="tab-content" id="completed-content">
+            <div class="participant-count">
+              <span id="completed-count-display">0</span> Participants
+            </div>
+            <ul class="participant-list" id="completed-list"></ul>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Search Dialog -->
+    <!-- Enhanced Search Dialog with both Search and Add New Member functionality -->
+    <div id="overlay" class="overlay"></div>
+
+    <div id="searchDialog" class="dialog">
+      <div class="dialog-header">
+        <h3>Add Member</h3>
+        <button id="closeDialogBtn" class="close-btn">
+          <span class="material-icons-outlined">close</span>
         </button>
       </div>
-      <button class="new-session-btn" id="newSessionBtn">
-        <span class="material-icons-outlined" style="font-size: 1.2rem"
-          >add_circle</span
-        >
-        New Session
-      </button>
-    </div>
-    <div class="communion-container">
-      <a href="sacraments.html" class="back-link">
-        <span class="material-icons-outlined">arrow_back</span>
-        Back to Sacraments
-      </a>
-      <h1 class="main-title">Baptism Participants</h1>
 
-      <div class="tab-container">
-        <div class="tab active" data-tab="training">
-          In Preparation (<span id="training-count">0</span>)
-        </div>
-        <div class="tab" data-tab="completed">
-          Baptized (<span id="completed-count">0</span>)
-        </div>
-        <button id="addMemberBtn" class="add-member-btn">
+      <!-- Dialog Tabs -->
+      <div class="dialog-tabs">
+        <button id="searchTab" class="dialog-tab active" data-tab="search">
+          <span class="material-icons-outlined">search</span>
+          Search Members
+        </button>
+        <button id="addTab" class="dialog-tab" data-tab="add">
           <span class="material-icons-outlined">person_add</span>
-          Add Candidate
+          Add New Member
         </button>
       </div>
 
-      <div id="training-content" class="tab-content active">
-        <div class="participant-count">
-          <span id="training-count-display">0</span> Candidates
-        </div>
-        <ul id="training-list" class="participant-list"></ul>
-      </div>
-
-      <div id="completed-content" class="tab-content">
-        <div class="participant-count">
-          <span id="completed-count-display">0</span> Baptized
-        </div>
-        <ul id="completed-list" class="participant-list"></ul>
-      </div>
-
-      <div id="overlay" class="overlay"></div>
-      <div id="searchDialog" class="search-dialog">
-        <div class="search-dialog-header">
-          <h2 class="search-dialog-title">Add Member</h2>
-          <button id="closeDialogBtn" class="close-dialog-btn">&times;</button>
-        </div>
-
-        <div class="dialog-tabs">
-          <button id="searchTab" class="dialog-tab active">
+      <!-- Search Content -->
+      <div id="searchContent" class="dialog-content active">
+        <form id="searchForm" class="search-form">
+          <div class="search-input-group">
             <span class="material-icons-outlined">search</span>
-            Search Members
-          </button>
-          <button id="addTab" class="dialog-tab">
-            <span class="material-icons-outlined">person_add</span>
-            Add New Member
-          </button>
-        </div>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name..."
+              autocomplete="off"
+            />
+          </div>
+        </form>
+        <div id="searchResults" class="search-results"></div>
+      </div>
 
-        <div id="searchContent" class="dialog-content active">
-          <form id="searchForm" class="search-form">
-            <div class="search-input-group">
-              <span class="material-icons-outlined">search</span>
-              <input
-                type="text"
-                id="searchInput"
-                class="search-input"
-                placeholder="Search by name..."
-              />
-            </div>
-            <button type="submit" class="search-btn">Search</button>
-          </form>
-          <div id="searchResults" class="search-results"></div>
-        </div>
-
-        <div id="addContent" class="dialog-content">
-          <form id="addMemberForm" class="add-member-form">
-            <div class="form-group">
-              <label for="newMemberName">Full Name</label>
-              <input
-                type="text"
-                id="newMemberName"
-                placeholder="Enter full name"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="newMemberEmail">Email Address</label>
-              <input
-                type="email"
-                id="newMemberEmail"
-                placeholder="Enter email address"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="newMemberPhone">Phone Number</label>
-              <input
-                type="tel"
-                id="newMemberPhone"
-                placeholder="Enter phone number"
-                required
-              />
-            </div>
-            <div class="form-actions">
-              <button
-                type="button"
-                class="btn-secondary"
-                onclick="document.getElementById('addMemberForm').reset()"
-              >
-                Cancel
-              </button>
-              <button type="submit" class="btn-primary">
-                <span class="material-icons-outlined">person_add</span>
-                Add Member
-              </button>
-            </div>
-          </form>
-        </div>
+      <!-- Add New Member Content -->
+      <div id="addContent" class="dialog-content">
+        <form id="addMemberForm" class="add-member-form">
+          <div class="form-group">
+            <label for="newMemberName">Full Name</label>
+            <input
+              type="text"
+              id="newMemberName"
+              name="fullName"
+              required
+              placeholder="Enter full name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="newMemberGender">Gender</label>
+            <select id="newMemberGender" name="gender" required>
+              <option value="">Select gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="newMemberPhone">Phone Number</label>
+            <input
+              type="tel"
+              id="newMemberPhone"
+              name="phoneNumber"
+              required
+              placeholder="Enter phone number"
+            />
+          </div>
+          <div class="form-group">
+            <label for="newMemberGuardian">Guardian Name</label>
+            <input
+              type="text"
+              id="newMemberGuardian"
+              name="guardianName"
+              placeholder="Enter guardian name"
+            />
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="closeSearchDialog()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary">
+              <span class="material-icons-outlined">person_add</span>
+              Add Member
+            </button>
+          </div>
+        </form>
       </div>
     </div>
+
+    <!-- New Session Dialog -->
+    <div id="newSessionDialog" class="dialog">
+      <div class="dialog-header">
+        <h3>New Batch</h3>
+        <button id="closeNewSessionDialogBtn" class="close-btn">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <form id="newSessionForm" class="add-member-form">
+        <div class="form-group">
+          <label for="newSessionStartDate">Start Date</label>
+          <input
+            type="date"
+            id="newSessionStartDate"
+            name="startDate"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="newSessionEndDate">End Date</label>
+          <input type="date" id="newSessionEndDate" name="endDate" required />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="cancelNewSessionBtn">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary">
+            <span class="material-icons-outlined">add_circle</span>
+            Create Batch
+          </button>
+        </div>
+      </form>
+    </div>
+
     <script src="sacraments.js"></script>
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initSacramentPage("BAPTISM");
+        loadAndDisplayCandidatesForSession();
+      });
+    </script>
+    <script src="../GENERAL/script.js"></script>
+    <script>
       // Session navigation logic
-      let sessions = [
-        { start: "2025-01-01", end: "2025-03-31" },
-        { start: "2025-04-01", end: "2025-06-30" },
-        { start: "2025-07-01", end: "2025-09-30" },
-      ];
+      let sessions = [];
       let currentSession = 0;
 
       const startDateInput = document.getElementById("startDate");
@@ -269,10 +367,46 @@
       const nextBtn = document.getElementById("nextSessionBtn");
       const newSessionBtn = document.getElementById("newSessionBtn");
 
+      // Helper: Get SacramentType for this page (must match backend enum)
+      function getSacramentType() {
+        return "BAPTISM";
+      }
+
+      // Fetch sessions from backend and initialize UI
+      async function fetchSessionsAndInit() {
+        const jwt = localStorage.getItem("authToken");
+        try {
+          const response = await fetch(
+            `http://localhost:8080/sacrament/sessions?type=${getSacramentType()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${jwt}`,
+              },
+            }
+          );
+          if (!response.ok) throw new Error("Failed to fetch sessions");
+          const data = await response.json();
+          // Map to {start, end} for UI
+          sessions = data.map((s) => ({
+            start: s.startDate,
+            end: s.completionDate,
+          }));
+          currentSession = 0;
+          updateSessionFields();
+          loadAndDisplayCandidatesForSession();
+        } catch (err) {
+          sessions = [];
+          updateSessionFields();
+          loadAndDisplayCandidatesForSession();
+        }
+      }
+
       function updateSessionFields() {
         if (sessions.length === 0) {
           startDateInput.value = "";
           endDateInput.value = "";
+          startDateInput.placeholder = "Start Date";
+          endDateInput.placeholder = "End Date";
           startDateInput.disabled = true;
           endDateInput.disabled = true;
           prevBtn.disabled = true;
@@ -288,39 +422,204 @@
       }
 
       startDateInput.addEventListener("change", () => {
-        sessions[currentSession].start = startDateInput.value;
+        if (sessions.length > 0)
+          sessions[currentSession].start = startDateInput.value;
       });
       endDateInput.addEventListener("change", () => {
-        sessions[currentSession].end = endDateInput.value;
+        if (sessions.length > 0)
+          sessions[currentSession].end = endDateInput.value;
       });
       prevBtn.addEventListener("click", () => {
         if (currentSession > 0) {
           currentSession--;
           updateSessionFields();
+          loadAndDisplayCandidatesForSession();
         }
       });
       nextBtn.addEventListener("click", () => {
         if (currentSession < sessions.length - 1) {
           currentSession++;
           updateSessionFields();
+          loadAndDisplayCandidatesForSession();
         }
       });
+
+      // --- New Session Dialog Logic ---
+      const newSessionDialog = document.getElementById("newSessionDialog");
+      const closeNewSessionDialogBtn = document.getElementById(
+        "closeNewSessionDialogBtn"
+      );
+      const cancelNewSessionBtn = document.getElementById(
+        "cancelNewSessionBtn"
+      );
+      const newSessionForm = document.getElementById("newSessionForm");
+      const newSessionStartDate = document.getElementById(
+        "newSessionStartDate"
+      );
+      const newSessionEndDate = document.getElementById("newSessionEndDate");
+
+      // Dialog helpers
+      function showDialog(dialog) {
+        document
+          .querySelectorAll(".dialog")
+          .forEach((d) => d.classList.remove("active"));
+        dialog.classList.add("active");
+        document.getElementById("overlay").classList.add("active");
+      }
+      function hideDialogs() {
+        document
+          .querySelectorAll(".dialog")
+          .forEach((d) => d.classList.remove("active"));
+        document.getElementById("overlay").classList.remove("active");
+      }
+
+      // Show dialog on New Session button click
       newSessionBtn.addEventListener("click", () => {
-        const today = new Date().toISOString().slice(0, 10);
-        sessions.push({ start: today, end: today });
-        currentSession = sessions.length - 1;
-        updateSessionFields();
-        startDateInput.focus();
+        newSessionStartDate.value = "";
+        newSessionEndDate.value = "";
+        showDialog(newSessionDialog);
+        newSessionStartDate.focus();
       });
+
+      closeNewSessionDialogBtn.addEventListener("click", hideDialogs);
+      cancelNewSessionBtn.addEventListener("click", hideDialogs);
+
+      // Show member dialog
+      document
+        .getElementById("addMemberBtn")
+        .addEventListener("click", function () {
+          showDialog(document.getElementById("searchDialog"));
+        });
+      document
+        .getElementById("closeDialogBtn")
+        .addEventListener("click", hideDialogs);
+
+      // Hide dialogs if overlay is clicked
+      document.getElementById("overlay").addEventListener("click", hideDialogs);
+
+      // Submit new session to backend
+      newSessionForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const startDate = newSessionStartDate.value;
+        const endDate = newSessionEndDate.value;
+        if (!startDate || !endDate) return;
+
+        const sacramentType = getSacramentType();
+        const jwt = localStorage.getItem("authToken");
+
+        const payload = {
+          sacramentType,
+          startDate,
+          completionDate: endDate,
+          registrationDate: startDate,
+        };
+
+        try {
+          const response = await fetch("http://localhost:8080/sacrament", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) throw new Error("Failed to create session");
+          hideDialogs();
+          await fetchSessionsAndInit(); // Refresh sessions after creation
+        } catch (err) {
+          alert("Could not create session. Please try again.");
+        }
+      });
+
+      // Helper: Get current session's start and end date
+      function getCurrentSessionDates() {
+        return sessions.length > 0
+          ? {
+              startDate: sessions[currentSession].start,
+              completionDate: sessions[currentSession].end,
+            }
+          : { startDate: "", completionDate: "" };
+      }
+
+      // Add Member Form Submission
+      document
+        .getElementById("addMemberForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Gather form data
+          const fullName = document.getElementById("newMemberName").value;
+          let gender = document.getElementById("newMemberGender").value;
+          const phoneNumber = document.getElementById("newMemberPhone").value;
+          const guardianName =
+            document.getElementById("newMemberGuardian").value;
+          const jwt = localStorage.getItem("authToken");
+
+          // Ensure gender is "Male" or "Female"
+          if (gender === "MALE") gender = "Male";
+          else if (gender === "FEMALE") gender = "Female";
+          else gender = "";
+
+          // If searching for an existing user, fill these from selection and set userId
+          // For new member, userId is left blank
+          let userId = null;
+          // If you have a variable like selectedUser, set userId = selectedUser.id and fill other fields from selectedUser
+
+          // Build candidate command
+          const candidatePayload = {
+            fullName,
+            gender,
+            phoneNumber,
+            guardianName: guardianName || undefined,
+            userId: userId || undefined,
+          };
+
+          try {
+            // 1. Create candidate
+            const candidateRes = await fetch(
+              "http://localhost:8080/sacrament/candidate",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${jwt}`,
+                },
+                body: JSON.stringify(candidatePayload),
+              }
+            );
+            if (!candidateRes.ok) throw new Error("Failed to add candidate");
+            const candidate = await candidateRes.json();
+
+            // 2. Register candidate for this sacrament
+            const { startDate, completionDate } = getCurrentSessionDates();
+            const registrationPayload = {
+              userId: candidate.id,
+              sacramentType: getSacramentType(),
+              registrationDate: new Date().toISOString().slice(0, 10),
+              startDate,
+              completionDate,
+            };
+            const regRes = await fetch("http://localhost:8080/sacrament", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwt}`,
+              },
+              body: JSON.stringify(registrationPayload),
+            });
+            if (!regRes.ok)
+              throw new Error("Failed to register candidate for sacrament");
+
+            // Success: close dialog, refresh participants if needed
+            hideDialogs();
+            // Optionally, refresh participant list here
+          } catch (err) {
+            alert("Could not add member. Please try again.");
+          }
+        });
 
       // Initialize on load
-      updateSessionFields();
-
-      document.addEventListener("DOMContentLoaded", function () {
-        initSacramentPage("baptism");
-      });
+      fetchSessionsAndInit();
     </script>
-
-    <script src="../GENERAL/script.js"></script>
   </body>
 </html>

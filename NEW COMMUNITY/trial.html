@@ -273,6 +273,16 @@
             <p>Track member attendance records</p>
             <button class="card-button">Manage Attendance</button>
           </div>
+
+          <!-- Announcements Card -->
+          <div class="option-card" id="announcements-card">
+            <div class="card-icon">
+              <span class="material-icons-outlined">campaign</span>
+            </div>
+            <h2>Announcements</h2>
+            <p>Create and manage community announcements</p>
+            <button class="card-button">Manage Announcements</button>
+          </div>
         </div>
 
         <!-- Content area that will change based on selection -->
@@ -321,6 +331,7 @@ function updateCommunityHeader() {
         const membersCard = document.getElementById("members-card");
         const contributionsCard = document.getElementById("contributions-card");
         const attendanceCard = document.getElementById("attendance-card");
+        const announcementsCard = document.getElementById("announcements-card");
         const dynamicContent = document.getElementById("dynamic-content");
 
         // Function to load content based on selection
@@ -376,6 +387,9 @@ function updateCommunityHeader() {
         );
         attendanceCard.addEventListener('click', () => {
   window.location.href = `attendance.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+});
+        announcementsCard.addEventListener('click', () => {
+  window.location.href = `announcements.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
 });
       // });
     </script>

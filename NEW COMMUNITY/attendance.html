@@ -43,17 +43,10 @@
       background-color: #f5f7fa;
       color: var(--text-color);
       line-height: 1.6;
-      padding: 20px;
+      /* padding: 20px; */
     }
     
-    .container {
-      /* max-width: 1200px; */
-      margin: 0 auto;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
+   
     
     /* Header */
     .header {
@@ -228,8 +221,8 @@
 </head>
 
 <body>
-  <div class="container">
-    <!-- Header with back button and community name -->
+ <div class="grid-container" id="containerId">
+    <main class="main-container">    <!-- Header with back button and community name -->
     <div class="header">
       <button class="back-btn" onclick="window.history.back()">
         <span class="material-icons-outlined">arrow_back</span>
@@ -260,6 +253,8 @@
       </table>
     </div>
   </div>
+</main>
+</div>
 
   <script>
     // Get URL parameters
