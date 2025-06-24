@@ -147,41 +147,43 @@
             display: block;
           }
         </style>
-        <div class="session-header">
-          <div class="session-nav">
-            <button
-              class="session-arrow"
-              id="prevSessionBtn"
-              title="Previous Session"
-            >
-              <span class="material-icons-outlined">chevron_left</span>
-            </button>
-            <div class="session-dates">
-              <input type="date" id="startDate" />
-              <span style="font-size: 1.2rem; color: #95a5a6">&#8212;</span>
-              <input type="date" id="endDate" />
-            </div>
-            <button
-              class="session-arrow"
-              id="nextSessionBtn"
-              title="Next Session"
-            >
-              <span class="material-icons-outlined">chevron_right</span>
-            </button>
-          </div>
-          <button class="new-session-btn" id="newSessionBtn">
-            <span class="material-icons-outlined" style="font-size: 1.2rem"
-              >add_circle</span
-            >
-            New Batch
-          </button>
-        </div>
 
         <div class="preaching-container">
           <a href="sacraments.html" class="back-link">
             <span class="material-icons-outlined">arrow_back</span>
             Back to Sacraments
           </a>
+
+          <!-- Move the session header here, below the back-link -->
+          <div class="session-header">
+            <div class="session-nav">
+              <button
+                class="session-arrow"
+                id="prevSessionBtn"
+                title="Previous Session"
+              >
+                <span class="material-icons-outlined">chevron_left</span>
+              </button>
+              <div class="session-dates">
+                <input type="date" id="startDate" />
+                <span style="font-size: 1.2rem; color: #95a5a6">&#8212;</span>
+                <input type="date" id="endDate" />
+              </div>
+              <button
+                class="session-arrow"
+                id="nextSessionBtn"
+                title="Next Session"
+              >
+                <span class="material-icons-outlined">chevron_right</span>
+              </button>
+            </div>
+            <button class="new-session-btn" id="newSessionBtn">
+              <span class="material-icons-outlined" style="font-size: 1.2rem"
+                >add_circle</span
+              >
+              New Batch
+            </button>
+          </div>
 
           <h1 class="main-title">Preaching Participants</h1>
 
