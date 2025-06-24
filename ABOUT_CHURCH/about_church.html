@@ -420,7 +420,7 @@
                       text-decoration: none;
                     "
                   >
-                    <img src="facebook.png" alt="">
+                    <img src="facebook.png" alt="" />
                     <div style="font-size: 12px">Facebook</div>
                   </a>
                   <a
@@ -433,7 +433,7 @@
                       text-decoration: none;
                     "
                   >
-                   <img src="twitter.png" alt="">
+                    <img src="twitter.png" alt="" />
                     <div style="font-size: 12px">Twitter</div>
                   </a>
                   <a
@@ -446,7 +446,7 @@
                       text-decoration: none;
                     "
                   >
-                  <img src="instagram.png" alt="">
+                    <img src="instagram.png" alt="" />
                     <div style="font-size: 12px">Instagram</div>
                   </a>
                 </div>
@@ -510,13 +510,15 @@
         document.getElementById("viewCity").textContent = data.city || "N/A";
         document.getElementById("viewRegion").textContent =
           data.region || "N/A";
-        document.getElementById("viewLocation").textContent =
-          data.location || "N/A";
-        document.getElementById("viewContactInfo").textContent =
-          data.contactInfo || "N/A";
+        // REMOVE or comment out these lines:
+        // document.getElementById("viewLocation").textContent =
+        //   data.location || "N/A";
+        // document.getElementById("viewContactInfo").textContent =
+        //   data.contactInfo || "N/A";
 
         // Facebook
         const facebookLink = document.getElementById("viewFacebook");
+        console.log("Setting Facebook link to:", data.facebookLink);
         if (data.facebookLink) {
           facebookLink.href = data.facebookLink;
           facebookLink.style.display = "";
@@ -526,6 +528,7 @@
 
         // Twitter
         const twitterLink = document.getElementById("viewTwitter");
+        console.log("Setting Twitter link to:", data.twitterLink);
         if (data.twitterLink) {
           twitterLink.href = data.twitterLink;
           twitterLink.style.display = "";
@@ -535,6 +538,7 @@
 
         // Instagram
         const instagramLink = document.getElementById("viewInstagram");
+        console.log("Setting Instagram link to:", data.instagramLink);
         if (data.instagramLink) {
           instagramLink.href = data.instagramLink;
           instagramLink.style.display = "";
@@ -697,8 +701,28 @@
         }
       });
 
+      // Helper function to upload parish image
+      async function uploadParishImage(parishId, file) {
+        const formData = new FormData();
+        formData.append("imageFile", file);
+
+        const response = await fetch(
+          `http://localhost:8080/parish/${parishId}/upload-image`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + getAuthToken(),
+            },
+            body: formData,
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to upload image");
+        return await response.text(); // or .json() if your backend returns JSON
+      }
+
       // Form Submission
-      churchProfileForm.addEventListener("submit", function (e) {
+      churchProfileForm.addEventListener("submit", async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
@@ -707,39 +731,32 @@
         const parishUpdate = {
           name: data.churchName,
           history: data.churchHistory,
-          phoneNumber: data.phoneNumber,
+          parishPhoneNumber: data.phoneNumber,
           email: data.email,
           poBox: data.poBox,
           street: data.street,
           city: data.city,
           region: data.region,
-          facebook: data.facebook,
-          twitter: data.twitter,
-          instagram: data.instagram,
+          facebookLink: data.facebook,
+          twitterLink: data.twitter,
+          instagramLink: data.instagram,
           image: churchData && churchData.image, // default to existing image
         };
 
-        function finalizeAndSave(imageData) {
-          parishUpdate.image = imageData;
-          saveParishToServer(parishId, parishUpdate)
-            .then((savedData) => {
-              churchData = savedData;
-              showViewMode(savedData);
-              alert("Profile saved successfully!");
-              churchProfileForm.reset();
-              imagePreview.style.display = "none";
-            })
-            .catch(() => {});
-        }
-
-        if (churchImageInput.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            finalizeAndSave(e.target.result);
-          };
-          reader.readAsDataURL(churchImageInput.files[0]);
-        } else {
-          finalizeAndSave(churchData ? churchData.image : "");
+        try {
+          // Upload image if a new file is selected
+          if (churchImageInput.files[0]) {
+            await uploadParishImage(parishId, churchImageInput.files[0]);
+          }
+          // Save parish info (without image data, since image is handled separately)
+          const savedData = await saveParishToServer(parishId, parishUpdate);
+          churchData = savedData;
+          showViewMode(savedData);
+          alert("Profile saved successfully!");
+          churchProfileForm.reset();
+          imagePreview.style.display = "none";
+        } catch (error) {
+          alert("Error saving profile: " + error.message);
         }
       });
     </script>
