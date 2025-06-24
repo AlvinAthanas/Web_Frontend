@@ -180,6 +180,11 @@
     .type-suggestion { background: #dbeafe; color: #1d4ed8; }
     .type-compliment { background: #dcfce7; color: #15803d; }
     .type-general { background: #f3f4f6; color: #4b5563; }
+    .type-concern { background: #fef9c3; color: #b45309; }
+    .type-contribution { background: #e0e7ff; color: #3730a3; }
+    .type-praise { background: #f0fdf4; color: #16a34a; }
+    .type-event { background: #f3e8ff; color: #7c3aed; }
+    .type-other { background: #f1f5f9; color: #334155; }
 
     .feedback-date {
       font-size: 12px;
@@ -327,10 +332,12 @@
           <label for="filter-type">Filter by Type</label>
           <select id="filter-type">
             <option value="All Types">All Types</option>
-            <option value="Suggestion">Suggestion</option>
-            <option value="Complaint">Complaint</option>
-            <option value="Compliment">Compliment</option>
-            <option value="General">General</option>
+            <option value="CONCERN">Concern</option>
+            <option value="PRAISE">Praise</option>
+            <option value="SUGGESTION">Suggestion</option>
+            <option value="CONTRIBUTION">Contribution</option>
+            <option value="EVENT">Event</option>
+            <option value="OTHER">Other</option>
           </select>
         </div>
         <div class="filter-group">
@@ -348,7 +355,7 @@
           <input type="text" id="search" placeholder="Search feedback...">
         </div>
         <div class="filter-group">
-          <button class="filter-button" onclick="fetchFeedbacks()">Apply Filters</button>
+          <button class="filter-button" onclick="applyFilters()">Apply Filters</button>
         </div>
       </div>
     </div>
@@ -363,8 +370,8 @@
       </div>
     </div>
 
-    <div class="modal" id="feedback-modal">
-      <div class="modal-content">
+    <div class="modal" id="feedback-modal" onclick="closeModal()">
+      <div class="modal-content" onclick="event.stopPropagation();">
         <div class="modal-header">
           <h2>Feedback Details</h2>
           <button class="close-button" onclick="closeModal()">
@@ -378,7 +385,11 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    const BASE_URL = 'http://localhost:8080';
+
+    let allFeedbacks = [];
     let feedbacks = [];
 
     async function fetchFeedbacks() {
@@ -388,21 +399,15 @@
       grid.innerHTML = '';
 
       try {
-        const filterType = document.getElementById('filter-type').value;
-        const dateRange = document.getElementById('date-range').value;
-        const search = document.getElementById('search').value;
-
-        const response = await axios.get('/feedbacks', {
-          params: {
-            type: filterType !== 'All Types' ? filterType : undefined,
-            dateRange: dateRange !== 'All Time' ? dateRange : undefined,
-            search: search || undefined
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`${BASE_URL}/feedbacks`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
         });
-
-        feedbacks = response.data;
-        updateStats();
-        renderFeedbacks();
+        if (!response.ok) throw new Error('Network response was not ok');
+        allFeedbacks = await response.json();
+        applyFilters(); // Apply filters after fetching
       } catch (error) {
         console.error('Error fetching feedbacks:', error);
         grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
@@ -414,23 +419,23 @@
     function updateStats() {
       const total = feedbacks.length;
       const thisWeek = feedbacks.filter(f => {
-        const date = new Date(f.createdAt);
+        if (!f.date) return false;
+        const date = new Date(f.date);
         const now = new Date();
         const diff = (now - date) / (1000 * 60 * 60 * 24);
         return diff <= 7;
       }).length;
-      const avgRating = feedbacks.length
-        ? (feedbacks.reduce((sum, f) => sum + (f.rating || 0), 0) / feedbacks.length).toFixed(1)
-        : 0;
-      const pending = feedbacks.filter(f => f.status === 'PENDING').length;
+
+      // No rating or status in your backend, so set pending to 0
+      const pending = 0;
 
       document.getElementById('total-feedback').textContent = total;
       document.getElementById('this-week').textContent = thisWeek;
-      document.getElementById('avg-rating').textContent = avgRating;
       document.getElementById('pending').textContent = pending;
     }
 
     function renderFeedbacks() {
+      console.log('Rendering feedbacks:', feedbacks); // Add this line
       const grid = document.getElementById('feedback-grid');
       grid.innerHTML = '';
 
@@ -439,44 +444,83 @@
         return;
       }
 
+      // Map backend types to user-friendly labels and CSS classes
+      const typeLabels = {
+        CONCERN: 'Concern',
+        PRAISE: 'Praise',
+        SUGGESTION: 'Suggestion',
+        CONTRIBUTION: 'Contribution',
+        EVENT: 'Event',
+        OTHER: 'Other'
+      };
+      const typeClasses = {
+        CONCERN: 'type-concern',
+        PRAISE: 'type-praise',
+        SUGGESTION: 'type-suggestion',
+        CONTRIBUTION: 'type-contribution',
+        EVENT: 'type-event',
+        OTHER: 'type-other'
+      };
+
       feedbacks.forEach(f => {
         const card = document.createElement('div');
         card.className = 'feedback-card';
+
+        // Show details on click
         card.onclick = () => fetchFeedbackDetails(f.id);
 
-        const typeClass = `type-${f.type.toLowerCase()}`;
-        const ratingStars = f.rating ? Array(5).fill().map((_, i) => `
-          <svg class="star" fill="${i < f.rating ? '#eab308' : '#d1d5db'}" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-          </svg>
-        `).join('') : '';
+        const typeLabel = typeLabels[f.type] || f.type;
+        const typeClass = typeClasses[f.type] || 'type-general';
+        const dateStr = f.date ? new Date(f.date).toLocaleDateString() : 'No date';
 
         card.innerHTML = `
           <div class="feedback-header">
-            <span class="feedback-type ${typeClass}">${f.type}</span>
-            <span class="feedback-date">${new Date(f.createdAt).toLocaleDateString()}</span>
+            <span class="feedback-type ${typeClass}">${typeLabel}</span>
+            <span class="feedback-date">${dateStr}</span>
           </div>
           <p class="feedback-message">${f.message}</p>
-          <div class="rating">${ratingStars}</div>
+          <button class="filter-button" onclick="event.stopPropagation(); deleteFeedback(${f.id})">Delete</button>
         `;
         grid.appendChild(card);
       });
     }
 
+    // Delete feedback by id
+    async function deleteFeedback(id) {
+      if (!confirm('Are you sure you want to delete this feedback?')) return;
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`${BASE_URL}/feedback/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error('Delete failed');
+        fetchFeedbacks();
+      } catch (error) {
+        alert('Failed to delete feedback.');
+        console.error(error);
+      }
+    }
+
     async function fetchFeedbackDetails(id) {
       try {
-        const response = await axios.get(`/feedback/${id}`);
-        const f = response.data;
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`${BASE_URL}/feedback/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        const f = await response.json();
         const modalBody = document.getElementById('modal-body');
         modalBody.innerHTML = `
           <p><strong>Type:</strong> ${f.type}</p>
-          <p><strong>Date:</strong> ${new Date(f.createdAt).toLocaleString()}</p>
+          <p><strong>Date:</strong> ${f.date ? new Date(f.date).toLocaleString() : ''}</p>
           <p><strong>Message:</strong> ${f.message}</p>
-          ${f.rating ? `<p><strong>Rating:</strong> ${f.rating} / 5</p>` : ''}
-          <p><strong>Status:</strong> ${f.status}</p>
-          ${f.user ? `<p><strong>Submitted by:</strong> ${f.user.name}</p>` : ''}
+          ${f.email ? `<p><strong>Email:</strong> ${f.email}</p>` : ''}
         `;
-        document.getElement = document.querySelector('#feedback-modal')
         document.getElementById('feedback-modal').style.display = 'flex';
       } catch (error) {
         console.error('Error fetching feedback details:', error);
@@ -485,6 +529,51 @@
 
     function closeModal() {
       document.getElementById('feedback-modal').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    });
+
+    function applyFilters() {
+      const filterType = document.getElementById('filter-type').value;
+      const dateRange = document.getElementById('date-range').value;
+      const search = document.getElementById('search').value.toLowerCase();
+
+      feedbacks = allFeedbacks.filter(f => {
+        // Type filter
+        if (filterType !== 'All Types' && f.type !== filterType) return false;
+
+        // Date range filter
+        if (dateRange !== 'All Time' && f.date) {
+          const feedbackDate = new Date(f.date);
+          const now = new Date();
+          if (dateRange === 'Today' && feedbackDate.toDateString() !== now.toDateString()) return false;
+          if (dateRange === 'This Week') {
+            const diff = (now - feedbackDate) / (1000 * 60 * 60 * 24);
+            if (diff > 7) return false;
+          }
+          if (dateRange === 'This Month' && feedbackDate.getMonth() !== now.getMonth()) return false;
+          if (dateRange === 'Last 3 Months') {
+            const diff = (now - feedbackDate) / (1000 * 60 * 60 * 24);
+            if (diff > 90) return false;
+          }
+        }
+
+        // Search filter
+        if (search) {
+          const msg = (f.message || '').toLowerCase();
+          const email = (f.email || '').toLowerCase();
+          if (!msg.includes(search) && !email.includes(search)) return false;
+        }
+
+        return true;
+      });
+
+      updateStats();
+      renderFeedbacks();
     }
 
     // Initial load
