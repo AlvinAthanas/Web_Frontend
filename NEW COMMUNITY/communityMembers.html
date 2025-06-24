@@ -588,6 +588,37 @@
   <!-- Notification Container -->
   <div id="notificationContainer"></div>
 
+  <!-- Edit Member Modal -->
+  <div class="modal" id="editMemberModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Member</h2>
+        <button class="close-btn" id="closeEditMemberBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="editMemberForm">
+          <input type="hidden" id="editMemberId">
+          <div class="form-group">
+            <label for="editMemberName">Full Name</label>
+            <input type="text" id="editMemberName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editMemberEmail">Email</label>
+            <input type="email" id="editMemberEmail" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="editMemberPhone">Phone</label>
+            <input type="text" id="editMemberPhone" class="form-control">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn" id="cancelEditMemberBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Get community details from URL
@@ -629,6 +660,14 @@
       const cancelConfirmationBtn = document.getElementById("cancelConfirmationBtn");
       const confirmActionBtn = document.getElementById("confirmActionBtn");
       const contributionDate = document.getElementById("contributionDate");
+      const editMemberModal = document.getElementById("editMemberModal");
+      const closeEditMemberBtn = document.getElementById("closeEditMemberBtn");
+      const editMemberForm = document.getElementById("editMemberForm");
+      const editMemberId = document.getElementById("editMemberId");
+      const editMemberName = document.getElementById("editMemberName");
+      const editMemberEmail = document.getElementById("editMemberEmail");
+      const editMemberPhone = document.getElementById("editMemberPhone");
+      const cancelEditMemberBtn = document.getElementById("cancelEditMemberBtn");
 
       // Set default date to today
       const today = new Date();
@@ -688,6 +727,10 @@
         }
         confirmationDialog.classList.remove("active");
       });
+
+      closeEditMemberBtn.addEventListener("click", () => editMemberModal.classList.remove("active"));
+      cancelEditMemberBtn.addEventListener("click", () => editMemberModal.classList.remove("active"));
+      editMemberForm.addEventListener("submit", updateMember);
 
       // Initialize the page
       fetchCommunityMembers();
@@ -969,10 +1012,63 @@
 
       // Edit member
       function editMember(memberId) {
-        console.log('Editing member with ID:', memberId);
-        // TODO: Replace with your actual edit endpoint
-        // For now, show a notification that this feature is coming soon
-        showNotification("Edit member feature coming soon", "info");
+        // Fetch the actual member data from the backend
+        fetch(`http://localhost:8080/user?id=${memberId}`)
+          .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch member details');
+            return response.json();
+          })
+          .then(member => {
+            editMemberId.value = member.id || '';
+            editMemberName.value = member.name || '';
+            editMemberEmail.value = member.email || '';
+            editMemberPhone.value = member.phone || '';
+            editMemberModal.classList.add("active");
+          })
+          .catch(error => {
+            showNotification("Error loading member details", "error");
+          });
+      }
+
+      // Update member
+      function updateMember(event) {
+        event.preventDefault();
+
+        const memberId = editMemberId.value;
+        const name = editMemberName.value.trim();
+        const email = editMemberEmail.value.trim();
+        const phone = editMemberPhone.value.trim();
+
+        // Basic validation
+        if (!name) {
+          return showNotification("Name is required", "warning");
+        }
+
+        // Update member data
+        const updatedMember = {
+          id: memberId,
+          name: name,
+          email: email,
+          phone: phone
+        };
+
+        fetch(`http://localhost:8080/user/update`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedMember)
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to update member');
+          showNotification("Member updated successfully", "success");
+          editMemberModal.classList.remove("active");
+          fetchCommunityMembers(); // Refresh the member list
+        })
+        .catch(error => {
+          console.error("Error updating member:", error);
+          showNotification("Failed to update member", "error");
+        });
       }
 
       // Delete member
@@ -1161,9 +1257,8 @@
         });
       }
     });
-  </script>
+ 
 
-  <script src="../GENERAL/script.js"></script>
-  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93901d391f19b02f',t:'MTc0NjExMTI2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+  <scrip src="../GENERAL/script.js"></scrip>
 </body>
 </html>
