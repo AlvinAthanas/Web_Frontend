@@ -315,16 +315,20 @@
       }
 
       // This function is called from other pages when a new report is generated
-      function addNewReport(filename, type) {
+      function addNewReport(filename) {
         const reports = JSON.parse(localStorage.getItem("reports") || "[]");
-        
-        // Check if report already exists
+        // Determine type by file extension
+        let type = "";
+        if (filename.toLowerCase().endsWith(".pdf")) type = "PDF";
+        else if (filename.toLowerCase().endsWith(".xlsx") || filename.toLowerCase().endsWith(".xls")) type = "Excel";
+        else type = "Other";
+
+        // Prevent duplicates
         const exists = reports.some(report => report.filename === filename);
-        
         if (!exists) {
           reports.push({
             filename: filename,
-            type: type || (filename.includes('members') ? 'Members' : filename.includes('contributions') ? 'Contributions' : 'Other'),
+            type: type,
             date: new Date().toLocaleString()
           });
           localStorage.setItem("reports", JSON.stringify(reports));

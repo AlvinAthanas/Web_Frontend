@@ -252,14 +252,6 @@
         margin-bottom: 20px;
       }
 
-      .duration-fields {
-        display: none;
-        margin-top: 10px;
-        padding: 10px;
-        background-color: rgba(230, 242, 255, 0.3);
-        border-radius: 4px;
-      }
-
       /* Responsive styles */
       @media (max-width: 768px) {
         .events-header {
@@ -303,10 +295,6 @@
         <div class="events-header">
           <div class="main-title">Church Events</div>
           <div class="top">
-            <div class="import">
-              <button id="importBtn">Import</button>
-              <button id="exportPdfBtn">Export PDF</button>
-            </div>
             <button class="add-event-btn" id="openDialogBtn">
               <span class="material-icons-outlined">add</span>
               Add Event
@@ -340,30 +328,12 @@
             <input type="text" id="name" name="name" required />
           </div>
           <div class="form-group">
-            <label for="duration">Duration (days)</label>
-            <select id="duration" name="duration" required>
-              <option value="1">1 day</option>
-              <option value="2">2 days</option>
-              <option value="3">3 days</option>
-              <option value="4">4 days</option>
-              <option value="5">5 days</option>
-              <option value="6">6 days</option>
-              <option value="7">7 days</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="eventDate">Start Date</label>
+            <label for="eventDate">Date</label>
             <input type="date" id="eventDate" name="eventDate" required />
           </div>
           <div class="form-group">
-            <label for="eventTime">Start Time</label>
+            <label for="eventTime">Time</label>
             <input type="time" id="eventTime" name="eventTime" required />
-          </div>
-          <div id="endDateGroup" class="duration-fields">
-            <div class="form-group">
-              <label for="endDate">End Date</label>
-              <input type="date" id="endDate" name="endDate" />
-            </div>
           </div>
           <div class="form-group">
             <label for="location">Venue</label>
@@ -426,9 +396,6 @@
         const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
         const responseBox = document.getElementById("response");
         const dialogTitle = document.getElementById("dialogTitle");
-        const durationSelect = document.getElementById("duration");
-        const endDateGroup = document.getElementById("endDateGroup");
-        const endDateInput = document.getElementById("endDate");
 
         let editingId = null;
         let deleteEventId = null;
@@ -445,6 +412,15 @@
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay",
             },
+            // Highlight days with events
+            eventDidMount: function(info) {
+              // Add a background color to the day cell
+              const dateString = info.event.startStr.split("T")[0];
+              const dayCell = calendarEl.querySelector(`[data-date="${dateString}"]`);
+              if (dayCell) {
+                dayCell.style.backgroundColor = "#ffe0b2"; // light orange
+              }
+            },
             events: function (fetchInfo, successCallback, failureCallback) {
               fetch("http://localhost:8080/events", {
                 headers: {
@@ -459,38 +435,16 @@
                     (event) => event.description?.toLowerCase() !== "mass"
                   );
 
-                  const calendarEvents = filteredEvents.map((event) => {
-                    // Handle multi-day events
-                    if (event.duration > 1) {
-                      const startDate = new Date(event.dateTime);
-                      const endDate = new Date(startDate);
-                      endDate.setDate(endDate.getDate() + (event.duration - 1));
-
-                      return {
-                        id: event.id,
-                        title: event.name,
-                        start: event.dateTime,
-                        end: endDate.toISOString().split("T")[0],
-                        allDay: false,
-                        extendedProps: {
-                          description: event.description,
-                          location: event.location,
-                          duration: event.duration,
-                        },
-                      };
-                    } else {
-                      return {
-                        id: event.id,
-                        title: event.name,
-                        start: event.dateTime,
-                        extendedProps: {
-                          description: event.description,
-                          location: event.location,
-                          duration: event.duration || 1,
-                        },
-                      };
-                    }
-                  });
+                  const calendarEvents = filteredEvents.map((event) => ({
+                    id: event.id,
+                    title: event.name,
+                    start: event.dateTime,
+                    allDay: false,
+                    extendedProps: {
+                      description: event.description,
+                      location: event.location
+                    },
+                  }));
                   successCallback(calendarEvents);
                 })
                 .catch(failureCallback);
@@ -518,40 +472,6 @@
           calendar.render();
         }
 
-        // Duration selection handler
-        durationSelect.addEventListener("change", function () {
-          if (this.value > 1) {
-            endDateGroup.style.display = "block";
-            calculateEndDate();
-          } else {
-            endDateGroup.style.display = "none";
-          }
-        });
-
-        // Calculate end date based on duration
-        function calculateEndDate() {
-          const startDate = document.getElementById("eventDate").value;
-          const duration = parseInt(durationSelect.value);
-
-          if (startDate && duration > 1) {
-            const start = new Date(startDate);
-            const end = new Date(start);
-            end.setDate(start.getDate() + (duration - 1));
-
-            const endDateStr = end.toISOString().split("T")[0];
-            endDateInput.value = endDateStr;
-          }
-        }
-
-        // Update end date when start date changes
-        document
-          .getElementById("eventDate")
-          .addEventListener("change", function () {
-            if (durationSelect.value > 1) {
-              calculateEndDate();
-            }
-          });
-
         // Opening and closing the form dialog
         openDialogBtn.onclick = () => {
           eventForm.reset();
@@ -560,7 +480,6 @@
           editingId = null;
           responseBox.innerText = "";
           formDialog.style.display = "flex";
-          endDateGroup.style.display = "none";
 
           eventForm.removeEventListener("submit", handleUpdate);
           eventForm.addEventListener("submit", handleCreate);
@@ -701,21 +620,14 @@
           const location = eventForm.location.value;
           const date = eventForm.eventDate.value;
           const time = eventForm.eventTime.value;
-          const duration = parseInt(eventForm.duration.value);
           const dateTime = `${date}T${time}`;
 
           let data = {
             name,
             description,
             location,
-            dateTime,
-            duration,
+            dateTime
           };
-
-          // For multi-day events, include end date
-          if (duration > 1) {
-            data.endDate = eventForm.endDate.value;
-          }
 
           fetch("http://localhost:8080/event", {
             method: "POST",
@@ -746,21 +658,14 @@
           const location = eventForm.location.value;
           const date = eventForm.eventDate.value;
           const time = eventForm.eventTime.value;
-          const duration = parseInt(eventForm.duration.value);
           const dateTime = `${date}T${time}`;
 
           let data = {
             name,
             description,
             location,
-            dateTime,
-            duration,
+            dateTime
           };
-
-          // For multi-day events, include end date
-          if (duration > 1) {
-            data.endDate = eventForm.endDate.value;
-          }
 
           fetch(`http://localhost:8080/event/${editingId}`, {
             method: "PUT",
@@ -805,23 +710,6 @@
               const [date, time] = (data.dateTime || "").split("T");
               eventForm.eventDate.value = date || "";
               eventForm.eventTime.value = time || "";
-              eventForm.duration.value = data.duration || 1;
-
-              // Show end date fields if duration > 1
-              if (data.duration > 1) {
-                endDateGroup.style.display = "block";
-                if (data.endDate) {
-                  eventForm.endDate.value = data.endDate;
-                } else {
-                  // Calculate end date if not provided
-                  const startDate = new Date(data.dateTime);
-                  const endDate = new Date(startDate);
-                  endDate.setDate(endDate.getDate() + (data.duration - 1));
-                  eventForm.endDate.value = endDate.toISOString().split("T")[0];
-                }
-              } else {
-                endDateGroup.style.display = "none";
-              }
 
               eventForm.name.value = data.name;
               eventForm.description.value = data.description;
@@ -864,45 +752,6 @@
         cancelDeleteBtn.addEventListener("click", function () {
           deleteDialog.style.display = "none";
         });
-
-        // Export to PDF
-        document
-          .getElementById("exportPdfBtn")
-          .addEventListener("click", () => {
-            const { jsPDF } = window.jspdf;
-            const container = document.querySelector(".main-container");
-
-            // Hide buttons temporarily
-            const buttons = container.querySelectorAll("button");
-            buttons.forEach((btn) => (btn.style.display = "none"));
-
-            html2canvas(container, {
-              scale: 2,
-              useCORS: true,
-            }).then((canvas) => {
-              const imgData = canvas.toDataURL("image/png");
-              const pdf = new jsPDF("p", "mm", "a4");
-
-              const pageWidth = pdf.internal.pageSize.getWidth();
-              const imgProps = pdf.getImageProperties(imgData);
-              const pdfWidth = pageWidth - 20; // some margin
-              const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-              // Add image of the entire content
-              pdf.addImage(imgData, "PNG", 10, 10, pdfWidth, pdfHeight);
-              pdf.save("church-events.pdf");
-
-              // Show buttons again
-              buttons.forEach((btn) => (btn.style.display = ""));
-            });
-          });
-
-        // Import events handling
-        document
-          .getElementById("importBtn")
-          .addEventListener("click", function () {
-            alert("Import functionality is not implemented in this version.");
-          });
 
         // Auth token for API requests
         const authToken = localStorage.getItem("authToken");

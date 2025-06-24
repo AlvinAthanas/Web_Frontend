@@ -535,6 +535,27 @@
         }, 3000);
       }
 
+      // Add new report to localStorage (replace your current addNewReport function with this)
+      function addNewReport(filename) {
+        const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+        // Determine type by file extension
+        let type = "";
+        if (filename.toLowerCase().endsWith(".pdf")) type = "PDF";
+        else if (filename.toLowerCase().endsWith(".xlsx") || filename.toLowerCase().endsWith(".xls")) type = "Excel";
+        else type = "Other";
+
+        // Prevent duplicates
+        const exists = reports.some(report => report.filename === filename);
+        if (!exists) {
+          reports.push({
+            filename: filename,
+            type: type,
+            date: new Date().toLocaleString()
+          });
+          localStorage.setItem("reports", JSON.stringify(reports));
+        }
+      }
+
       // Export to Excel
       document.getElementById("exportExcelBtn").addEventListener("click", () => {
         try {
@@ -549,8 +570,8 @@
           const filename = "contributions-list.xlsx";
           XLSX.writeFile(wb, filename);
 
-          // Add to reports
-          addNewReport(filename, "Contributions");
+          // Add to reports (type will be "Excel")
+          addNewReport(filename);
 
           showMessage("Excel exported successfully!", "success");
         } catch (error) {
@@ -606,8 +627,8 @@
           const filename = "contributions-list.pdf";
           doc.save(filename);
 
-          // Add to reports
-          addNewReport(filename, "Contributions");
+          // Add to reports (type will be "PDF")
+          addNewReport(filename);
 
           showMessage("PDF exported successfully!", "success");
         } catch (error) {
@@ -616,22 +637,6 @@
         }
       });
 
-      // Add new report to localStorage
-      function addNewReport(filename, type) {
-        const reports = JSON.parse(localStorage.getItem("reports") || []);
-
-        // Check if report already exists
-        const exists = reports.some(report => report.filename === filename);
-
-        if (!exists) {
-          reports.push({
-            filename: filename,
-            type: type || (filename.includes('members') ? 'Members' : filename.includes('contributions') ? 'Contributions' : 'Other'),
-            date: new Date().toLocaleString()
-          });
-          localStorage.setItem("reports", JSON.stringify(reports));
-        }
-      }
     </script>
 
 <script src="../GENERAL/script.js"></script>
