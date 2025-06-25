@@ -469,6 +469,8 @@
     <!-- JavaScript for State Management, Image Preview, and Form Submission -->
     <script src="../GENERAL/script.js"></script>
     <script>
+        const backendBaseUrl = "http://10.44.184.245:8080";
+
       // State Management
       const emptyState = document.getElementById("emptyState");
       const editMode = document.getElementById("editMode");
@@ -494,8 +496,9 @@
         editMode.classList.add("hidden");
         viewMode.classList.remove("hidden");
 
-        document.getElementById("viewImage").src = data.imageUrl || "";
-        document.getElementById("viewChurchName").textContent =
+document.getElementById("viewImage").src = data.imageUrl 
+    ? backendBaseUrl + data.imageUrl.trim() 
+    : "";        document.getElementById("viewChurchName").textContent =
           data.name || "N/A";
         document.getElementById("viewParishPriest").textContent =
           data.parishPriest || "N/A";
@@ -573,10 +576,12 @@
             console.warn(`Element with id "${id}" not found`);
           }
         });
-        if (data.imageUrl && typeof imagePreview !== "undefined") {
-          imagePreview.src = data.imageUrl;
-          imagePreview.style.display = "block";
-        }
+
+if (data.imageUrl && typeof imagePreview !== "undefined") {
+    imagePreview.src = backendBaseUrl + data.imageUrl.trim();
+    imagePreview.style.display = "block";
+}
+
       }
 
       // Add Details Button
