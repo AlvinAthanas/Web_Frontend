@@ -700,7 +700,11 @@
 
         // Editing an event
         function editEvent(id) {
-          fetch(`http://localhost:8080/event/${id}`)
+          fetch(`http://localhost:8080/event/${id}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          })
             .then((res) => res.json())
             .then((data) => {
               editingId = id;

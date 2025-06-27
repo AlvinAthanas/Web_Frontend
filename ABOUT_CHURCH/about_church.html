@@ -469,7 +469,7 @@
     <!-- JavaScript for State Management, Image Preview, and Form Submission -->
     <script src="../GENERAL/script.js"></script>
     <script>
-        const backendBaseUrl = "http://10.44.184.245:8080";
+        const backendBaseUrl = "http://192.168.92.245:8080";
 
       // State Management
       const emptyState = document.getElementById("emptyState");
@@ -664,7 +664,10 @@ if (data.imageUrl && typeof imagePreview !== "undefined") {
             "http://localhost:8080/api/church-profile",
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + getAuthToken()
+               },
               body: JSON.stringify(data),
             }
           );
@@ -681,7 +684,12 @@ if (data.imageUrl && typeof imagePreview !== "undefined") {
         // Replace the URL and logic as needed
         try {
           const response = await fetch(
-            "http://localhost:8080/api/church-profile"
+            "http://localhost:8080/api/church-profile",
+            {
+              headers: {
+                Authorization: "Bearer " + getAuthToken(),
+              },
+            }
           );
           if (!response.ok) throw new Error("Failed to load profile");
           return await response.json();

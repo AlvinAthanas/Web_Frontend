@@ -309,6 +309,8 @@
         `${monthNames[currentMonth]} ${currentYear}`;
     }
     
+    const authToken = localStorage.getItem("authToken");
+    
     function fetchCommunityMembers() {
       // First show loading state
       document.getElementById("membersList").innerHTML = 
@@ -317,8 +319,12 @@
       // Replace this URL with your actual API endpoint
       const url = `http://localhost:8080/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
       
-      fetch(url,
-      )
+      fetch(url, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        }
+      })
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -356,7 +362,12 @@
     }
     
     function fetchAttendances() {
-      fetch('http://localhost:8080/attendances')
+      fetch('http://localhost:8080/attendances', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        }
+      })
         .then(res => res.json())
         .then(data => {
           attendanceRecords = data;
@@ -479,7 +490,10 @@
         // Create new attendance
         fetch('http://localhost:8080/attendance', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             isPresent: newStatus,
             date: dateKey,
@@ -496,7 +510,10 @@
         // Update existing attendance
         fetch(`http://localhost:8080/attendance/${attendanceId}`, {
           method: 'PUT',
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             ...record,
             isPresent: newStatus

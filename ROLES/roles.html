@@ -166,43 +166,56 @@
     "READ_SACRAMENTS"
   ];
 
+  // ---- AUTH HEADER HELPER ----
+  function getAuthHeader() {
+    const token = localStorage.getItem("authToken");
+    return token ? { Authorization: "Bearer " + token } : {};
+  }
+
   // ---- LOAD ROLES AND AUTHORITIES FOR FORMS ----
   function loadRoles() {
-    fetch(`${API_BASE}/roles`)
-            .then(res => res.json())
-            .then(data => {
-              allRoles = data.map(r => r.name || r.roleName || r); // adapt for your object structure
-              // Ensure PARISHIONER role is included
-              if (!allRoles.includes("PARISHIONER")) {
-                allRoles.push("PARISHIONER");
-              }
-              renderRolesCheckboxes();
-              renderRuleRoleDropdown();
-            });
+    fetch(`${API_BASE}/roles`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      allRoles = data.map(r => r.name || r.roleName || r); // adapt for your object structure
+      // Ensure PARISHIONER role is included
+      if (!allRoles.includes("PARISHIONER")) {
+        allRoles.push("PARISHIONER");
+      }
+      renderRolesCheckboxes();
+      renderRuleRoleDropdown();
+    });
   }
 
   function loadAuthorities() {
-    // It is assumed there is an endpoint `/authorities` returning a list of authority names.
-    fetch(`${API_BASE}/authorities`)
-            .then(res => {
-              if (!res.ok) {
-                throw new Error('Authorities endpoint not available');
-              }
-              return res.json();
-            })
-            .then(data => {
-              allAuthorities = Array.isArray(data) ? data : specificAuthorities;
-              // On startup, render everything not assigned
-              renderAuthoritiesAssignable([]);
-              renderRuleAuthorityCheckboxes();
-            })
-            .catch(error => {
-              console.warn('Error loading authorities:', error);
-              // Use specificAuthorities as fallback
-              allAuthorities = specificAuthorities;
-              renderAuthoritiesAssignable([]);
-              renderRuleAuthorityCheckboxes();
-            });
+    fetch(`${API_BASE}/authorities`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Authorities endpoint not available');
+      }
+      return res.json();
+    })
+    .then(data => {
+      allAuthorities = Array.isArray(data) ? data : specificAuthorities;
+      // On startup, render everything not assigned
+      renderAuthoritiesAssignable([]);
+      renderRuleAuthorityCheckboxes();
+    })
+    .catch(error => {
+      console.warn('Error loading authorities:', error);
+      // Use specificAuthorities as fallback
+      allAuthorities = specificAuthorities;
+      renderAuthoritiesAssignable([]);
+      renderRuleAuthorityCheckboxes();
+    });
   }
 
   function renderRolesCheckboxes(selected = []) {
@@ -350,46 +363,58 @@
       suggestionBox.innerHTML = "";
       return;
     }
-    fetch(`${API_BASE}/user/search?name=${encodeURIComponent(query)}`)
-            .then((res) => res.json())
-            .then((data) => {
-              suggestionBox.innerHTML = "";
-              data.forEach((user) => {
-                const div = document.createElement("div");
-                div.textContent = user.name;
-                div.dataset.id = user.id;
-                div.classList.add("user-suggestion");
-                div.addEventListener("click", () => {
-                  nameInput.value = user.name;
-                  selectedUserId = user.id;
-                  suggestionBox.innerHTML = "";
-                  highlightRolesAndAuthorities();
-                });
-                suggestionBox.appendChild(div);
-              });
-              if (data.length === 0) {
-                const noMatch = document.createElement("div");
-                noMatch.textContent = "No matching names found";
-                suggestionBox.appendChild(noMatch);
-              }
-            });
+    fetch(`${API_BASE}/user/search?name=${encodeURIComponent(query)}`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      suggestionBox.innerHTML = "";
+      data.forEach((user) => {
+        const div = document.createElement("div");
+        div.textContent = user.name;
+        div.dataset.id = user.id;
+        div.classList.add("user-suggestion");
+        div.addEventListener("click", () => {
+          nameInput.value = user.name;
+          selectedUserId = user.id;
+          suggestionBox.innerHTML = "";
+          highlightRolesAndAuthorities();
+        });
+        suggestionBox.appendChild(div);
+      });
+      if (data.length === 0) {
+        const noMatch = document.createElement("div");
+        noMatch.textContent = "No matching names found";
+        suggestionBox.appendChild(noMatch);
+      }
+    });
   });
 
   function highlightRolesAndAuthorities() {
     if (!selectedUserId) return;
     // Highlight Roles
-    fetch(`${API_BASE}/user/${selectedUserId}/roles`)
-            .then((res) => res.json())
-            .then((roles) => {
-              renderRolesCheckboxes(roles);
-            });
+    fetch(`${API_BASE}/user/${selectedUserId}/roles`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    })
+    .then((res) => res.json())
+    .then((roles) => {
+      renderRolesCheckboxes(roles);
+    });
 
     // Highlight Authorities (updated)
-    fetch(`${API_BASE}/user/${selectedUserId}/authorities`)
-            .then((res) => res.json())
-            .then((authorities) => {
-              renderAuthoritiesAssignable(authorities);
-            });
+    fetch(`${API_BASE}/user/${selectedUserId}/authorities`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    })
+    .then((res) => res.json())
+    .then((authorities) => {
+      renderAuthoritiesAssignable(authorities);
+    });
   }
 
   // ---- FORM SUBMISSION: ASSIGN ROLES ----
@@ -405,17 +430,20 @@
     }
     fetch(`${API_BASE}/user/${selectedUserId}/roles`, {
       method: "PUT",
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
       body: JSON.stringify(checkedRoles),
     })
-            .then((res) => {
-              if (res.ok) {
-                alert("Roles updated successfully!");
-                highlightRolesAndAuthorities();
-              } else {
-                alert("Failed to update roles.");
-              }
-            });
+    .then((res) => {
+      if (res.ok) {
+        alert("Roles updated successfully!");
+        highlightRolesAndAuthorities();
+      } else {
+        alert("Failed to update roles.");
+      }
+    });
   });
 
   // ---- FORM SUBMISSION: ASSIGN AUTHORITIES ----
@@ -431,17 +459,20 @@
 
     fetch(`${API_BASE}/user/${selectedUserId}/authorities`, {
       method: "PUT",
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
       body: JSON.stringify(checkedAuthorities),
     })
-            .then((res) => {
-              if (res.ok) {
-                alert("Authorities updated successfully!");
-                highlightRolesAndAuthorities();
-              } else {
-                alert("Failed to update authorities.");
-              }
-            });
+    .then((res) => {
+      if (res.ok) {
+        alert("Authorities updated successfully!");
+        highlightRolesAndAuthorities();
+      } else {
+        alert("Failed to update authorities.");
+      }
+    });
   });
 
   // ---- FORM SUBMISSION: CREATE/MODIFY RULES ----
@@ -470,7 +501,10 @@
     // First try to create a new rule using POST
     fetch(`${API_BASE}/role-authority-rules/AuthorityRule`, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
       body: JSON.stringify(payload),
     })
     .then((res) => {
@@ -479,7 +513,11 @@
           document.getElementById('rule-message').textContent = "Rule saved successfully.";
 
           // Refresh the checkboxes to reflect the updated state
-          fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+          fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`, {
+            headers: {
+              ...getAuthHeader(),
+            },
+          })
             .then(res => {
               if (!res.ok) throw new Error();
               return res.json();
@@ -498,7 +536,11 @@
           // Check if the error is because the rule already exists
           if (errorData.message && errorData.message.includes("Authority rule already exists for role")) {
             // Get the existing rule's ID
-            return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+            return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`, {
+              headers: {
+                ...getAuthHeader(),
+              },
+            })
               .then(res => {
                 if (!res.ok) throw new Error("Failed to get existing rule");
                 return res.json();
@@ -507,7 +549,10 @@
                 // Update the existing rule using PUT
                 return fetch(`${API_BASE}/role-authority-rules/AuthorityRule/${existingRule.id}`, {
                   method: "PUT",
-                  headers: {"Content-Type": "application/json"},
+                  headers: {
+                    "Content-Type": "application/json",
+                    ...getAuthHeader(),
+                  },
                   body: JSON.stringify(payload),
                 });
               })
@@ -519,7 +564,11 @@
                 document.getElementById('rule-message').textContent = "Rule updated successfully.";
 
                 // Refresh the checkboxes to reflect the updated state
-                fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+                fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`, {
+                  headers: {
+                    ...getAuthHeader(),
+                  },
+                })
                   .then(res => {
                     if (!res.ok) throw new Error();
                     return res.json();
@@ -573,7 +622,11 @@
 
     // Only fetch the rule if a checkbox was not clicked
     if (!isCheckboxClicked) {
-      fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`)
+      fetch(`${API_BASE}/role-authority-rules/AuthorityRule/role/${roleName}`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      })
               .then(res => {
                 if (!res.ok) throw new Error();
                 return res.json();

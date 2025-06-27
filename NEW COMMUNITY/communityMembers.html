@@ -742,7 +742,15 @@
         const url = `http://localhost:8080/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
         console.log("Fetching members from:", url);
 
-        fetch(url)
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
+        fetch(url, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          }
+        })
           .then(response => {
             if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`);
@@ -884,7 +892,15 @@
           </div>
         `;
 
-        fetch(`http://localhost:8080/user/search?name=${encodeURIComponent(searchTerm)}`)
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
+        fetch(`http://localhost:8080/user/search?name=${encodeURIComponent(searchTerm)}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          }
+        })
           .then(response => response.json())
           .then(data => {
             if (data.length === 0) {
@@ -938,9 +954,13 @@
           groupId: window.currentCommunity.id
         };
 
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
         fetch('http://localhost:8080/group/assignMember', {
           method: 'POST',
           headers: {
+            Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(command)
@@ -977,10 +997,13 @@
 
       // Delete member
       function deleteMember(memberId, memberName) {
-        // Replace with your actual delete endpoint
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
         fetch(`http://localhost:8080/group/removeMember`, {
           method: 'DELETE',
           headers: {
+            Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -1001,7 +1024,15 @@
 
       // View member details
       function viewMemberDetails(memberId) {
-        fetch(`http://localhost:8080/user?id=${memberId}`)
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
+        fetch(`http://localhost:8080/user?id=${memberId}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          }
+        })
           .then(response => {
             if (!response.ok) throw new Error('Failed to fetch member details');
             return response.json();
@@ -1054,7 +1085,15 @@
 
       // Fetch member contributions
       function fetchMemberContributions(memberId) {
-        fetch(`http://localhost:8080/contributions?memberId=${memberId}`)
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
+        fetch(`http://localhost:8080/contributions?memberId=${memberId}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          }
+        })
           .then(response => {
             if (!response.ok) throw new Error('Failed to fetch contributions');
             return response.json();
@@ -1137,10 +1176,14 @@
           notes: notes
         };
 
+        // Get auth token
+        const authToken = localStorage.getItem("authToken");
+
         // Send contribution to API
         fetch('http://localhost:8080/contributions', {
           method: 'POST',
           headers: {
+            Authorization: `Bearer ${authToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(contribution)
