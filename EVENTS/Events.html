@@ -425,7 +425,6 @@
               fetch("http://localhost:8080/events", {
                 headers: {
                   Authorization: `Bearer ${authToken}`,
-                  "Content-Type": "application/json",
                 },
               })
                 .then((res) => res.json())
