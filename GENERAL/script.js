@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
     closeSidebar();
     loadParishName(); // <-- Call after sidebar is loaded
     setupLogout();    // <-- Add logout logic here
+
+    restrictSidebarByRole(); // Restrict sidebar based on user role
   });
 });
 
@@ -138,4 +140,128 @@ function setupLogout() {
 const user = getUserFromStorage();
 if (user && user.parishId) {
     localStorage.setItem('parishId', user.parishId);
+}
+
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Failed to parse JWT:", e);
+    return null;
+  }
+}
+
+function restrictSidebarByRole() {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    console.warn("No authToken found.");
+    return;
+  }
+
+  const payload = parseJwt(token);
+  console.log("Parsed JWT:", payload);
+  const roles = payload?.roles || [];
+
+  const allPages = [
+    "dashboard.html",
+    "about_church.html",
+    "roles.html",
+    "members.html",
+    "contribution.html",
+    "schedules.html",
+    "events.html",
+    "community.html",
+    "projects.html",
+    "sacraments.html",
+    "announcement.html",
+    "reports.html",
+    "feedback.html",
+    "index.html" // Logout
+  ];
+
+  // Role-based access map
+  const visibilityRules = {
+    ROLE_CATECHIST: [
+      "sacraments.html",
+      "feedback.html",
+      "announcement.html",
+      // "index.html"
+    ],
+    ROLE_COMMUNITY_CHAIRPERSON: [
+      "community.html",
+      "feedback.html",
+      // "index.html"
+    ],
+    ROLE_COMMUNITY_SECRETARY: [
+      "community.html",
+      "feedback.html",
+      // "index.html"
+    ],
+    ROLE_COMMUNITY_TREASURER: [
+      "community.html",
+      "feedback.html",
+      // "index.html"
+    ],
+    ROLE_COMMITTEE_TREASURER: [
+      "Treasurer_dashboard.html",
+      "contribution.html",
+      "projects.html",
+      "feedback.html",
+      "expenses.html",
+      // "index.html"
+    ],
+    ROLE_COMMITTEE_SECRETARY: [
+      "dashboard.html",
+      "members.html",
+      "events.html",
+      "schedules.html",
+      "projects.html",
+      "feedback.html",
+      "announcement.html",
+      "index.html"
+    ],
+    ROLE_COMMITTEE_CHAIRPERSON: allPages.filter(
+      page => !["roles.html", "contribution.html", "sacraments.html", "community.html"].includes(page)
+    ),
+    // Parish member can access everything (no restrictions)
+  };
+
+  // Find the first matching role in the rules
+  const userRole = roles.find(role => visibilityRules[role]);
+
+  if (!userRole) {
+    console.log("No restrictions for this role.");
+    return;
+  }
+
+  const allowedPages = visibilityRules[userRole];
+  console.log(`User role: ${userRole}`);
+  console.log("Allowed pages:", allowedPages);
+
+  // Restrict sidebar
+  document.querySelectorAll(".sidebar-list a").forEach(link => {
+    const href = link.getAttribute("href");
+    const page = href?.split('/').pop();
+    if (!allowedPages.includes(page)) {
+      console.log("Hiding link:", page);
+      link.style.display = "none";
+    }
+  });
+
+  // Restrict bottom (logout section)
+  document.querySelectorAll(".bottom-content a").forEach(link => {
+    const href = link.getAttribute("href");
+    const page = href?.split('/').pop();
+    if (!allowedPages.includes(page)) {
+      link.style.display = "none";
+    }
+  });
 }
