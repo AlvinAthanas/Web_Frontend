@@ -324,30 +324,50 @@
       const token = localStorage.getItem("authToken");
       const expenseForm = document.getElementById("expenseForm");
       const expenseTableBody = document.getElementById("expenseTableBody");
-      
+
       if (!token) {
         console.error("No auth token found.");
         window.location.href = "../login.html";
         return;
       }
-      
+
+      // Enum mapping for category and payment method
+      const categoryMap = {
+        Utilities: "UTILITY",
+        Maintenance: "MAINTENANCE",
+        Supplies: "SUPPLIES",
+        Events: "EVENTS",
+        Staff: "STAFF",
+        Outreach: "OUTREACH",
+        Other: "OTHER"
+      };
+
+      const paymentMethodMap = {
+        Cash: "CASH",
+        "Credit Card": "CREDIT_CARD",
+        "Debit Card": "DEBIT_CARD",
+        "Bank Transfer": "BANK_TRANSFER",
+        "Mobile Payment": "MOBILE_PAYMENT",
+        Check: "CHECK"
+      };
+
       // Format currency
       function formatCurrency(amount) {
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD'
-        }).format(amount);
+        }).format(amount / 100); // Assuming amount is stored as cents
       }
-      
+
       // Format date
       function formatDate(dateString) {
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
       }
-      
+
       // Load expenses from server
       function loadExpenses() {
-        fetch("http://localhost:8080/expenses", {
+        fetch("http://localhost:8080/transactions", {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -356,7 +376,6 @@
           .then(expenses => {
             if (expenses.length > 0) {
               expenseTableBody.innerHTML = '';
-              
               expenses.forEach(expense => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -366,36 +385,59 @@
                   <td>${formatCurrency(expense.amount)}</td>
                   <td>${expense.paymentMethod}</td>
                   <td>
-                    <button class="action-btn" title="Edit">
+                    <button class="action-btn edit-btn" data-id="${expense.id}" title="Edit">
                       <span class="material-icons-outlined">edit</span>
                     </button>
-                    <button class="action-btn" title="Delete">
+                    <button class="action-btn delete-btn" data-id="${expense.id}" title="Delete">
                       <span class="material-icons-outlined">delete</span>
                     </button>
                   </td>
                 `;
                 expenseTableBody.appendChild(row);
               });
+
+              // Attach event listeners for edit and delete
+              document.querySelectorAll(".delete-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                  const id = btn.getAttribute("data-id");
+                  if (confirm("Are you sure you want to delete this expense?")) {
+                    deleteExpense(id);
+                  }
+                });
+              });
+
+              document.querySelectorAll(".edit-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                  const id = btn.getAttribute("data-id");
+                  editExpense(id);
+                });
+              });
+
+            } else {
+              expenseTableBody.innerHTML = `<tr>
+                <td colspan="6" class="no-expenses">No expenses recorded yet</td>
+              </tr>`;
             }
           })
           .catch(error => {
             console.error("Error loading expenses:", error);
           });
       }
-      
-      // Handle form submission
+
+      // Handle form submission (Create)
       expenseForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        
+
         const expenseData = {
+          type: "EXPENSE",
           date: document.getElementById("expenseDate").value,
-          amount: parseFloat(document.getElementById("expenseAmount").value),
-          category: document.getElementById("expenseCategory").value,
-          paymentMethod: document.getElementById("expensePaymentMethod").value,
+          amount: Math.round(parseFloat(document.getElementById("expenseAmount").value) * 100), // store as cents
+          category: categoryMap[document.getElementById("expenseCategory").value],
+          paymentMethod: paymentMethodMap[document.getElementById("expensePaymentMethod").value],
           description: document.getElementById("expenseDescription").value
         };
-        
-        fetch("http://localhost:8080/expenses", {
+
+        fetch("http://localhost:8080/transaction", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -403,7 +445,10 @@
           },
           body: JSON.stringify(expenseData)
         })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) throw new Error("Failed to save expense");
+            return response.json();
+          })
           .then(data => {
             alert("Expense recorded successfully!");
             expenseForm.reset();
@@ -414,7 +459,88 @@
             alert("Failed to save expense. Please try again.");
           });
       });
-      
+
+      // Delete expense
+      function deleteExpense(id) {
+        fetch(`http://localhost:8080/transaction/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then(response => {
+            if (!response.ok) throw new Error("Failed to delete expense");
+            loadExpenses();
+          })
+          .catch(error => {
+            console.error("Error deleting expense:", error);
+            alert("Failed to delete expense. Please try again.");
+          });
+      }
+
+      // Edit expense (populate form and update)
+      function editExpense(id) {
+        // Find the expense in the table (or reload from server if needed)
+        fetch("http://localhost:8080/transactions", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then(response => response.json())
+          .then(expenses => {
+            const expense = expenses.find(e => e.id == id);
+            if (!expense) {
+              alert("Expense not found.");
+              return;
+            }
+            // Populate form
+            document.getElementById("expenseDate").value = expense.date;
+            document.getElementById("expenseAmount").value = (expense.amount / 100).toFixed(2);
+            document.getElementById("expenseCategory").value = Object.keys(categoryMap).find(key => categoryMap[key] === expense.category);
+            document.getElementById("expensePaymentMethod").value = Object.keys(paymentMethodMap).find(key => paymentMethodMap[key] === expense.paymentMethod);
+            document.getElementById("expenseDescription").value = expense.description;
+
+            // Change submit to update mode
+            expenseForm.onsubmit = function (e) {
+              e.preventDefault();
+              const updatedExpense = {
+                type: "EXPENSE",
+                date: document.getElementById("expenseDate").value,
+                amount: Math.round(parseFloat(document.getElementById("expenseAmount").value) * 100),
+                category: categoryMap[document.getElementById("expenseCategory").value],
+                paymentMethod: paymentMethodMap[document.getElementById("expensePaymentMethod").value],
+                description: document.getElementById("expenseDescription").value
+              };
+              fetch(`http://localhost:8080/transaction/${id}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(updatedExpense)
+              })
+                .then(response => {
+                  if (!response.ok) throw new Error("Failed to update expense");
+                  return response.json();
+                })
+                .then(data => {
+                  alert("Expense updated successfully!");
+                  expenseForm.reset();
+                  // Restore form to create mode
+                  expenseForm.onsubmit = defaultSubmitHandler;
+                  loadExpenses();
+                })
+                .catch(error => {
+                  console.error("Error updating expense:", error);
+                  alert("Failed to update expense. Please try again.");
+                });
+            };
+          });
+      }
+
+      // Restore default submit handler
+      const defaultSubmitHandler = expenseForm.onsubmit;
+
       // Initial load of expenses
       loadExpenses();
     });
