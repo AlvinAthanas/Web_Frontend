@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Contributions</title>
+
+    <!-- Montserrat Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <!-- FullCalendar CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+    <style>
+        body {
+            /* font-family: Arial, sans-serif; */
+            /* margin: 20px; */
+            background-color: #f9f9f9;
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        input, textarea, select, button {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .export-buttons {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+
+        .export-buttons button {
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .btn-export-excel {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .btn-export-excel:hover {
+            background: #219150;
+        }
+
+        .btn-export-pdf {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .btn-export-pdf:hover {
+            background: #c0392b;
+        }
+
+        /* Declare Contribution button */
+        #declareForm button[type="submit"] {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #declareForm button[type="submit"]:hover {
+            background: #217dbb;
+        }
+
+        .details {
+            background: #ecf0f1;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-container" id="containerId">
+        <main class="main-container">
+            <div class="grid0">
+                <!-- Place this inside the main section, above the "Declare New Contribution" section -->
+                <div style="margin-bottom: 18px;">
+                    <a href="../NEW COMMUNITY/trial.html" style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        color: #3498db;
+                        font-weight: bold;
+                        font-size: 1.05rem;
+                        background: #ecf0f1;
+                        padding: 5px 14px;
+                        border-radius: 6px;
+                        text-decoration: none;
+                        box-shadow: 0 1px 4px rgba(44,62,80,0.08);
+                        transition: background 0.2s, color 0.2s;
+                    " onmouseover="this.style.background='#d0e6fa';this.style.color='#217dbb';"
+                      onmouseout="this.style.background='#ecf0f1';this.style.color='#3498db';">
+                        <span class="material-icons-outlined" style="font-size:1.2em;">arrow_back</span>
+                    </a>
+                </div>
+
+                <!-- Declare Contribution Section -->
+                <div class="section">
+                    <h2>Declare New Contribution</h2>
+                    <form id="declareForm">
+                        <label>Contribution Type:</label>
+                        <input type="text" id="contributionType" placeholder="e.g., Tithe, Project" required>
+                        <label>Target Amount (TZS):</label>
+                        <input type="number" id="targetAmount" required>
+                        <label>Deadline:</label>
+                        <input type="date" id="deadline" required>
+                        <label>Description:</label>
+                        <textarea id="description" rows="3"></textarea>
+                        <button type="submit">Declare Contribution</button>
+                    </form>
+                </div>
+                <!-- Contributions List -->
+                <div class="section">
+                    <h2>Declared Contributions</h2>
+                    <!-- Place this div just before the table, inside the section -->
+                    <div class="export-buttons">
+                        <button class="btn-export-excel" onclick="exportExcel()">Export to Excel</button>
+                        <button class="btn-export-pdf" onclick="exportPDF()">Export to PDF</button>
+                    </div>
+                    <!-- Update the table header -->
+                    <table id="contributionsTable">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Target</th>
+                                <th>Collected</th>
+                                <th>Remaining</th>
+                                <th>Deadline</th>
+                                <th>Fulfilled</th> <!-- Added column -->
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Member Contributions Details -->
+            <div id="detailsSection" class="section hidden">
+                <h2>Member Contributions for: <span id="detailsType"></span></h2>
+                <button id="toggleTotalsBtn" onclick="toggleTotals()" style="margin-bottom:10px;">Toggle Totals</button>
+                <div id="detailsTables">
+                    <table id="memberContributionsTable">
+                        <thead>
+                            <tr>
+                                <th>Member Name</th>
+                                <th>Amount Paid</th>
+                                <th>Date</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <table id="memberTotalsTable" class="hidden">
+                        <thead>
+                            <tr>
+                                <th>Member Name</th>
+                                <th>Total Amount Contributed</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const backendBaseUrl = 'http://localhost:8080';  // Change if needed
+
+        document.addEventListener('DOMContentLoaded', loadContributions);
+
+        document.getElementById('declareForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            declareContribution();
+        });
+
+        function loadContributions() {
+            fetch(`${backendBaseUrl}/group/contributions/declarations`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            })
+            .then(res => res.json())
+            .then(data => populateContributionTable(data))
+            .catch(error => console.error('Error fetching contributions:', error));
+        }
+
+        function populateContributionTable(contributions) {
+            const tbody = document.querySelector('#contributionsTable tbody');
+            tbody.innerHTML = '';
+
+            contributions.forEach(c => {
+                const collected = c.totalContributedAmount || 0;
+                const remaining = c.targetAmount - collected;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${c.contributionType}</td>
+                        <td>${c.targetAmount}</td>
+                        <td>${collected}</td>
+                        <td>${remaining}</td>
+                        <td>${c.deadline ? c.deadline.split('T')[0] : 'N/A'}</td>
+                        <td>${c.fulfilled ? 'Yes' : 'No'}</td> <!-- Show fulfilled status -->
+                        <td><button onclick="viewDetails(${c.id}, '${c.contributionType}')">View Details</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        let currentRequirementId = null;
+        let currentType = null;
+        let totalsVisible = false;
+
+        function viewDetails(requirementId, type) {
+            currentRequirementId = requirementId;
+            currentType = type;
+            totalsVisible = false;
+            document.getElementById('memberContributionsTable').classList.remove('hidden');
+            document.getElementById('memberTotalsTable').classList.add('hidden');
+            fetch(`${backendBaseUrl}/group/contributions/requirement/${requirementId}/submissions`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            })
+            .then(res => res.json())
+            .then(data => showMemberDetails(data, type))
+            .catch(error => console.error('Error fetching member details:', error));
+        }
+
+        function showMemberDetails(submissions, type) {
+            document.getElementById('detailsType').innerText = type;
+            document.getElementById('detailsSection').classList.remove('hidden');
+
+            // Update table headers for new details
+            const thead = document.querySelector('#memberContributionsTable thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Member Name</th>
+                    <th>Amount Paid</th>
+                    <th>Date</th>
+                    <th>Note</th>
+                </tr>
+            `;
+
+            const tbody = document.querySelector('#memberContributionsTable tbody');
+            tbody.innerHTML = '';
+
+            submissions.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.userName || 'Member'}</td>
+                        <td>${s.amount}</td>
+                        <td>${s.date || ''}</td>
+                        <td>${s.note || ''}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function toggleTotals() {
+            totalsVisible = !totalsVisible;
+            const detailsTable = document.getElementById('memberContributionsTable');
+            const totalsTable = document.getElementById('memberTotalsTable');
+            if (totalsVisible) {
+                // Fetch and show totals
+                fetch(`${backendBaseUrl}/group/contributions/${currentRequirementId}/members-progress`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = totalsTable.querySelector('tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(member => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${member.userName}</td>
+                                <td>${member.totalAmountContributed}</td>
+                                <td>
+                                    <button onclick="showAddContributionForm(${member.userId}, '${member.userName.replace(/'/g, "\\'")}')">Add Contribution</button>
+                                </td>
+                            </tr>
+                            <tr id="add-contribution-row-${member.userId}" class="hidden">
+                                <td colspan="3">
+                                    <form onsubmit="submitMemberContribution(event, ${member.userId})">
+                                        <input type="number" id="amount-${member.userId}" placeholder="Amount" required style="width:120px;display:inline;">
+                                        <input type="date" id="date-${member.userId}" required style="width:150px;display:inline;">
+                                        <input type="text" id="note-${member.userId}" placeholder="Note" style="width:200px;display:inline;">
+                                        <button type="submit" style="display:inline;">Submit</button>
+                                        <button type="button" onclick="hideAddContributionForm(${member.userId})" style="display:inline;">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    detailsTable.classList.add('hidden');
+                    totalsTable.classList.remove('hidden');
+                })
+                .catch(error => alert('Failed to fetch totals'));
+            } else {
+                detailsTable.classList.remove('hidden');
+                totalsTable.classList.add('hidden');
+            }
+        }
+
+        function declareContribution() {
+            const data = {
+                contributionType: document.getElementById('contributionType').value,
+                targetAmount: parseInt(document.getElementById('targetAmount').value),
+                deadline: document.getElementById('deadline').value,
+                description: document.getElementById('description').value
+            };
+
+            fetch(`${backendBaseUrl}/group/contributions/declare`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + getToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert('Contribution Declared Successfully');
+                    loadContributions();
+                    document.getElementById('declareForm').reset();
+                } else {
+                    alert('Error declaring contribution');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function exportExcel() {
+            fetch(`${backendBaseUrl}/group/contributions/declarations/export`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'contributions.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => alert('Failed to export Excel'));
+        }
+
+        function exportPDF() {
+            fetch(`${backendBaseUrl}/group/contributions/declarations/export/pdf`, {
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'contributions.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => alert('Failed to export PDF'));
+        }
+
+        function showAddContributionForm(userId, userName) {
+            document.getElementById(`add-contribution-row-${userId}`).classList.remove('hidden');
+        }
+
+        function hideAddContributionForm(userId) {
+            document.getElementById(`add-contribution-row-${userId}`).classList.add('hidden');
+        }
+
+        /**
+         * Submits a member's contribution for a specific requirement.
+         * @param {Event} event - The form submission event.
+         * @param {number} userId - The ID of the user/member.
+         */
+        function submitMemberContribution(event, userId) {
+            event.preventDefault();
+
+            // Get form values for this user
+            const amount = parseInt(document.getElementById(`amount-${userId}`).value, 10);
+            const date = document.getElementById(`date-${userId}`).value;
+            const note = document.getElementById(`note-${userId}`).value;
+
+            // Prepare the data payload
+            const data = {
+                requirementId: currentRequirementId, // The current contribution requirement
+                userId: userId,                      // The member's user ID
+                amount: amount,                      // Contribution amount (integer)
+                date: date,                          // Contribution date (YYYY-MM-DD)
+                note: note                           // Optional note
+            };
+
+            // Send the contribution to the backend
+            fetch(`${backendBaseUrl}/group/contributions/submit`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + getToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert('Contribution submitted!');
+                    hideAddContributionForm(userId); // Hide the form after submission
+                    toggleTotals();                  // Refresh the totals table
+                } else {
+                    alert('Failed to submit contribution');
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting contribution:', error);
+                alert('Error submitting contribution');
+            });
+        }
+
+        function getToken() {
+            return localStorage.getItem('authToken');
+        }
+    </script>   
+
+<script src="../GENERAL/script.js"></script>
+
+
+</html>

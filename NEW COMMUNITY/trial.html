@@ -382,9 +382,9 @@ function updateCommunityHeader() {
         membersCard.addEventListener('click', () => {
   window.location.href = `communityMembers.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
 });
-        contributionsCard.addEventListener("click", () =>
-          loadContent("Contributions")
-        );
+        contributionsCard.addEventListener('click', () => {
+  window.location.href = `community_contribution.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+});
         attendanceCard.addEventListener('click', () => {
   window.location.href = `attendance.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
 });
