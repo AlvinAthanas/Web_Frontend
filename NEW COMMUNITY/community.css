@@ -22,10 +22,11 @@ body {
 
 .community-list li {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Pushes content to edges */
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+  gap: 8px; /* Add small gap between items */
 }
 
 .community-list li a {
@@ -35,8 +36,9 @@ body {
 }
 
 .buttonGroup {
-  /* display: flex; */
-  gap: 15px;
+  display: flex;
+  gap: 8px; /* Reduce gap between buttons */
+  margin-left: auto; /* Ensures button group stays at far right */
 }
 
 button {
@@ -67,18 +69,80 @@ input[type="text"] {
 
 .edit-btn {
   background-color: #f0ad4e;
+  margin-right: 0;
 }
 
 .delete-btn {
   background-color: #d9534f;
-  margin-left: 5px;
+  margin-left: 0;
 }
 
 .cancel-btn {
   background: #79b3f1;
-  margin-left: 5px;
+  margin-left: 8px;
 }
 
 .save-btn {
   background: #f0ad4e;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.import-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.import-btn:hover {
+  background-color: #45a049;
+}
+
+.filter-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.filter-btn:hover {
+  background-color: #0b7dda;
+}
+
+/* Style for the filter dropdown */
+.filter-dropdown {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.filter-dropdown.show {
+  display: block;
+}
+
+.filter-dropdown input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }

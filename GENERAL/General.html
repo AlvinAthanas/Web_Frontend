@@ -31,10 +31,11 @@
       </div>
 
       <div class="header-right">
-        <span class="material-icons-outlined"> notifications </span>
-        <span class="material-icons-outlined"> mail </span>
-        <div class="account-container">
-          <span class="material-icons-outlined"> account_circle </span>
+        <!-- <span class="material-icons-outlined"> notifications </span>
+        <span class="material-icons-outlined"> mail </span> -->
+        <div class="account-container" id="accountContainer" style="display: flex; align-items: center; gap: 10px;">
+          <span id="profileAvatar" class="material-icons-outlined" style="font-size: 2rem; background: #e3e6ea; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: #607d8b;"></span>
+          <span id="userName" style="font-weight: 500; color: #2c3e50;"></span>
           <div class="account-dropdown">
             <a href="../PROFILE/profile.html" class="dropdown-item">
               <span class="material-icons-outlined">person</span>
@@ -131,6 +132,15 @@
           </li>
         </a>
 
+        
+        <a href="../NEW COMMUNITY/trial.html">
+          <li class="sidebar-list-item">
+            <span class="material-icons-outlined"> groups </span>
+            Community
+          </li>
+        </a>
+
+
         <a href="../PROJECTS/projects.html">
           <li class="sidebar-list-item">
             <span class="material-icons-outlined"> rowing </span>
@@ -202,6 +212,51 @@
         }
       }
 
+      // Helper: Parse JWT and extract email
+      function getEmailFromJWT(token) {
+        if (!token) return null;
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.sub || payload.email || null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Fetch user info using email from JWT and set header name (first and last only)
+      async function setHeaderUserNameFromAPI() {
+        const authToken = localStorage.getItem("authToken");
+        const email = getEmailFromJWT(authToken);
+        if (!email) return;
+
+        try {
+          const res = await fetch(`http://localhost:8080/user?email=${encodeURIComponent(email)}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json"
+            }
+          });
+          if (res.ok) {
+            const user = await res.json();
+            // Only show first and last name
+            let name = user.name || "";
+            if (name) {
+              const parts = name.trim().split(" ");
+              name = parts[0] + (parts.length > 1 ? " " + parts[parts.length - 1] : "");
+            }
+            document.getElementById("userName").textContent = name || "User";
+            // Set initials if no profile picture
+            if (!user.profilePictureUrl) {
+              document.getElementById("profileAvatar").textContent = (name ? (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")) : "U").toUpperCase();
+            } else {
+              document.getElementById("profileAvatar").innerHTML = `<img src="${user.profilePictureUrl}" alt="Profile" style="width:38px;height:38px;border-radius:50%;">`;
+            }
+          }
+        } catch (e) {
+          // fallback: do nothing
+        }
+      }
+
       // Function to fetch and display parish name
       async function loadParishName() {
         try {
@@ -239,6 +294,7 @@
       // Load parish name when page loads
       document.addEventListener("DOMContentLoaded", function () {
         loadParishName();
+        setHeaderUserNameFromAPI();
       });
 
       // Existing logout functionality
@@ -249,6 +305,35 @@
           localStorage.removeItem("user");
           window.location.href = this.getAttribute("href");
         });
+      });
+
+      // Helper to get initials from name
+      function getInitials(name) {
+        if (!name) return "";
+        const parts = name.trim().split(" ");
+        if (parts.length === 1) return parts[0][0].toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+
+      // Show user name and avatar/initials
+      document.addEventListener("DOMContentLoaded", function () {
+        const user = getUserFromStorage();
+        const userNameSpan = document.getElementById("userName");
+        const profileAvatar = document.getElementById("profileAvatar");
+
+        if (user) {
+          userNameSpan.textContent = user.name || "User";
+          if (user.profilePictureUrl) {
+            // If user has a profile picture, show it
+            profileAvatar.innerHTML = `<img src="${user.profilePictureUrl}" alt="Profile" style="width:38px;height:38px;border-radius:50%;">`;
+          } else {
+            // Otherwise, show initials
+            profileAvatar.textContent = getInitials(user.name || "U");
+          }
+        } else {
+          userNameSpan.textContent = "User";
+          profileAvatar.textContent = "U";
+        }
       });
     </script>
 

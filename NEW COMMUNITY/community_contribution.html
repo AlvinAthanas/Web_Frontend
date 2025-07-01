@@ -27,116 +27,176 @@
 
     <!-- External Stylesheets -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
-    <style>
-        body {
-            /* font-family: Arial, sans-serif; */
-            /* margin: 20px; */
-            background-color: #f9f9f9;
-        }
+   <style>
+    body {
+        background-color: #f9f9f9;
+    }
 
-        h2 {
-            color: #2c3e50;
-        }
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 1.2rem;
+        font-weight: 600;
+    }
 
-        .section {
-            background: white;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+    .section {
+        background: white;
+        padding: 25px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
 
-        input, textarea, select, button {
-            display: block;
-            width: 100%;
-            margin-top: 8px;
-            margin-bottom: 16px;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+    input, textarea, select {
+        display: block;
+        width: 100%;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+        /* font-family: 'Montserrat', sans-serif; */
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
+    th, td {
+        border: 1px solid #e0e0e0;
+        padding: 12px;
+        text-align: left;
+    }
 
-        th {
-            background-color: #3498db;
-            color: white;
-        }
+    th {
+        background-color: #2196F3;
+        color: white;
+        font-weight: 600;
+        border-bottom: 2px solid #e0e0e0;
+    }
 
-        .export-buttons {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            margin-bottom: 10px;
-            gap: 8px;
-        }
+    .export-buttons {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 12px;
+    }
 
-        .export-buttons button {
-            font-size: 0.85rem;
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-        }
+    .export-buttons button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
 
-        .btn-export-excel {
-            background: #27ae60;
-            color: #fff;
-        }
+    .btn-export-excel {
+  background-color: #4caf50;
+        color: white;
+        border: 1px solid #e0e0e0;
+    }
 
-        .btn-export-excel:hover {
-            background: #219150;
-        }
+    .btn-export-excel:hover {
+        opacity: .5;
+    }
 
-        .btn-export-pdf {
-            background: #e74c3c;
-            color: #fff;
-        }
+    .btn-export-pdf {
+  background-color: rgb(245, 75, 75);
+        color: white;
+        border: 1px solid #e0e0e0;
+    }
 
-        .btn-export-pdf:hover {
-            background: #c0392b;
-        }
+    .btn-export-pdf:hover {
+        opacity: .5;
+    }
 
-        /* Declare Contribution button */
-        #declareForm button[type="submit"] {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 18px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+    /* Declare Contribution button */
+    #declareForm button[type="submit"] {
+        background: #2196F3;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: auto;
+        margin-top: 10px;
+    }
 
-        #declareForm button[type="submit"]:hover {
-            background: #217dbb;
-        }
+    #declareForm button[type="submit"]:hover {
+        background: #1a252f;
+    }
 
-        .details {
-            background: #ecf0f1;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 6px;
-        }
+    .details {
+        background: #f5f7fa;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
 
-        .hidden {
-            display: none;
-        }
-    </style>
+    .hidden {
+        display: none;
+    }
+
+    /* Action buttons in tables */
+    table button {
+        padding: 6px 12px;
+        background: #adbdcb;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    table button:hover {
+        background: #e8ebee;
+    }
+
+    #toggleTotalsBtn {
+         font-size: 0.9rem;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        background: #adbdcb;
+        color: white;
+    }
+
+    /* Back button */
+    .back-button-container {
+        margin-bottom: 25px;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 1rem;
+        background: #f5f7fa;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        border: 1px solid #e0e0e0;
+        transition: all 0.2s ease;
+    }
+
+    .back-button:hover {
+        background: #e8ebee;
+        color: #2c3e50;
+    }
+</style>
 </head>
 <body>
 

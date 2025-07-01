@@ -15,61 +15,7 @@
   <!-- Styles -->
   <link rel="stylesheet" href="../GENERAL/style.css" />
   <link rel="stylesheet" href="community.css" />
-  <style>
-    /* Add these styles for the new buttons */
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-    .action-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
-    .import-btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-    .import-btn:hover {
-      background-color: #45a049;
-    }
-    .filter-btn {
-      background-color: #2196F3;
-      color: white;
-    }
-    .filter-btn:hover {
-      background-color: #0b7dda;
-    }
-    /* Style for the filter dropdown */
-    .filter-dropdown {
-      display: none;
-      position: absolute;
-      background-color: white;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-      padding: 10px;
-      border-radius: 4px;
-    }
-    .filter-dropdown.show {
-      display: block;
-    }
-    .filter-dropdown input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-  </style>
+  
 </head>
 
 <body>
@@ -79,7 +25,7 @@
         <h2>Community List</h2>
         <input type="text" id="communityInput" placeholder="Enter community name" required>
         <button class="add-btn" onclick="addCommunity()">Add</button>
-        
+
         <!-- Add these new action buttons -->
         <div class="action-buttons">
           <button class="action-btn import-btn" onclick="document.getElementById('fileInput').click()">
@@ -87,7 +33,7 @@
             Import
           </button>
           <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileImport(event)">
-          
+
           <div style="position: relative;">
             <button class="action-btn filter-btn" onclick="toggleFilterDropdown()">
               <span class="material-icons-outlined">filter_alt</span>
@@ -99,7 +45,7 @@
             </div>
           </div>
         </div>
-        
+
         <ul class="community-list" id="communityList"></ul>
       </div>
     </main>
@@ -132,9 +78,11 @@
 
       communities.forEach((community) => {
         const li = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = `../NEW COMMUNITY/trial.html?communityId=${community.id}&communityName=${encodeURIComponent(community.name)}`;  
-        link.textContent = community.name;
+        // Replace link with plain text span
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = community.name;
+        nameSpan.style.fontWeight = "500";
+        nameSpan.style.fontSize = "1rem";
 
         const delButton = document.createElement("button");
         delButton.textContent = "Delete";
@@ -144,9 +92,9 @@
         const editButton = document.createElement("button");
         editButton.textContent = "Edit";
         editButton.classList.add("edit-btn");
-        editButton.onclick = () => enableEditing(li, link, community.id);
+        editButton.onclick = () => enableEditing(li, nameSpan, community.id);
 
-        li.appendChild(link);
+        li.appendChild(nameSpan);
         li.appendChild(editButton);
         li.appendChild(delButton);
         list.appendChild(li);
@@ -163,7 +111,7 @@
         const token = localStorage.getItem("authToken");
         const response = await fetch(`${apiUrl}/group/community`, {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
           },
@@ -200,10 +148,10 @@
     }
 
     // Edit community name
-    function enableEditing(li, link, id) {
+    function enableEditing(li, nameSpan, id) {
       const input = document.createElement("input");
       input.type = "text";
-      input.value = link.textContent;
+      input.value = nameSpan.textContent;
       input.classList.add("edit-input");
 
       const saveBtn = document.createElement("button");
@@ -214,9 +162,9 @@
       cancelBtn.textContent = "Cancel";
       cancelBtn.classList.add("cancel-btn");
 
-      const originalName = link.textContent;
+      const originalName = nameSpan.textContent;
 
-      li.replaceChild(input, link);
+      li.replaceChild(input, nameSpan);
       li.replaceChild(saveBtn, li.children[1]); // edit button
       li.appendChild(cancelBtn);
       li.children[2].style.display = "none"; // hide delete
@@ -229,7 +177,7 @@
           const token = localStorage.getItem("authToken");
           const response = await fetch(`${apiUrl}/group/${id}`, {
             method: "PUT",
-            headers: { 
+            headers: {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${token}`
             },
@@ -238,7 +186,7 @@
 
           if (!response.ok) throw new Error("Failed to update");
 
-          link.textContent = newName;
+          nameSpan.textContent = newName;
           reset();
         } catch (error) {
           console.error("Update error:", error);
@@ -248,17 +196,17 @@
       cancelBtn.onclick = reset;
 
       function reset() {
-        li.replaceChild(link, input);
-        li.replaceChild(createEditButton(link, id), saveBtn);
+        li.replaceChild(nameSpan, input);
+        li.replaceChild(createEditButton(nameSpan, id), saveBtn);
         li.removeChild(cancelBtn);
         li.children[2].style.display = "inline-block";
       }
 
-      function createEditButton(link, id) {
+      function createEditButton(nameSpan, id) {
         const button = document.createElement("button");
         button.textContent = "Edit";
         button.classList.add("edit-btn");
-        button.onclick = () => enableEditing(li, link, id);
+        button.onclick = () => enableEditing(li, nameSpan, id);
         return button;
       }
 
@@ -273,7 +221,7 @@
       // Here you would implement Excel file parsing
       // For now, just show an alert
       alert(`Selected file: ${file.name}\n\nExcel import functionality would be implemented here.`);
-      
+
       // Reset the file input
       event.target.value = '';
     }
@@ -290,7 +238,7 @@
       if (!filterValue) {
         renderCommunityList(allCommunities);
       } else {
-        const filtered = allCommunities.filter(community => 
+        const filtered = allCommunities.filter(community =>
           community.name.toLowerCase().includes(filterValue)
         );
         renderCommunityList(filtered);
@@ -299,7 +247,7 @@
     }
 
     // Close the filter dropdown if clicked outside
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       if (!event.target.matches('.filter-btn')) {
         const dropdowns = document.getElementsByClassName("filter-dropdown");
         for (let i = 0; i < dropdowns.length; i++) {

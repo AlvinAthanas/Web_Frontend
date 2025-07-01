@@ -196,17 +196,17 @@ function restrictSidebarByRole() {
       // "index.html"
     ],
     ROLE_COMMUNITY_CHAIRPERSON: [
-      "community.html",
+      "trial.html",
       "feedback.html",
       // "index.html"
     ],
     ROLE_COMMUNITY_SECRETARY: [
-      "community.html",
+      "trial.html",
       "feedback.html",
       // "index.html"
     ],
     ROLE_COMMUNITY_TREASURER: [
-      "community.html",
+      "trial.html",
       "feedback.html",
       // "index.html"
     ],
@@ -228,10 +228,36 @@ function restrictSidebarByRole() {
       "announcement.html",
       "index.html"
     ],
-    ROLE_COMMITTEE_CHAIRPERSON: allPages.filter(
-      page => !["roles.html", "contribution.html", "sacraments.html", "community.html"].includes(page)
-    ),
-    // Parish member can access everything (no restrictions)
+      ROLE_COMMITTEE_CHAIRPERSON: [
+        "dashboard.html",
+        "members.html",
+        "roles.html",
+        "contribution.html",
+        "reports.html",
+        "events.html",
+        "schedules.html",
+        "projects.html",
+        "feedback.html",
+        "announcement.html",
+        "index.html"
+      ],
+    ROLE_PARISHIONER: [
+      "dashboard.html",
+      "about_church.html",
+      "members.html",
+      "roles.html",
+      "community.html",
+      "contribution.html",
+      "Schedules.html",
+      "Events.html",
+      "projects.html",
+      "sacraments.html",
+      "reports.html",
+      "announcement.html",
+      "feedback.html",
+      "index.html"
+    ] 
+
   };
 
   // Find the first matching role in the rules
@@ -265,3 +291,68 @@ function restrictSidebarByRole() {
     }
   });
 }
+
+// Helper: Parse JWT and extract email
+function getEmailFromJWT(token) {
+  if (!token) return null;
+  try {
+    const payload = parseJwt(token);
+    return payload?.sub || payload?.email || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Helper: Get initials from name
+function getInitials(name) {
+  if (!name) return "";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+// Fetch user info using email from JWT and set header name (first and last only)
+async function setHeaderUserNameFromAPI() {
+  const authToken = localStorage.getItem("authToken");
+  const email = getEmailFromJWT(authToken);
+  if (!email) return;
+
+  try {
+    const res = await fetch(`http://localhost:8080/user?email=${encodeURIComponent(email)}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-Type": "application/json"
+      }
+    });
+    if (res.ok) {
+      const user = await res.json();
+      // Only show first and last name
+      let name = user.name || "";
+      let initials = "U";
+      if (name) {
+        const parts = name.trim().split(" ");
+        name = parts[0] + (parts.length > 1 ? " " + parts[parts.length - 1] : "");
+        initials = getInitials(name);
+      }
+      const userNameEl = document.getElementById("userName");
+      const profileAvatarEl = document.getElementById("profileAvatar");
+      if (userNameEl) userNameEl.textContent = name || "User";
+      if (profileAvatarEl) {
+        if (user.profilePictureUrl) {
+          profileAvatarEl.innerHTML = `<img src="${user.profilePictureUrl}" alt="Profile" style="width:38px;height:38px;border-radius:50%;">`;
+        } else {
+          profileAvatarEl.textContent = initials;
+        }
+      }
+    }
+  } catch (e) {
+    // fallback: do nothing
+  }
+}
+
+// Call this after loading the header (after loadComponent)
+document.addEventListener("DOMContentLoaded", function () {
+  // ...existing code...
+  // After loadComponent and its callback:
+  setTimeout(setHeaderUserNameFromAPI, 500); // Delay to ensure header is loaded
+});
