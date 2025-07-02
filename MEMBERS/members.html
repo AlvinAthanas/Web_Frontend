@@ -158,14 +158,13 @@
               <ul>
                 <li>Name (required)</li>
                 <li>Email (required)</li>
-                <li>Password (required)</li>
                 <li>Phone</li>
                 <li>Address</li>
                 <li>Birth Date (YYYY-MM-DD format)</li>
-                <li>Gender (exactly "Male" or "Female" - case sensitive)</li>
+                <li>Gender (exactly "Male" or "Female")</li>
                 <li>Marital Status (Single, Married, Divorced)</li>
-                <li>Parish ID</li>
               </ul>
+              <p><strong>Note:</strong> Password and Parish ID are set automatically by the system.</p>
             </div>
             <form id="importForm">
               <input type="file" id="excelFile" accept=".xlsx, .xls" required />
@@ -642,6 +641,37 @@
         localStorage.setItem("reports", JSON.stringify(reports));
       }
 
+      // Helper function to format gender to match backend enum
+      function formatGender(gender) {
+        if (!gender) return null;
+
+        // Convert to string and trim
+        const genderStr = String(gender).trim();
+
+        // Match to enum values: Male, Female
+        if (genderStr.toLowerCase() === 'male') return 'Male';
+        if (genderStr.toLowerCase() === 'female') return 'Female';
+
+        // If no match, return null
+        return null;
+      }
+
+      // Helper function to format marital status to match backend enum
+      function formatMaritalStatus(status) {
+        if (!status) return null;
+
+        // Convert to string and trim
+        const statusStr = String(status).trim();
+
+        // Match to enum values: Married, Single, Divorced
+        if (statusStr.toLowerCase() === 'married') return 'Married';
+        if (statusStr.toLowerCase() === 'single') return 'Single';
+        if (statusStr.toLowerCase() === 'divorced') return 'Divorced';
+
+        // If no match, return null
+        return null;
+      }
+
       // Setup import functionality
       function setupImport() {
         const importBtn = document.getElementById("importBtn");
@@ -717,7 +747,7 @@
       // Validate and transform Excel data to match User entity
       function validateAndTransformData(jsonData) {
         const validUsers = [];
-        const requiredFields = ['name', 'email', 'password'];
+        const requiredFields = ['name', 'email'];
 
         jsonData.forEach((row, index) => {
           // Check if all required fields are present
@@ -732,13 +762,14 @@
           const user = {
             name: row.name,
             email: row.email,
-            password: row.password,
+            // password and parishId are set by the backend
+            password: null,
+            parishId: null,
             phone: row.phone || null,
             address: row.address || null,
             birthDate: row.birthDate || row['birthDate'] || null,
-            gender: row.gender ? (row.gender.charAt(0).toUpperCase() + row.gender.slice(1).toLowerCase()) : null,
-            maritalStatus: row.maritalStatus || row['marital status'] ? (row.maritalStatus || row['marital status']).toUpperCase() : null,
-            parishId: row.parishId || row['parish id'] || null
+            gender: formatGender(row.gender),
+            maritalStatus: formatMaritalStatus(row.maritalStatus || row['marital status'])
           };
 
           // Convert birthDate to proper format if it exists

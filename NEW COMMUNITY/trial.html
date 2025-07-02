@@ -98,15 +98,38 @@
     <script>
       // At the top of your script in trial.html
       document.addEventListener("DOMContentLoaded", function () {
-        // Get community details from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const communityId = urlParams.get("communityId");
-        const communityName = urlParams.get("communityName");
+        // Only get community details from localStorage
+        let communityId = null;
+        let communityName = null;
+
+        const storedCommunity = localStorage.getItem("currentCommunity");
+        if (storedCommunity) {
+          const group = JSON.parse(storedCommunity);
+          if (group && group.id && group.name) {
+            communityId = group.id;
+            communityName = group.name;
+          } else {
+            // Remove invalid or empty community from storage
+            localStorage.removeItem("currentCommunity");
+            communityId = null;
+            communityName = null;
+          }
+        } else {
+          communityId = null;
+          communityName = null;
+        }
+
+        // If still no community, ensure localStorage is clean
+        if (!communityId || !communityName) {
+          localStorage.removeItem("currentCommunity");
+        }
 
         // Store these in a way that other functions can access
         window.currentCommunity = {
           id: communityId,
-          name: communityName ? decodeURIComponent(communityName) : "Community",
+          name: communityName
+            ? decodeURIComponent(communityName)
+            : "No Community assigned",
         };
 
         // Update the header

@@ -372,6 +372,7 @@
       </div>
     </div>
 
+    <script src="../config.js"></script>
     <script src="../GENERAL/script.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
@@ -395,7 +396,6 @@
         const collectedAmountGroup = document.getElementById("collectedAmountGroup");
         const remainingAmountGroup = document.getElementById("remainingAmountGroup");
 
-        const apiUrl = BASE_API_URL;
         let projects = [];
         let currentProjectId = null;
         let deleteProjectId = null;
@@ -404,7 +404,7 @@
         async function fetchProjects() {
           try {
             const token = localStorage.getItem("authToken");
-            const response = await fetch(`${apiUrl}/projects`, {
+            const response = await fetch(`${BASE_API_URL}/projects`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -637,14 +637,14 @@
             let response;
             if (currentProjectId) {
               // Update project
-              response = await fetch(`${apiUrl}/project/${currentProjectId}`, {
+              response = await fetch(`${BASE_API_URL}/project/${currentProjectId}`, {
                 method: "PUT",
                 body: formData,
                 headers,
               });
             } else {
               // Add new project
-              response = await fetch(`${apiUrl}/project`, {
+              response = await fetch(`${BASE_API_URL}/project`, {
                 method: "POST",
                 body: formData,
                 headers,
@@ -666,7 +666,7 @@
         confirmDeleteBtn.addEventListener("click", async function () {
           try {
             const token = localStorage.getItem("authToken");
-            await fetch(`${apiUrl}/project/${deleteProjectId}`, {
+            await fetch(`${BASE_API_URL}/project/${deleteProjectId}`, {
               method: "DELETE",
               headers: {
                 Authorization: `Bearer ${token}`,

@@ -15,7 +15,6 @@ let addMemberForm, newMemberName, newMemberEmail, newMemberPhone;
 let searchTab, addTab, searchContent, addContent;
 
 // Base URL for API endpoints
-const API_BASE_URL = "http://localhost:8080";
 
 // Initialize the page
 function initSacramentPage(type) {
@@ -141,7 +140,7 @@ async function addNewMember() {
         }
 
         // Create new user
-        const response = await fetch(`${API_BASE_URL}/user`, {
+        const response = await fetch(`${BASE_API_URL}/user`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -186,7 +185,7 @@ async function fetchParticipants() {
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/users`, {
+        const response = await fetch(`${BASE_API_URL}/users`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -214,7 +213,7 @@ async function searchUsers(name) {
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/user/search?name=${encodeURIComponent(name)}`, {
+        const response = await fetch(`${BASE_API_URL}/user/search?name=${encodeURIComponent(name)}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -341,7 +340,7 @@ async function completeTraining(participantId) {
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/user/${participantId}`, {
+        const response = await fetch(`${BASE_API_URL}/user/${participantId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -442,7 +441,7 @@ async function loadAndDisplayCandidatesForSession() {
         return;
     }
 
-    const url = `${API_BASE_URL}/sacrament-candidates-for-session?type=${encodeURIComponent(type)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+    const url = `${BASE_API_URL}/sacrament-candidates-for-session?type=${encodeURIComponent(type)}&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
 
     try {
         const response = await fetch(url, {

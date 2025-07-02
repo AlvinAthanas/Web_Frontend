@@ -349,7 +349,7 @@
         </div>
       </form>
     </div>
-
+    <script src="../config.js"></script>
     <script src="sacraments.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -357,6 +357,7 @@
         loadAndDisplayCandidatesForSession();
       });
     </script>
+
     <script src="../GENERAL/script.js"></script>
     <script>
       // Session navigation logic
@@ -517,7 +518,7 @@
         };
 
         try {
-          const response = await fetch("${BASE_API_URL}/sacrament", {
+          const response = await fetch(`${BASE_API_URL}/sacrament`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -579,7 +580,7 @@
           try {
             // 1. Create candidate
             const candidateRes = await fetch(
-              "${BASE_API_URL}/sacrament/candidate",
+              `${BASE_API_URL}/sacrament/candidate`,
               {
                 method: "POST",
                 headers: {
@@ -601,7 +602,7 @@
               startDate,
               completionDate,
             };
-            const regRes = await fetch("${BASE_API_URL}/sacrament", {
+            const regRes = await fetch(`${BASE_API_URL}/sacrament`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

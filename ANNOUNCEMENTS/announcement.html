@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
 
-     <!-- Config.js -->
+    <!-- Config.js -->
     <script src="../config.js"></script>
 
     <!-- External CSS -->
@@ -798,16 +798,16 @@
 
         // Format recipient information for display
         function formatRecipientInfo(announcement) {
-          if (announcement.recipientType === "entire_parish") {
-            return "Entire Parish";
-          } else if (announcement.recipientType === "community") {
-            return announcement.communityName || "Community";
-          } else if (announcement.recipientType === "individual") {
-            return announcement.recipientName || "Individual";
-          } else if (announcement.recipientType === "kanda") {
-            return announcement.kandaName || "Kanda";
+          // Show group/community if present
+          if (announcement.targetGroupName) {
+            return `${announcement.targetGroupName} community`;
           }
-          return "N/A";
+          // Show kanda if present
+          if (announcement.targetKandaName) {
+            return `${announcement.targetKandaName} kanda`;
+          }
+          // Default to entire parish
+          return "Entire Parish";
         }
 
         // Format date to be more readable

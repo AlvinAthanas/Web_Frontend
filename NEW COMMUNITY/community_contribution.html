@@ -295,8 +295,8 @@
         </main>
     </div>
 
+    <script src="../config.js"></script>
     <script>
-        const backendBaseUrl = BASE_API_URL;  // Change if needed
 
         document.addEventListener('DOMContentLoaded', loadContributions);
 
@@ -306,7 +306,7 @@
         });
 
         function loadContributions() {
-            fetch(`${backendBaseUrl}/group/contributions/declarations`, {
+            fetch(`${BASE_API_URL}/group/contributions/declarations`, {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer ' + getToken() }
             })
@@ -346,7 +346,7 @@
             totalsVisible = false;
             document.getElementById('memberContributionsTable').classList.remove('hidden');
             document.getElementById('memberTotalsTable').classList.add('hidden');
-            fetch(`${backendBaseUrl}/group/contributions/requirement/${requirementId}/submissions`, {
+            fetch(`${BASE_API_URL}/group/contributions/requirement/${requirementId}/submissions`, {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer ' + getToken() }
             })
@@ -391,7 +391,7 @@
             const totalsTable = document.getElementById('memberTotalsTable');
             if (totalsVisible) {
                 // Fetch and show totals
-                fetch(`${backendBaseUrl}/group/contributions/${currentRequirementId}/members-progress`, {
+                fetch(`${BASE_API_URL}/group/contributions/${currentRequirementId}/members-progress`, {
                     method: 'GET',
                     headers: { 'Authorization': 'Bearer ' + getToken() }
                 })
@@ -439,7 +439,7 @@
                 description: document.getElementById('description').value
             };
 
-            fetch(`${backendBaseUrl}/group/contributions/declare`, {
+            fetch(`${BASE_API_URL}/group/contributions/declare`, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + getToken(),
@@ -460,7 +460,7 @@
         }
 
         function exportExcel() {
-            fetch(`${backendBaseUrl}/group/contributions/declarations/export`, {
+            fetch(`${BASE_API_URL}/group/contributions/declarations/export`, {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer ' + getToken() }
             })
@@ -479,7 +479,7 @@
         }
 
         function exportPDF() {
-            fetch(`${backendBaseUrl}/group/contributions/declarations/export/pdf`, {
+            fetch(`${BASE_API_URL}/group/contributions/declarations/export/pdf`, {
                 method: 'GET',
                 headers: { 'Authorization': 'Bearer ' + getToken() }
             })
@@ -528,7 +528,7 @@
             };
 
             // Send the contribution to the backend
-            fetch(`${backendBaseUrl}/group/contributions/submit`, {
+            fetch(`${BASE_API_URL}/group/contributions/submit`, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + getToken(),

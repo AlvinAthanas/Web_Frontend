@@ -1,269 +1,448 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Management</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Community Management</title>
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
 
-  <!-- Fonts and Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <!-- Styles -->
+    <link rel="stylesheet" href="../GENERAL/style.css" />
+    <link rel="stylesheet" href="community.css" />
+    <style>
+      .kanda-header {
+        font-weight: bold;
+        margin-top: 1em;
+        background: #f3f3f3;
+        padding: 0.5em;
+      }
+      .unassigned-label {
+        font-weight: bold;
+        color: #b00;
+        margin-top: 1.5em;
+        background: #fff3f3;
+        padding: 0.5em;
+      }
+      .empty-community {
+        font-style: italic;
+        color: #888;
+        margin-left: 1em;
+      }
+    </style>
+  </head>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="../GENERAL/style.css" />
-  <link rel="stylesheet" href="community.css" />
-  
-</head>
+  <body>
+    <div class="grid-container" id="containerId">
+      <main class="main-container">
+        <div class="container">
+          <h2>Community List</h2>
+          <input
+            type="text"
+            id="communityInput"
+            placeholder="Enter community name"
+            required
+          />
+          <button class="add-btn" onclick="addCommunity()">Add</button>
 
-<body>
-  <div class="grid-container" id="containerId">
-    <main class="main-container">
-      <div class="container">
-        <h2>Community List</h2>
-        <input type="text" id="communityInput" placeholder="Enter community name" required>
-        <button class="add-btn" onclick="addCommunity()">Add</button>
-
-        <!-- Add these new action buttons -->
-        <div class="action-buttons">
-          <button class="action-btn import-btn" onclick="document.getElementById('fileInput').click()">
-            <span class="material-icons-outlined">upload</span>
-            Import
-          </button>
-          <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileImport(event)">
-
-          <div style="position: relative;">
-            <button class="action-btn filter-btn" onclick="toggleFilterDropdown()">
-              <span class="material-icons-outlined">filter_alt</span>
-              Filter
+          <!-- Add these new action buttons -->
+          <div class="action-buttons">
+            <button
+              class="action-btn import-btn"
+              onclick="document.getElementById('fileInput').click()"
+            >
+              <span class="material-icons-outlined">upload</span>
+              Import
             </button>
-            <div id="filterDropdown" class="filter-dropdown">
-              <input type="text" id="kandaFilter" placeholder="Filter by Kanda name">
-              <button onclick="applyFilter()">Apply</button>
+            <input
+              type="file"
+              id="fileInput"
+              accept=".xlsx,.xls"
+              style="display: none"
+              onchange="handleFileImport(event)"
+            />
+
+            <div style="position: relative">
+              <button
+                class="action-btn filter-btn"
+                onclick="toggleFilterDropdown()"
+              >
+                <span class="material-icons-outlined">filter_alt</span>
+                Filter
+              </button>
+              <div id="filterDropdown" class="filter-dropdown">
+                <input
+                  type="text"
+                  id="kandaFilter"
+                  placeholder="Filter by Kanda name"
+                />
+                <button onclick="applyFilter()">Apply</button>
+              </div>
             </div>
           </div>
+
+          <ul class="community-list" id="communityList"></ul>
         </div>
+      </main>
+    </div>
 
-        <ul class="community-list" id="communityList"></ul>
-      </div>
-    </main>
-  </div>
+    <script src="../config.js"></script>
+    <script>
+      let allKandas = [];
+      let unassignedCommunities = [];
 
-  <script>
-    const apiUrl = "http://localhost:8080"; // adjust if needed
-    let allCommunities = []; // Store all communities for filtering
+      // Fetch kandas and their communities
+      async function fetchKandasAndCommunities() {
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${BASE_API_URL}/kandas`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          allKandas = await response.json();
+          renderKandasWithCommunities(allKandas);
+        } catch (error) {
+          console.error("Error fetching kandas:", error);
+        }
+      }
 
-    // Fetch and display all communities
-    async function fetchCommunities() {
-      try {
-        const token = localStorage.getItem("authToken");
-        const response = await fetch(`${apiUrl}/groups/communities`, {
-          headers: {
-            Authorization: `Bearer ${token}`
+      // Fetch communities not assigned to any kanda
+      async function fetchUnassignedCommunities() {
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${BASE_API_URL}/groups/communities`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const allCommunities = await response.json();
+          // Filter communities with empty or null kandaId
+          unassignedCommunities = allCommunities.filter(community => 
+            !community.kandaId || community.kandaId === "" || community.kandaId === null
+          );
+          renderUnassignedCommunities(unassignedCommunities);
+        } catch (error) {
+          console.error("Error fetching unassigned communities:", error);
+        }
+      }
+
+      // Render kandas and their communities
+      function renderKandasWithCommunities(kandas) {
+        const list = document.getElementById("communityList");
+        list.innerHTML = "";
+
+        kandas.forEach((kanda) => {
+          // Kanda header
+          const kandaHeader = document.createElement("li");
+          kandaHeader.textContent = kanda.name;
+          kandaHeader.classList.add("kanda-header");
+          list.appendChild(kandaHeader);
+
+          // Communities under this kanda
+          if (Array.isArray(kanda.groups) && kanda.groups.length > 0) {
+            kanda.groups.forEach((community) => {
+              const li = document.createElement("li");
+              li.classList.add("community-item");
+
+              const nameSpan = document.createElement("span");
+              nameSpan.textContent = community.name;
+              nameSpan.style.fontWeight = "500";
+              nameSpan.style.fontSize = "1rem";
+
+              const delButton = document.createElement("button");
+              delButton.textContent = "Delete";
+              delButton.classList.add("delete-btn");
+              delButton.onclick = () => deleteCommunity(community.id, li);
+
+              const editButton = document.createElement("button");
+              editButton.textContent = "Edit";
+              editButton.classList.add("edit-btn");
+              editButton.onclick = () => enableEditing(li, nameSpan, community.id);
+
+              li.appendChild(nameSpan);
+              li.appendChild(editButton);
+              li.appendChild(delButton);
+              list.appendChild(li);
+            });
+          } else {
+            // No communities under this kanda
+            const emptyLi = document.createElement("li");
+            emptyLi.textContent = "No communities in this kanda.";
+            emptyLi.classList.add("empty-community");
+            list.appendChild(emptyLi);
           }
         });
-        allCommunities = await response.json();
-        renderCommunityList(allCommunities);
-      } catch (error) {
-        console.error("Error fetching communities:", error);
       }
-    }
 
-    // Render list items
-    function renderCommunityList(communities) {
-      const list = document.getElementById("communityList");
-      list.innerHTML = "";
+      // Render unassigned communities at the bottom
+      function renderUnassignedCommunities(communities) {
+        const list = document.getElementById("communityList");
+        if (!communities.length) return;
 
-      communities.forEach((community) => {
-        const li = document.createElement("li");
-        // Replace link with plain text span
-        const nameSpan = document.createElement("span");
-        nameSpan.textContent = community.name;
-        nameSpan.style.fontWeight = "500";
-        nameSpan.style.fontSize = "1rem";
+        // Label
+        const labelLi = document.createElement("li");
+        labelLi.textContent = "Unassigned Communities";
+        labelLi.classList.add("unassigned-label");
+        list.appendChild(labelLi);
 
-        const delButton = document.createElement("button");
-        delButton.textContent = "Delete";
-        delButton.classList.add("delete-btn");
-        delButton.onclick = () => deleteCommunity(community.id, li);
+        communities.forEach((community) => {
+          const li = document.createElement("li");
+          li.classList.add("community-item");
 
-        const editButton = document.createElement("button");
-        editButton.textContent = "Edit";
-        editButton.classList.add("edit-btn");
-        editButton.onclick = () => enableEditing(li, nameSpan, community.id);
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = community.name;
+          nameSpan.style.fontWeight = "500";
+          nameSpan.style.fontSize = "1rem";
 
-        li.appendChild(nameSpan);
-        li.appendChild(editButton);
-        li.appendChild(delButton);
-        list.appendChild(li);
-      });
-    }
+          const delButton = document.createElement("button");
+          delButton.textContent = "Delete";
+          delButton.classList.add("delete-btn");
+          delButton.onclick = () => deleteCommunity(community.id, li);
 
-    // Add new community
-    async function addCommunity() {
-      const input = document.getElementById("communityInput");
-      const name = input.value.trim();
-      if (!name) return;
+          const editButton = document.createElement("button");
+          editButton.textContent = "Edit";
+          editButton.classList.add("edit-btn");
+          editButton.onclick = () => enableEditing(li, nameSpan, community.id);
 
-      try {
-        const token = localStorage.getItem("authToken");
-        const response = await fetch(`${apiUrl}/group/community`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({ name })
+          li.appendChild(nameSpan);
+          li.appendChild(editButton);
+          li.appendChild(delButton);
+          list.appendChild(li);
         });
-
-        if (!response.ok) throw new Error("Failed to add community");
-
-        input.value = "";
-        fetchCommunities();
-      } catch (error) {
-        console.error("Error adding community:", error);
       }
-    }
 
-    // Delete community (optional backend call if you have delete support)
-    async function deleteCommunity(id, li) {
-      if (!confirm("Delete this community?")) return;
-      try {
-        const token = localStorage.getItem("authToken");
-        const response = await fetch(`${apiUrl}/group/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+      // Fetch and display all communities
+      async function fetchCommunities() {
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${BASE_API_URL}/groups/communities`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          allCommunities = await response.json();
+          renderCommunityList(allCommunities);
+        } catch (error) {
+          console.error("Error fetching communities:", error);
+        }
+      }
+
+      // Render list items
+      function renderCommunityList(communities) {
+        const list = document.getElementById("communityList");
+        list.innerHTML = "";
+
+        communities.forEach((community) => {
+          const li = document.createElement("li");
+          // Replace link with plain text span
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = community.name;
+          nameSpan.style.fontWeight = "500";
+          nameSpan.style.fontSize = "1rem";
+
+          const delButton = document.createElement("button");
+          delButton.textContent = "Delete";
+          delButton.classList.add("delete-btn");
+          delButton.onclick = () => deleteCommunity(community.id, li);
+
+          const editButton = document.createElement("button");
+          editButton.textContent = "Edit";
+          editButton.classList.add("edit-btn");
+          editButton.onclick = () => enableEditing(li, nameSpan, community.id);
+
+          li.appendChild(nameSpan);
+          li.appendChild(editButton);
+          li.appendChild(delButton);
+          list.appendChild(li);
         });
-
-        if (!response.ok) throw new Error("Failed to delete community");
-
-        li.remove();
-      } catch (error) {
-        console.error("Error deleting community:", error);
       }
-    }
 
-    // Edit community name
-    function enableEditing(li, nameSpan, id) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = nameSpan.textContent;
-      input.classList.add("edit-input");
-
-      const saveBtn = document.createElement("button");
-      saveBtn.textContent = "Save";
-      saveBtn.classList.add("save-btn");
-
-      const cancelBtn = document.createElement("button");
-      cancelBtn.textContent = "Cancel";
-      cancelBtn.classList.add("cancel-btn");
-
-      const originalName = nameSpan.textContent;
-
-      li.replaceChild(input, nameSpan);
-      li.replaceChild(saveBtn, li.children[1]); // edit button
-      li.appendChild(cancelBtn);
-      li.children[2].style.display = "none"; // hide delete
-
-      saveBtn.onclick = async () => {
-        const newName = input.value.trim();
-        if (newName === "") return;
+      // Add new community
+      async function addCommunity() {
+        const input = document.getElementById("communityInput");
+        const name = input.value.trim();
+        if (!name) return;
 
         try {
           const token = localStorage.getItem("authToken");
-          const response = await fetch(`${apiUrl}/group/${id}`, {
-            method: "PUT",
+          const response = await fetch(`${BASE_API_URL}/group/community`, {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ id, name: newName, description: "community" })
+            body: JSON.stringify({ name }),
           });
 
-          if (!response.ok) throw new Error("Failed to update");
+          if (!response.ok) throw new Error("Failed to add community");
 
-          nameSpan.textContent = newName;
-          reset();
+          input.value = "";
+          fetchCommunities();
         } catch (error) {
-          console.error("Update error:", error);
+          console.error("Error adding community:", error);
+        }
+      }
+
+      // Delete community (optional backend call if you have delete support)
+      async function deleteCommunity(id, li) {
+        if (!confirm("Delete this community?")) return;
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(`${BASE_API_URL}/group/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) throw new Error("Failed to delete community");
+
+          li.remove();
+        } catch (error) {
+          console.error("Error deleting community:", error);
+        }
+      }
+
+      // Edit community name
+      function enableEditing(li, nameSpan, id) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = nameSpan.textContent;
+        input.classList.add("edit-input");
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Save";
+        saveBtn.classList.add("save-btn");
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.classList.add("cancel-btn");
+
+        const originalName = nameSpan.textContent;
+
+        li.replaceChild(input, nameSpan);
+        li.replaceChild(saveBtn, li.children[1]); // edit button
+        li.appendChild(cancelBtn);
+        li.children[2].style.display = "none"; // hide delete
+
+        saveBtn.onclick = async () => {
+          const newName = input.value.trim();
+          if (newName === "") return;
+
+          try {
+            const token = localStorage.getItem("authToken");
+            const response = await fetch(`${BASE_API_URL}/group/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                id,
+                name: newName,
+                description: "community",
+              }),
+            });
+
+            if (!response.ok) throw new Error("Failed to update");
+
+            nameSpan.textContent = newName;
+            reset();
+          } catch (error) {
+            console.error("Update error:", error);
+          }
+        };
+
+        cancelBtn.onclick = reset;
+
+        function reset() {
+          li.replaceChild(nameSpan, input);
+          li.replaceChild(createEditButton(nameSpan, id), saveBtn);
+          li.removeChild(cancelBtn);
+          li.children[2].style.display = "inline-block";
+        }
+
+        function createEditButton(nameSpan, id) {
+          const button = document.createElement("button");
+          button.textContent = "Edit";
+          button.classList.add("edit-btn");
+          button.onclick = () => enableEditing(li, nameSpan, id);
+          return button;
+        }
+
+        input.focus();
+      }
+
+      // New function to handle file import
+      function handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Here you would implement Excel file parsing
+        // For now, just show an alert
+        alert(
+          `Selected file: ${file.name}\n\nExcel import functionality would be implemented here.`
+        );
+
+        // Reset the file input
+        event.target.value = "";
+      }
+
+      // New function to toggle filter dropdown
+      function toggleFilterDropdown() {
+        const dropdown = document.getElementById("filterDropdown");
+        dropdown.classList.toggle("show");
+      }
+
+      // New function to apply filter
+      function applyFilter() {
+        const filterValue = document
+          .getElementById("kandaFilter")
+          .value.toLowerCase();
+        if (!filterValue) {
+          renderCommunityList(allCommunities);
+        } else {
+          const filtered = allCommunities.filter((community) =>
+            community.name.toLowerCase().includes(filterValue)
+          );
+          renderCommunityList(filtered);
+        }
+        document.getElementById("filterDropdown").classList.remove("show");
+      }
+
+      // Close the filter dropdown if clicked outside
+      window.onclick = function (event) {
+        if (!event.target.matches(".filter-btn")) {
+          const dropdowns = document.getElementsByClassName("filter-dropdown");
+          for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains("show")) {
+              openDropdown.classList.remove("show");
+            }
+          }
         }
       };
 
-      cancelBtn.onclick = reset;
-
-      function reset() {
-        li.replaceChild(nameSpan, input);
-        li.replaceChild(createEditButton(nameSpan, id), saveBtn);
-        li.removeChild(cancelBtn);
-        li.children[2].style.display = "inline-block";
+      // Initial load
+      async function initialLoad() {
+        await fetchKandasAndCommunities();
+        await fetchUnassignedCommunities();
       }
 
-      function createEditButton(nameSpan, id) {
-        const button = document.createElement("button");
-        button.textContent = "Edit";
-        button.classList.add("edit-btn");
-        button.onclick = () => enableEditing(li, nameSpan, id);
-        return button;
-      }
+      initialLoad();
+    </script>
 
-      input.focus();
-    }
-
-    // New function to handle file import
-    function handleFileImport(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      // Here you would implement Excel file parsing
-      // For now, just show an alert
-      alert(`Selected file: ${file.name}\n\nExcel import functionality would be implemented here.`);
-
-      // Reset the file input
-      event.target.value = '';
-    }
-
-    // New function to toggle filter dropdown
-    function toggleFilterDropdown() {
-      const dropdown = document.getElementById("filterDropdown");
-      dropdown.classList.toggle("show");
-    }
-
-    // New function to apply filter
-    function applyFilter() {
-      const filterValue = document.getElementById("kandaFilter").value.toLowerCase();
-      if (!filterValue) {
-        renderCommunityList(allCommunities);
-      } else {
-        const filtered = allCommunities.filter(community =>
-          community.name.toLowerCase().includes(filterValue)
-        );
-        renderCommunityList(filtered);
-      }
-      document.getElementById("filterDropdown").classList.remove("show");
-    }
-
-    // Close the filter dropdown if clicked outside
-    window.onclick = function (event) {
-      if (!event.target.matches('.filter-btn')) {
-        const dropdowns = document.getElementsByClassName("filter-dropdown");
-        for (let i = 0; i < dropdowns.length; i++) {
-          const openDropdown = dropdowns[i];
-          if (openDropdown.classList.contains('show')) {
-            openDropdown.classList.remove('show');
-          }
-        }
-      }
-    }
-
-    // Initial load
-    fetchCommunities();
-  </script>
-
-  <script src="../GENERAL/script.js"></script>
-</body>
-
+    <script src="../GENERAL/script.js"></script>
+  </body>
 </html>

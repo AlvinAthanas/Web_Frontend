@@ -22,201 +22,255 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="../DASHBOARD/dashboard.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
-    <link rel="stylesheet" href="feedback.css">
+    <link rel="stylesheet" href="feedback.css" />
 
     <!-- FullCalendar CSS -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
     />
-  <style>
-   
-  </style>
-</head>
+    <style></style>
+  </head>
   <body>
+    <div
+      id="loading"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 999;
+        background: rgba(255, 255, 255, 0.7);
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <span>Loading...</span>
+    </div>
     <div class="grid-container" id="containerId">
       <main class="main-container">
-    <h1>Feedback Management</h1>
-    <p class="subtitle">Monitor and respond to user feedback to improve your church management system</p>
+        <h1>Feedback Management</h1>
+        <p class="subtitle">
+          Monitor and respond to user feedback to improve your church management
+          system
+        </p>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <svg class="stat-icon" fill="none" stroke="#3b82f6" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        <div class="stat-info">
-          <span>Total Feedback</span>
-          <p id="total-feedback">0</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <svg class="stat-icon" fill="none" stroke="#22c55e" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        <div class="stat-info">
-          <span>This Week</span>
-          <p id="this-week">0</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <svg class="stat-icon" fill="none" stroke="#f97316" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <div class="stat-info">
-          <span>Pending Review</span>
-          <p id="pending">0</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="filters">
-      <div class="filter-grid">
-        <div class="filter-group">
-          <label for="filter-type">Filter by Type</label>
-          <select id="filter-type">
-            <option value="All Types">All Types</option>
-            <option value="CONCERN">Concern</option>
-            <option value="PRAISE">Praise</option>
-            <option value="SUGGESTION">Suggestion</option>
-            <option value="CONTRIBUTION">Contribution</option>
-            <option value="EVENT">Event</option>
-            <option value="OTHER">Other</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="date-range">Date Range</label>
-          <select id="date-range">
-            <option value="All Time">All Time</option>
-            <option value="Today">Today</option>
-            <option value="This Week">This Week</option>
-            <option value="This Month">This Month</option>
-            <option value="Last 3 Months">Last 3 Months</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label for="search">Search</label>
-          <input type="text" id="search" placeholder="Search feedback...">
-        </div>
-        <div class="filter-group">
-          <button class="filter-button" onclick="applyFilters()">Apply Filters</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="feedback-grid" id="feedback-grid">
-      <div class="loading" id="loading">
-        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
-          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"/>
-        </svg>
-        Loading feedback...
-      </div>
-    </div>
-
-    <div class="modal" id="feedback-modal" onclick="closeModal()">
-      <div class="modal-content" onclick="event.stopPropagation();">
-        <div class="modal-header">
-          <h2>Feedback Details</h2>
-          <button class="close-button" onclick="closeModal()">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <svg
+              class="stat-icon"
+              fill="none"
+              stroke="#3b82f6"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
             </svg>
-          </button>
+            <div class="stat-info">
+              <span>Total Feedback</span>
+              <p id="total-feedback">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <svg
+              class="stat-icon"
+              fill="none"
+              stroke="#22c55e"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <div class="stat-info">
+              <span>This Week</span>
+              <p id="this-week">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <svg
+              class="stat-icon"
+              fill="none"
+              stroke="#f97316"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div class="stat-info">
+              <span>Pending Review</span>
+              <p id="pending">0</p>
+            </div>
+          </div>
         </div>
-        <div class="modal-body" id="modal-body"></div>
-      </div>
+
+        <div class="filters">
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label for="filter-type">Filter by Type</label>
+              <select id="filter-type">
+                <option value="All Types">All Types</option>
+                <option value="CONCERN">Concern</option>
+                <option value="PRAISE">Praise</option>
+                <option value="SUGGESTION">Suggestion</option>
+                <option value="CONTRIBUTION">Contribution</option>
+                <option value="EVENT">Event</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="date-range">Date Range</label>
+              <select id="date-range">
+                <option value="All Time">All Time</option>
+                <option value="Today">Today</option>
+                <option value="This Week">This Week</option>
+                <option value="This Month">This Month</option>
+                <option value="Last 3 Months">Last 3 Months</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="search">Search</label>
+              <input type="text" id="search" placeholder="Search feedback..." />
+            </div>
+            <div class="filter-group">
+              <button class="filter-button" onclick="applyFilters()">
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback-grid" id="feedback-grid"></div>
+
+        <div class="modal" id="feedback-modal" onclick="closeModal()">
+          <div class="modal-content" onclick="event.stopPropagation();">
+            <div class="modal-header">
+              <h2>Feedback Details</h2>
+              <button class="close-button" onclick="closeModal()">
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+          </div>
+        </div>
+      </main>
     </div>
-  </div>
+    <script src="../config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let allFeedbacks = [];
+        let feedbacks = [];
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
-    const BASE_URL = BASE_API_URL;
+        async function fetchFeedbacks() {
+          const loading = document.getElementById("loading");
+          loading.style.display = "flex";
+          const grid = document.getElementById("feedback-grid");
+          grid.innerHTML = "";
 
-    let allFeedbacks = [];
-    let feedbacks = [];
-
-    async function fetchFeedbacks() {
-      const loading = document.getElementById('loading');
-      loading.style.display = 'flex';
-      const grid = document.getElementById('feedback-grid');
-      grid.innerHTML = '';
-
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BASE_URL}/feedbacks`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+          try {
+            const token = localStorage.getItem("authToken");
+            const response = await fetch(`${BASE_API_URL}/feedbacks`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (!response.ok) throw new Error("Network response was not ok");
+            allFeedbacks = await response.json();
+            applyFilters(); // Apply filters after fetching
+          } catch (error) {
+            console.error("Error fetching feedbacks:", error);
+            grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
+          } finally {
+            loading.style.display = "none";
           }
-        });
-        if (!response.ok) throw new Error('Network response was not ok');
-        allFeedbacks = await response.json();
-        applyFilters(); // Apply filters after fetching
-      } catch (error) {
-        console.error('Error fetching feedbacks:', error);
-        grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
-      } finally {
-        loading.style.display = 'none';
-      }
-    }
+        }
 
-    function updateStats() {
-      const total = feedbacks.length;
-      const thisWeek = feedbacks.filter(f => {
-        if (!f.date) return false;
-        const date = new Date(f.date);
-        const now = new Date();
-        const diff = (now - date) / (1000 * 60 * 60 * 24);
-        return diff <= 7;
-      }).length;
+        function updateStats() {
+          const total = feedbacks.length;
+          const thisWeek = feedbacks.filter((f) => {
+            if (!f.date) return false;
+            const date = new Date(f.date);
+            const now = new Date();
+            const diff = (now - date) / (1000 * 60 * 60 * 24);
+            return diff <= 7;
+          }).length;
 
-      // No rating or status in your backend, so set pending to 0
-      const pending = 0;
+          // No rating or status in your backend, so set pending to 0
+          const pending = 0;
 
-      document.getElementById('total-feedback').textContent = total;
-      document.getElementById('this-week').textContent = thisWeek;
-      document.getElementById('pending').textContent = pending;
-    }
+          document.getElementById("total-feedback").textContent = total;
+          document.getElementById("this-week").textContent = thisWeek;
+          document.getElementById("pending").textContent = pending;
+        }
 
-    function renderFeedbacks() {
-      console.log('Rendering feedbacks:', feedbacks); // Add this line
-      const grid = document.getElementById('feedback-grid');
-      grid.innerHTML = '';
+        function renderFeedbacks() {
+          console.log("Rendering feedbacks:", feedbacks); // Add this line
+          const grid = document.getElementById("feedback-grid");
+          grid.innerHTML = "";
 
-      if (feedbacks.length === 0) {
-        grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
-        return;
-      }
+          if (feedbacks.length === 0) {
+            grid.innerHTML = '<p class="no-feedback">No feedback found.</p>';
+            return;
+          }
 
-      // Map backend types to user-friendly labels and CSS classes
-      const typeLabels = {
-        CONCERN: 'Concern',
-        PRAISE: 'Praise',
-        SUGGESTION: 'Suggestion',
-        CONTRIBUTION: 'Contribution',
-        EVENT: 'Event',
-        OTHER: 'Other'
-      };
-      const typeClasses = {
-        CONCERN: 'type-concern',
-        PRAISE: 'type-praise',
-        SUGGESTION: 'type-suggestion',
-        CONTRIBUTION: 'type-contribution',
-        EVENT: 'type-event',
-        OTHER: 'type-other'
-      };
+          // Map backend types to user-friendly labels and CSS classes
+          const typeLabels = {
+            CONCERN: "Concern",
+            PRAISE: "Praise",
+            SUGGESTION: "Suggestion",
+            CONTRIBUTION: "Contribution",
+            EVENT: "Event",
+            OTHER: "Other",
+          };
+          const typeClasses = {
+            CONCERN: "type-concern",
+            PRAISE: "type-praise",
+            SUGGESTION: "type-suggestion",
+            CONTRIBUTION: "type-contribution",
+            EVENT: "type-event",
+            OTHER: "type-other",
+          };
 
-      feedbacks.forEach(f => {
-        const card = document.createElement('div');
-        card.className = 'feedback-card';
+          feedbacks.forEach((f) => {
+            const card = document.createElement("div");
+            card.className = "feedback-card";
 
-        // Show details on click
-        card.onclick = () => fetchFeedbackDetails(f.id);
+            // Show details on click
+            card.onclick = () => fetchFeedbackDetails(f.id);
 
-        const typeLabel = typeLabels[f.type] || f.type;
-        const typeClass = typeClasses[f.type] || 'type-general';
-        const dateStr = f.date ? new Date(f.date).toLocaleDateString() : 'No date';
+            const typeLabel = typeLabels[f.type] || f.type;
+            const typeClass = typeClasses[f.type] || "type-general";
+            const dateStr = f.date
+              ? new Date(f.date).toLocaleDateString()
+              : "No date";
 
-        card.innerHTML = `
+            card.innerHTML = `
           <div class="feedback-header">
             <span class="feedback-type ${typeClass}">${typeLabel}</span>
             <span class="feedback-date">${dateStr}</span>
@@ -224,104 +278,127 @@
           <p class="feedback-message">${f.message}</p>
           <button class="filter-button" onclick="event.stopPropagation(); deleteFeedback(${f.id})">Delete</button>
         `;
-        grid.appendChild(card);
-      });
-    }
+            grid.appendChild(card);
+          });
+        }
 
-    // Delete feedback by id
-    async function deleteFeedback(id) {
-      if (!confirm('Are you sure you want to delete this feedback?')) return;
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BASE_URL}/feedback/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
+        // Delete feedback by id
+        async function deleteFeedback(id) {
+          if (!confirm("Are you sure you want to delete this feedback?"))
+            return;
+          try {
+            const token = localStorage.getItem("authToken");
+            const response = await fetch(`${BASE_API_URL}/feedback/${id}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (!response.ok) throw new Error("Delete failed");
+            fetchFeedbacks();
+          } catch (error) {
+            alert("Failed to delete feedback.");
+            console.error(error);
           }
-        });
-        if (!response.ok) throw new Error('Delete failed');
-        fetchFeedbacks();
-      } catch (error) {
-        alert('Failed to delete feedback.');
-        console.error(error);
-      }
-    }
+        }
 
-    async function fetchFeedbackDetails(id) {
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BASE_URL}/feedback/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) throw new Error('Network response was not ok');
-        const f = await response.json();
-        const modalBody = document.getElementById('modal-body');
-        modalBody.innerHTML = `
+        // Add this line to expose the function globally
+        window.deleteFeedback = deleteFeedback;
+
+        async function fetchFeedbackDetails(id) {
+          try {
+            const token = localStorage.getItem("authToken");
+            const response = await fetch(`${BASE_API_URL}/feedback/${id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (!response.ok) throw new Error("Network response was not ok");
+            const f = await response.json();
+            const modalBody = document.getElementById("modal-body");
+            modalBody.innerHTML = `
           <p><strong>Type:</strong> ${f.type}</p>
-          <p><strong>Date:</strong> ${f.date ? new Date(f.date).toLocaleString() : ''}</p>
+          <p><strong>Date:</strong> ${
+            f.date ? new Date(f.date).toLocaleString() : ""
+          }</p>
           <p><strong>Message:</strong> ${f.message}</p>
-          ${f.email ? `<p><strong>Email:</strong> ${f.email}</p>` : ''}
+          ${f.email ? `<p><strong>Email:</strong> ${f.email}</p>` : ""}
         `;
-        document.getElementById('feedback-modal').style.display = 'flex';
-      } catch (error) {
-        console.error('Error fetching feedback details:', error);
-      }
-    }
-
-    function closeModal() {
-      document.getElementById('feedback-modal').style.display = 'none';
-    }
-
-    document.addEventListener('keydown', function(event) {
-      if (event.key === "Escape") {
-        closeModal();
-      }
-    });
-
-    function applyFilters() {
-      const filterType = document.getElementById('filter-type').value;
-      const dateRange = document.getElementById('date-range').value;
-      const search = document.getElementById('search').value.toLowerCase();
-
-      feedbacks = allFeedbacks.filter(f => {
-        // Type filter
-        if (filterType !== 'All Types' && f.type !== filterType) return false;
-
-        // Date range filter
-        if (dateRange !== 'All Time' && f.date) {
-          const feedbackDate = new Date(f.date);
-          const now = new Date();
-          if (dateRange === 'Today' && feedbackDate.toDateString() !== now.toDateString()) return false;
-          if (dateRange === 'This Week') {
-            const diff = (now - feedbackDate) / (1000 * 60 * 60 * 24);
-            if (diff > 7) return false;
-          }
-          if (dateRange === 'This Month' && feedbackDate.getMonth() !== now.getMonth()) return false;
-          if (dateRange === 'Last 3 Months') {
-            const diff = (now - feedbackDate) / (1000 * 60 * 60 * 24);
-            if (diff > 90) return false;
+            document.getElementById("feedback-modal").style.display = "flex";
+          } catch (error) {
+            console.error("Error fetching feedback details:", error);
           }
         }
 
-        // Search filter
-        if (search) {
-          const msg = (f.message || '').toLowerCase();
-          const email = (f.email || '').toLowerCase();
-          if (!msg.includes(search) && !email.includes(search)) return false;
+        function closeModal() {
+          document.getElementById("feedback-modal").style.display = "none";
         }
 
-        return true;
+        // Add this line to expose the function globally
+        window.closeModal = closeModal;
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            closeModal();
+          }
+        });
+
+        function applyFilters() {
+          const filterType = document.getElementById("filter-type").value;
+          const dateRange = document.getElementById("date-range").value;
+          const search = document.getElementById("search").value.toLowerCase();
+
+          feedbacks = allFeedbacks.filter((f) => {
+            // Type filter
+            if (filterType !== "All Types" && f.type !== filterType)
+              return false;
+
+            // Date range filter
+            if (dateRange !== "All Time" && f.date) {
+              const feedbackDate = new Date(f.date);
+              const now = new Date();
+              if (
+                dateRange === "Today" &&
+                feedbackDate.toDateString() !== now.toDateString()
+              )
+                return false;
+              if (dateRange === "This Week") {
+                const diff = (now - feedbackDate) / (1000 * 60 * 60 * 24);
+                if (diff > 7) return false;
+              }
+              if (
+                dateRange === "This Month" &&
+                feedbackDate.getMonth() !== now.getMonth()
+              )
+                return false;
+              if (dateRange === "Last 3 Months") {
+                const diff = (now - feedbackDate) / (1000 * 60 * 60 * 24);
+                if (diff > 90) return false;
+              }
+            }
+
+            // Search filter
+            if (search) {
+              const msg = (f.message || "").toLowerCase();
+              const email = (f.email || "").toLowerCase();
+              if (!msg.includes(search) && !email.includes(search))
+                return false;
+            }
+
+            return true;
+          });
+
+          updateStats();
+          renderFeedbacks();
+        }
+
+        // Add this line to expose the function globally
+        window.applyFilters = applyFilters;
+
+        // Initial load
+        fetchFeedbacks();
       });
-
-      updateStats();
-      renderFeedbacks();
-    }
-
-    // Initial load
-    fetchFeedbacks();
-  </script>
-</body>
-<script src="../GENERAL/script.js"></script>
+    </script>
+  </body>
+  <script src="../GENERAL/script.js"></script>
 </html>

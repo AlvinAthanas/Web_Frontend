@@ -142,6 +142,20 @@ if (user && user.parishId) {
     localStorage.setItem('parishId', user.parishId);
 }
 
+// Store the user's community group in localStorage
+if (user && Array.isArray(user.groups)) {
+  const communityGroup = user.groups.find(g => g.description === "community");
+  if (communityGroup) {
+    localStorage.setItem("currentCommunity", JSON.stringify(communityGroup));
+  } else {
+    // Remove any previous community if user has none
+    localStorage.removeItem("currentCommunity");
+  }
+} else {
+  // Remove any previous community if user has none
+  localStorage.removeItem("currentCommunity");
+}
+
 function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1];

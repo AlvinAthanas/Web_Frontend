@@ -433,8 +433,8 @@
       </div>
     </div>
 
+    <script src="../config.js"></script>
     <script>
-      const apiUrl = BASE_API_URL; // change if needed
       const massTableBody = document.getElementById("massTableBody");
       let currentTab = 'mass';
       let editingId = null;
@@ -479,7 +479,7 @@
       async function fetchSchedules() {
         try {
           const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`${apiUrl}/event/schedules?description=Mass`, {
+          const response = await fetch(`${BASE_API_URL}/event/schedules?description=Mass`, {
             headers: {
               'Authorization': `Bearer ${authToken}`
             }
@@ -552,7 +552,7 @@
             editingEvent.dateTime = localDateTime;
             editingEvent.description = description;
 
-            const response = await fetch(`${apiUrl}/event/${editingId}`, {
+            const response = await fetch(`${BASE_API_URL}/event/${editingId}`, {
               method: "PUT",
               headers: { 
                 "Content-Type": "application/json",
@@ -570,7 +570,7 @@
               description
             };
 
-            const response = await fetch(`${apiUrl}/event/schedule`, {
+            const response = await fetch(`${BASE_API_URL}/event/schedule`, {
               method: "POST",
               headers: { 
                 "Content-Type": "application/json",
@@ -593,7 +593,7 @@
       async function editSchedule(id, type) {
         try {
           const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`${apiUrl}/event/${id}`, {
+          const response = await fetch(`${BASE_API_URL}/event/${id}`, {
             headers: {
               'Authorization': `Bearer ${authToken}`
             }
@@ -673,7 +673,7 @@
             confirmBox.remove();
             try {
               const authToken = localStorage.getItem('authToken');
-              const response = await fetch(`${apiUrl}/event/${id}`, {
+              const response = await fetch(`${BASE_API_URL}/event/${id}`, {
                 method: "DELETE",
                 headers: {
                   'Authorization': `Bearer ${authToken}`
