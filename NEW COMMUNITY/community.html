@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
+      href="https://
       rel="stylesheet"
     />
     <link
@@ -38,6 +38,21 @@
         font-style: italic;
         color: #888;
         margin-left: 1em;
+      }
+      .button-group {
+        display: flex;
+        gap: 0.5em;
+        margin-left: 1em;
+      }
+      .button-group .edit-btn,
+      .button-group .delete-btn {
+        margin: 0;
+        min-width: 60px;
+      }
+      /* Optional: vertically center buttons if needed */
+      .community-item {
+        display: flex;
+        align-items: center;
       }
     </style>
   </head>
@@ -126,11 +141,7 @@
               Authorization: `Bearer ${token}`,
             },
           });
-          const allCommunities = await response.json();
-          // Filter communities with empty or null kandaId
-          unassignedCommunities = allCommunities.filter(community => 
-            !community.kandaId || community.kandaId === "" || community.kandaId === null
-          );
+          unassignedCommunities = await response.json();
           renderUnassignedCommunities(unassignedCommunities);
         } catch (error) {
           console.error("Error fetching unassigned communities:", error);
@@ -170,9 +181,13 @@
               editButton.classList.add("edit-btn");
               editButton.onclick = () => enableEditing(li, nameSpan, community.id);
 
+              const buttonGroup = document.createElement("span");
+              buttonGroup.classList.add("button-group");
+              buttonGroup.appendChild(editButton);
+              buttonGroup.appendChild(delButton);
+
               li.appendChild(nameSpan);
-              li.appendChild(editButton);
-              li.appendChild(delButton);
+              li.appendChild(buttonGroup);
               list.appendChild(li);
             });
           } else {
@@ -215,9 +230,13 @@
           editButton.classList.add("edit-btn");
           editButton.onclick = () => enableEditing(li, nameSpan, community.id);
 
+          const buttonGroup = document.createElement("span");
+          buttonGroup.classList.add("button-group");
+          buttonGroup.appendChild(editButton);
+          buttonGroup.appendChild(delButton);
+
           li.appendChild(nameSpan);
-          li.appendChild(editButton);
-          li.appendChild(delButton);
+          li.appendChild(buttonGroup);
           list.appendChild(li);
         });
       }
@@ -261,9 +280,13 @@
           editButton.classList.add("edit-btn");
           editButton.onclick = () => enableEditing(li, nameSpan, community.id);
 
+          const buttonGroup = document.createElement("span");
+          buttonGroup.classList.add("button-group");
+          buttonGroup.appendChild(editButton);
+          buttonGroup.appendChild(delButton);
+
           li.appendChild(nameSpan);
-          li.appendChild(editButton);
-          li.appendChild(delButton);
+          li.appendChild(buttonGroup);
           list.appendChild(li);
         });
       }
