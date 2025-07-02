@@ -379,7 +379,7 @@
         const jwt = localStorage.getItem("authToken");
         try {
           const response = await fetch(
-            `http://localhost:8080/sacrament/sessions?type=${getSacramentType()}`,
+            `${BASE_API_URL}/sacrament/sessions?type=${getSacramentType()}`,
             {
               headers: {
                 Authorization: `Bearer ${jwt}`,
@@ -517,7 +517,7 @@
         };
 
         try {
-          const response = await fetch("http://localhost:8080/sacrament", {
+          const response = await fetch("${BASE_API_URL}/sacrament", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -579,7 +579,7 @@
           try {
             // 1. Create candidate
             const candidateRes = await fetch(
-              "http://localhost:8080/sacrament/candidate",
+              "${BASE_API_URL}/sacrament/candidate",
               {
                 method: "POST",
                 headers: {
@@ -601,7 +601,7 @@
               startDate,
               completionDate,
             };
-            const regRes = await fetch("http://localhost:8080/sacrament", {
+            const regRes = await fetch("${BASE_API_URL}/sacrament", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

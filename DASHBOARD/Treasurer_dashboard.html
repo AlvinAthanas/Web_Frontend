@@ -28,6 +28,9 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
     />
+
+     <!-- Config.js -->
+    <script src="../config.js"></script>
     
     <style>
         .main-cards {
@@ -367,7 +370,7 @@
         // Fetch all data
         function fetchAllData() {
           // Fetch registered users count
-          fetch("http://localhost:8080/user/count", {
+          fetch(`${BASE_API_URL}/user/count`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -381,7 +384,7 @@
             });
 
           // Fetch total contribution amount
-          fetch("http://localhost:8080/contributions/totalAmount", {
+          fetch(`${BASE_API_URL}/contributions/totalAmount`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -396,7 +399,7 @@
             });
 
           // Fetch group count with description=community
-          fetch("http://localhost:8080/group/count?description=community", {
+          fetch(`${BASE_API_URL}/group/count?description=community`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -412,7 +415,7 @@
 
           // Fetch logged-in user's parishId and project count
           fetch(
-            "http://localhost:8080/user?email=" + getEmailFromToken(token),
+            `${BASE_API_URL}/user?email=` + getEmailFromToken(token),
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -424,7 +427,7 @@
               const parishId = user.parishId;
               if (parishId) {
                 fetch(
-                  `http://localhost:8080/parish/${parishId}/project-count`,
+                  `${BASE_API_URL}/parish/${parishId}/project-count`,
                   {
                     headers: {
                       Authorization: `Bearer ${token}`,
@@ -447,7 +450,7 @@
             });
 
           // Fetch total expenses amount (placeholder - you'd need to implement this endpoint)
-          fetch("http://localhost:8080/expenses/totalAmount", {
+          fetch(`${BASE_API_URL}/expenses/totalAmount`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -464,7 +467,7 @@
             });
 
           // Fetch all contributions
-          fetch("http://localhost:8080/contributions", {
+          fetch(`${BASE_API_URL}/contributions`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

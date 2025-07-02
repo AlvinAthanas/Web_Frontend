@@ -19,6 +19,9 @@
       rel="stylesheet"
     />
 
+     <!-- Config.js -->
+    <script src="../config.js"></script>
+
     <!-- External CSS -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
     <style>
@@ -675,7 +678,6 @@
         let searchTimeout = null;
 
         // API Base URL
-        const API_BASE_URL = "http://localhost:8080";
 
         // Always get the JWT from localStorage as 'authToken'
         function getAuthToken() {
@@ -696,7 +698,7 @@
           try {
             // Use the parish notifications endpoint
             const response = await fetch(
-              `${API_BASE_URL}/notifications/parish`,
+              `${BASE_API_URL}/notifications/parish`,
               {
                 headers: authHeaders(),
               }
@@ -904,7 +906,7 @@
             searchResults.style.display = "block";
 
             const response = await fetch(
-              `${API_BASE_URL}/user/search?name=${encodeURIComponent(query)}`,
+              `${BASE_API_URL}/user/search?name=${encodeURIComponent(query)}`,
               {
                 headers: authHeaders(),
               }
@@ -930,7 +932,7 @@
             searchResults.style.display = "block";
 
             const response = await fetch(
-              `${API_BASE_URL}/kanda/search?name=${encodeURIComponent(query)}`,
+              `${BASE_API_URL}/kanda/search?name=${encodeURIComponent(query)}`,
               {
                 headers: authHeaders(),
               }
@@ -956,7 +958,7 @@
             searchResults.style.display = "block";
 
             // Use the new endpoint, set description to "community"
-            const url = `${API_BASE_URL}/groupsNameByDescription/search?name=${encodeURIComponent(
+            const url = `${BASE_API_URL}/groupsNameByDescription/search?name=${encodeURIComponent(
               query
             )}&description=community`;
 
@@ -1091,14 +1093,14 @@
             let response;
             if (isEditMode && id) {
               // Update existing announcement (if you have an update endpoint)
-              response = await fetch(`${API_BASE_URL}/notification/${id}`, {
+              response = await fetch(`${BASE_API_URL}/notification/${id}`, {
                 method: "PUT",
                 headers: authHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify(notificationData),
               });
             } else {
               // Create new announcement
-              response = await fetch(`${API_BASE_URL}/notification`, {
+              response = await fetch(`${BASE_API_URL}/notification`, {
                 method: "POST",
                 headers: authHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify(notificationData),
@@ -1143,7 +1145,7 @@
         // Edit an existing announcement
         async function editAnnouncement(id) {
           try {
-            const response = await fetch(`${API_BASE_URL}/notification/${id}`, {
+            const response = await fetch(`${BASE_API_URL}/notification/${id}`, {
               headers: authHeaders(),
             });
             if (!response.ok) throw new Error("Failed to fetch announcement");
@@ -1234,7 +1236,7 @@
 
           try {
             const response = await fetch(
-              `${API_BASE_URL}/notification/${currentNotificationId}`,
+              `${BASE_API_URL}/notification/${currentNotificationId}`,
               {
                 method: "DELETE",
                 headers: authHeaders(),

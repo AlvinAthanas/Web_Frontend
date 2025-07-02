@@ -739,7 +739,7 @@
           return;
         }
 
-        const url = `http://localhost:8080/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
+        const url = `${BASE_API_URL}/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
         console.log("Fetching members from:", url);
 
         // Get auth token
@@ -895,7 +895,7 @@
         // Get auth token
         const authToken = localStorage.getItem("authToken");
 
-        fetch(`http://localhost:8080/user/search?name=${encodeURIComponent(searchTerm)}`, {
+        fetch(`${BASE_API_URL}/user/search?name=${encodeURIComponent(searchTerm)}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -957,7 +957,7 @@
         // Get auth token
         const authToken = localStorage.getItem("authToken");
 
-        fetch('http://localhost:8080/group/assignMember', {
+        fetch('${BASE_API_URL}/group/assignMember', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -1000,7 +1000,7 @@
         // Get auth token
         const authToken = localStorage.getItem("authToken");
 
-        fetch(`http://localhost:8080/group/removeMember`, {
+        fetch(`${BASE_API_URL}/group/removeMember`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -1027,7 +1027,7 @@
         // Get auth token
         const authToken = localStorage.getItem("authToken");
 
-        fetch(`http://localhost:8080/user?id=${memberId}`, {
+        fetch(`${BASE_API_URL}/user?id=${memberId}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -1088,7 +1088,7 @@
         // Get auth token
         const authToken = localStorage.getItem("authToken");
 
-        fetch(`http://localhost:8080/contributions?memberId=${memberId}`, {
+        fetch(`${BASE_API_URL}/contributions?memberId=${memberId}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
@@ -1180,7 +1180,7 @@
         const authToken = localStorage.getItem("authToken");
 
         // Send contribution to API
-        fetch('http://localhost:8080/contributions', {
+        fetch(`${BASE_API_URL}/contributions`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,

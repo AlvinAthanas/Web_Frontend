@@ -21,208 +21,7 @@
 
     <!-- External Styles -->
     <link rel="stylesheet" href="../GENERAL/style.css" />
-
-    <!-- Internal Styles -->
-    <style>
-      /* Community Page Styles */
-      .community-header {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-      }
-
-      .community-header h1 {
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-      }
-
-      .community-header p {
-        color: #7f8c8d;
-        font-size: 1.1rem;
-      }
-
-      .community-options {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-      }
-
-      .option-card {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        text-align: center;
-        cursor: pointer;
-        border: 1px solid #e0e0e0;
-      }
-
-      .option-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      }
-
-      .card-icon {
-        font-size: 3rem;
-        color: #3498db;
-        margin-bottom: 1rem;
-      }
-
-      .option-card h2 {
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-      }
-
-      .option-card p {
-        color: #7f8c8d;
-        margin-bottom: 1.5rem;
-      }
-
-      .card-button {
-        background-color: #3498db;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      .card-button:hover {
-        background-color: #2980b9;
-      }
-
-      .content-area {
-        background: white;
-        border-radius: 10px;
-        padding: 2rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        min-height: 300px;
-      }
-
-      .welcome-message {
-        text-align: center;
-        color: #7f8c8d;
-        padding: 2rem;
-      }
-
-      .welcome-message h2 {
-        margin-bottom: 1rem;
-        color: #2c3e50;
-      }
-
-      .welcome-message .material-icons-outlined {
-        font-size: 3rem;
-        color: #bdc3c7;
-        margin-top: 1rem;
-      }
-
-      /* Loading spinner */
-      .loading {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 200px;
-      }
-
-      .spinner {
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* Content header styles */
-      #community-header {
-  background-color: #f5f5f5;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  border-left: 4px solid #3498db;
-}
-
-.header-content {
-  /* display: flex; */
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.header-actions .btn-icon {
-  background: none;
-  border: none;
-  color: #3498db;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-}
-
-.header-actions .btn-icon:hover {
-  background-color: #e3f2fd;
-}
-
-#community-header h1 {
-  color: #2c3e50;
-  margin: 0;
-  font-size: 1.8rem;
-}
-
-#community-header p {
-  color: #7f8c8d;
-  margin: 0;
-}
-      .back-button {
-        background: none;
-        border: 1px solid #3498db;
-        color: #3498db;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s;
-      }
-
-      .back-button:hover {
-        background-color: #3498db;
-        color: white;
-      }
-
-      .content-body {
-        padding: 1rem 0;
-      }
-
-      .content-body p {
-        color: #7f8c8d;
-        margin-bottom: 1rem;
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .community-options {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="trial.css" />
   </head>
 
   <body>
@@ -297,61 +96,61 @@
     </div>
 
     <script>
-     // At the top of your script in trial.html
-document.addEventListener('DOMContentLoaded', function() {
-  // Get community details from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const communityId = urlParams.get('communityId');
-  const communityName = urlParams.get('communityName');
-  
-  // Store these in a way that other functions can access
-  window.currentCommunity = {
-    id: communityId,
-    name: communityName ? decodeURIComponent(communityName) : 'Community'
-  };
+      // At the top of your script in trial.html
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get community details from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const communityId = urlParams.get("communityId");
+        const communityName = urlParams.get("communityName");
 
-  // Update the header
-  updateCommunityHeader();
-  
-  // Rest of your existing code...
-});
+        // Store these in a way that other functions can access
+        window.currentCommunity = {
+          id: communityId,
+          name: communityName ? decodeURIComponent(communityName) : "Community",
+        };
 
-function updateCommunityHeader() {
-  const communityHeader = document.getElementById('community-header');
-  communityHeader.innerHTML = `
+        // Update the header
+        updateCommunityHeader();
+
+        // Rest of your existing code...
+      });
+
+      function updateCommunityHeader() {
+        const communityHeader = document.getElementById("community-header");
+        communityHeader.innerHTML = `
     <div class="header-content">
       <h1>${window.currentCommunity.name} </h1>
      
     </div>
     <p>Manage ${window.currentCommunity.name} members, contributions, and attendance</p>
   `;
-}
+      }
 
-        // Get all the option cards
-        const membersCard = document.getElementById("members-card");
-        const contributionsCard = document.getElementById("contributions-card");
-        const attendanceCard = document.getElementById("attendance-card");
-        const announcementsCard = document.getElementById("announcements-card");
-        const dynamicContent = document.getElementById("dynamic-content");
+      // Get all the option cards
+      const membersCard = document.getElementById("members-card");
+      const contributionsCard = document.getElementById("contributions-card");
+      const attendanceCard = document.getElementById("attendance-card");
+      const announcementsCard = document.getElementById("announcements-card");
+      const dynamicContent = document.getElementById("dynamic-content");
 
-        // Function to load content based on selection
-        function loadContent(contentType) {
-          // Clear previous content
-          dynamicContent.innerHTML = "";
+      // Function to load content based on selection
+      function loadContent(contentType) {
+        // Clear previous content
+        dynamicContent.innerHTML = "";
 
-          // Create a loading indicator
-          const loadingDiv = document.createElement("div");
-          loadingDiv.className = "loading";
-          loadingDiv.innerHTML = `
+        // Create a loading indicator
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "loading";
+        loadingDiv.innerHTML = `
       <div class="spinner"></div>
       <p>Loading ${contentType} data...</p>
     `;
-          dynamicContent.appendChild(loadingDiv);
+        dynamicContent.appendChild(loadingDiv);
 
-          // Simulate loading delay (in a real app, this would be an API call)
-          setTimeout(() => {
-            // Replace with actual content
-            dynamicContent.innerHTML = `
+        // Simulate loading delay (in a real app, this would be an API call)
+        setTimeout(() => {
+          // Replace with actual content
+          dynamicContent.innerHTML = `
         <div class="content-header">
           <h2>${contentType} Management</h2>
           <button class="back-button">
@@ -364,33 +163,41 @@ function updateCommunityHeader() {
         </div>
       `;
 
-            // Add event listener to back button
-            const backButton = document.querySelector(".back-button");
-            backButton.addEventListener("click", () => {
-              dynamicContent.innerHTML = `
+          // Add event listener to back button
+          const backButton = document.querySelector(".back-button");
+          backButton.addEventListener("click", () => {
+            dynamicContent.innerHTML = `
           <div class="welcome-message">
             <h2>Welcome to Community Management</h2>
             <p>Select an option above to get started</p>
             <span class="material-icons-outlined">arrow_upward</span>
           </div>
         `;
-            });
-          }, 800);
-        }
+          });
+        }, 800);
+      }
 
-        // Add click event listeners to each card
-        membersCard.addEventListener('click', () => {
-  window.location.href = `communityMembers.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
-});
-        contributionsCard.addEventListener('click', () => {
-  window.location.href = `community_contribution.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
-});
-        attendanceCard.addEventListener('click', () => {
-  window.location.href = `attendance.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
-});
-        announcementsCard.addEventListener('click', () => {
-  window.location.href = `announcements.html?communityId=${window.currentCommunity.id}&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
-});
+      // Add click event listeners to each card
+      membersCard.addEventListener("click", () => {
+        window.location.href = `communityMembers.html?communityId=${
+          window.currentCommunity.id
+        }&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+      });
+      contributionsCard.addEventListener("click", () => {
+        window.location.href = `community_contribution.html?communityId=${
+          window.currentCommunity.id
+        }&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+      });
+      attendanceCard.addEventListener("click", () => {
+        window.location.href = `attendance.html?communityId=${
+          window.currentCommunity.id
+        }&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+      });
+      announcementsCard.addEventListener("click", () => {
+        window.location.href = `community_announcements.html?communityId=${
+          window.currentCommunity.id
+        }&communityName=${encodeURIComponent(window.currentCommunity.name)}`;
+      });
       // });
     </script>
 

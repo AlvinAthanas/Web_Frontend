@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="../GENERAL/style.css" />
     <link rel="stylesheet" href="contribution.css" />
 
+     <!-- Config.js -->
+    <script src="../config.js"></script>
+
     <!-- SheetJS for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -219,7 +222,7 @@
       // Load contributions from server
       function loadContributions() {
         const token = localStorage.getItem("authToken");
-        fetch("http://localhost:8080/contributions", {
+        fetch(`${BASE_API_URL}/contributions`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -345,7 +348,7 @@
         if (year) params.append("year", year);
 
         const token = localStorage.getItem("authToken");
-        fetch(`http://localhost:8080/contributions/filter?${params.toString()}`, {
+        fetch(`${BASE_API_URL}/contributions/filter?${params.toString()}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -387,7 +390,7 @@
       // Delete a contribution
       function deleteContribution(id) {
         const token = localStorage.getItem("authToken");
-        fetch(`http://localhost:8080/contribution/${id}`, {
+        fetch(`${BASE_API_URL}/contribution/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`
@@ -426,7 +429,7 @@
 
           if (contributionId) {
             // Update existing contribution
-            fetch(`http://localhost:8080/contribution/${contributionId}`, {
+            fetch(`${BASE_API_URL}/contribution/${contributionId}`, {
               method: "PUT",
               headers: { 
                 "Content-Type": "application/json",
@@ -446,7 +449,7 @@
               });
           } else {
             // Create new contribution
-            fetch("http://localhost:8080/contribution", {
+            fetch(`${BASE_API_URL}/contribution`, {
               method: "POST",
               headers: { 
                 "Content-Type": "application/json",
@@ -489,7 +492,7 @@
       // Edit a contribution
       function editContribution(id) {
         const token = localStorage.getItem("authToken");
-        fetch(`http://localhost:8080/contribution/${id}`, {
+        fetch(`${BASE_API_URL}/contribution/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

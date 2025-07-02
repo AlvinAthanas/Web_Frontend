@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="../MEMBERS/members.css" />
     <link rel="stylesheet" href="../GENERAL/style.css" />
 
+    <!-- Base API URL -->
+    <script src="../config.js"></script>
+
     <!-- SheetJS for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -208,7 +211,7 @@
           return;
         }
 
-        fetch("http://localhost:8080/users", {
+        fetch(`${BASE_API_URL}/users`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -265,7 +268,7 @@
           };
 
           const memberId = formEl.dataset.editId;
-          const url = memberId ? `http://localhost:8080/user/${memberId}` : "http://localhost:8080/user";
+          const url = memberId ? `${BASE_API_URL}/user/${memberId}` : `${BASE_API_URL}/user`;
           const method = memberId ? "PUT" : "POST";
 
           fetch(url, {
@@ -322,7 +325,7 @@
           return;
         }
 
-        fetch(`http://localhost:8080/user/${id}`, {
+        fetch(`${BASE_API_URL}/user/${id}`, {
           method: "DELETE",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -491,7 +494,7 @@
           return;
         }
 
-        fetch(`http://localhost:8080/user?id=${id}`, {
+        fetch(`${BASE_API_URL}/user?id=${id}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -770,7 +773,7 @@
         // Show loading message
         showMessage("Importing users, please wait...", "info");
 
-        fetch("http://localhost:8080/users", {
+        fetch(`${BASE_API_URL}/users`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

@@ -18,6 +18,10 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
       rel="stylesheet"
     />
+
+  <!-- Base API URL -->
+    <script src="../config.js"></script>
+
   </head>
   <body>
     <!-- <div class="grid-container"> -->
@@ -230,7 +234,7 @@
         if (!email) return;
 
         try {
-          const res = await fetch(`http://localhost:8080/user?email=${encodeURIComponent(email)}`, {
+          const res = await fetch(`${BASE_API_URL}/user?email=${encodeURIComponent(email)}`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json"
@@ -269,7 +273,7 @@
 
           // Fetch parish data using the parish ID from user object
           const parishResponse = await fetch(
-            `http://localhost:8080/parish/${user.parishId}`,
+            `${BASE_API_URL}/parish/${user.parishId}`,
             {
               method: "GET",
               headers: {
