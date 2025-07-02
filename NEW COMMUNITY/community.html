@@ -8,10 +8,7 @@
     <!-- Fonts and Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://
-      rel="stylesheet"
-    />
+    <link href="https:// rel="stylesheet" />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
       rel="stylesheet"
@@ -179,7 +176,8 @@
               const editButton = document.createElement("button");
               editButton.textContent = "Edit";
               editButton.classList.add("edit-btn");
-              editButton.onclick = () => enableEditing(li, nameSpan, community.id);
+              editButton.onclick = () =>
+                enableEditing(li, nameSpan, community.id);
 
               const buttonGroup = document.createElement("span");
               buttonGroup.classList.add("button-group");
@@ -203,7 +201,11 @@
       // Render unassigned communities at the bottom
       function renderUnassignedCommunities(communities) {
         const list = document.getElementById("communityList");
-        if (!communities.length) return;
+        // Filter only communities with null or empty kandaId
+        const unassigned = communities.filter(
+          (community) => !community.kandaId || community.kandaId === ""
+        );
+        if (!unassigned.length) return;
 
         // Label
         const labelLi = document.createElement("li");
@@ -211,7 +213,7 @@
         labelLi.classList.add("unassigned-label");
         list.appendChild(labelLi);
 
-        communities.forEach((community) => {
+        unassigned.forEach((community) => {
           const li = document.createElement("li");
           li.classList.add("community-item");
 
