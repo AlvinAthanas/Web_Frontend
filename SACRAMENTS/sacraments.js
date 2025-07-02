@@ -97,6 +97,11 @@ function setupEventListeners() {
         e.preventDefault();
         await addNewMember();
     });
+
+    const batchCompleteBtn = document.getElementById("batchCompleteBtn");
+    if (batchCompleteBtn) {
+        batchCompleteBtn.addEventListener("click", batchCompleteTraining);
+    }
 }
 
 function switchDialogTab(tabType) {
@@ -340,16 +345,29 @@ async function completeTraining(participantId) {
             return;
         }
 
-        const response = await fetch(`${BASE_API_URL}/user/${participantId}`, {
+        // Find the candidate object to get the correct candidateId
+        const candidate = participants.training.find(p => p.id == participantId);
+        if (!candidate) {
+            alert("Candidate not found.");
+            return;
+        }
+
+        // Send completion request to backend
+        const response = await fetch("http://localhost:8080/sacrament/completion", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ baptismStatus: "completed" })
+            body: JSON.stringify({
+                candidateId: candidate.id,
+                sacramentType: sacramentType,
+                completed: true
+            })
         });
 
         if (response.ok) {
+            // Move participant from training to completed
             const participantIndex = participants.training.findIndex(p => p.id == participantId);
             if (participantIndex !== -1) {
                 const participant = participants.training[participantIndex];
@@ -366,6 +384,56 @@ async function completeTraining(participantId) {
         console.error("Error completing training:", error);
         alert("Error updating status");
     }
+}
+
+async function batchCompleteTraining() {
+    if (participants.training.length === 0) {
+        alert("No candidates to complete.");
+        return;
+    }
+    if (!confirm("Mark ALL candidates as completed? This cannot be undone.")) return;
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        alert("Authentication error. Please login again.");
+        return;
+    }
+
+    // Complete all in parallel
+    const results = await Promise.all(participants.training.map(async (candidate) => {
+        try {
+            const response = await fetch("http://localhost:8080/sacrament/completion", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    candidateId: candidate.id,
+                    sacramentType: sacramentType,
+                    completed: true
+                })
+            });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }));
+
+    // Move all successful to completed
+    const completedNow = [];
+    participants.training = participants.training.filter((c, i) => {
+        if (results[i]) {
+            c.status = "completed";
+            completedNow.push(c);
+            return false;
+        }
+        return true;
+    });
+    participants.completed.push(...completedNow);
+    updateParticipantsList();
+    updateCounts();
+    alert(`Batch complete: ${completedNow.length} marked as completed.`);
 }
 
 function updateParticipantsList() {
@@ -457,19 +525,36 @@ async function loadAndDisplayCandidatesForSession() {
         }
         const candidates = await response.json();
 
-        // Map candidates to the format expected by updateParticipantsList
-        participants.training = candidates.map(candidate => ({
-            id: candidate.id,
-            name: candidate.fullName,
-            email: candidate.contactInfo || "",
-            phone: candidate.contactInfo || "",
-            guardian: candidate.guardianName || "",
-            gender: candidate.gender || "",
-            status: "training"
-        }));
-
-        // Optionally clear completed list if only showing current session
+        // Separate candidates into training and completed based on sacramentRegistrations
+        participants.training = [];
         participants.completed = [];
+
+        candidates.forEach(candidate => {
+            // Find the registration for the current sacrament type
+            const reg = (candidate.sacramentRegistrations || []).find(
+                r => r.sacramentType === sacramentType
+            );
+            const baseInfo = {
+                id: candidate.id,
+                name: candidate.fullName,
+                email: candidate.contactInfo || "",
+                phone: candidate.contactInfo || "",
+                guardian: candidate.guardianName || "",
+                gender: candidate.gender || "",
+            };
+            if (reg && reg.completed) {
+                participants.completed.push({
+                    ...baseInfo,
+                    status: "completed"
+                });
+            } else {
+                participants.training.push({
+                    ...baseInfo,
+                    status: "training"
+                });
+            }
+        });
+
         updateParticipantsList();
         updateCounts();
     } catch (error) {

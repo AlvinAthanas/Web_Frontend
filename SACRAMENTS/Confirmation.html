@@ -146,6 +146,23 @@
           .overlay.active {
             display: block;
           }
+          .batch-complete-btn {
+            background: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+          }
+          .batch-complete-btn:hover {
+            background: #d35400;
+          }
         </style>
 
         <div class="confirmation-container">
@@ -197,6 +214,11 @@
             <button class="add-member-btn" id="addMemberBtn">
               <span class="material-icons-outlined">person_add</span>
               Add Member
+            </button>
+            <!-- Add after the Add Member button -->
+            <button class="batch-complete-btn" id="batchCompleteBtn">
+              <span class="material-icons-outlined">done_all</span>
+              Batch Completed
             </button>
           </div>
 
@@ -350,7 +372,7 @@
       </form>
     </div>
 
-        <script src="../config.js"></script>
+    <script src="../config.js"></script>
     <script src="sacraments.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
