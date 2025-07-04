@@ -354,7 +354,7 @@
                 // Store JWT and user details in localStorage
                 localStorage.setItem("authToken", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
-  redirectUserAfterLogin(token); // ✅ role-based landing
+                redirectUserAfterLogin(data.token); // Use the freshly returned JWT
               })
               .catch((error) => {
                 // Error already handled above
@@ -407,56 +407,56 @@
       });
     </script>
 
-<script>
-  const token = localStorage.getItem("authToken");
-  // Add this helper to decode the JWT
-  function parseJwt(token) {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch (e) {
-      console.error("Error parsing JWT", e);
-      return null;
-    }
-  }
+    <script>
+      const token = localStorage.getItem("authToken");
+      // Add this helper to decode the JWT
+      function parseJwt(token) {
+        try {
+          const base64Url = token.split(".")[1];
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split("")
+              .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+              .join("")
+          );
+          return JSON.parse(jsonPayload);
+        } catch (e) {
+          console.error("Error parsing JWT", e);
+          return null;
+        }
+      }
 
-  function redirectUserAfterLogin(token) {
-    console.log("Auth token received:", token);
+      function redirectUserAfterLogin(token) {
+        console.log("Auth token received:", token);
 
-    const payload = parseJwt(token);
-    console.log("Parsed JWT payload:", payload);
+        const payload = parseJwt(token);
+        console.log("Parsed JWT payload:", payload);
 
-    const roles = payload?.roles || [];
-    console.log("Extracted roles:", roles);
+        const roles = payload?.roles || [];
+        console.log("Extracted roles:", roles);
 
-    const landingPages = {
-      ROLE_CATECHIST: "../SACRAMENTS/sacraments.html",
-      ROLE_COMMUNITY_CHAIRPERSON: "../NEW COMMUNITY/trial.html",
-      ROLE_COMMUNITY_SECRETARY: "../NEW COMMUNITY/trial.html",
-      ROLE_COMMUNITY_TREASURER: "../NEW COMMUNITY/trial.html",
-      ROLE_COMMITTEE_TREASURER: "../DASHBOARD/treasurer_dashboard.html",
-      ROLE_COMMITTEE_SECRETARY: "../DASHBOARD/dashboard.html",
-      ROLE_COMMITTEE_CHAIRPERSON: "../DASHBOARD/dashboard.html",
-      ROLE_PARISH_MEMBER: "../DASHBOARD/dashboard.html"
-    };
+        const landingPages = {
+          ROLE_CATECHIST: "../SACRAMENTS/sacraments.html",
+          ROLE_COMMUNITY_CHAIRPERSON: "../NEW COMMUNITY/trial.html",
+          ROLE_COMMUNITY_SECRETARY: "../NEW COMMUNITY/trial.html",
+          ROLE_COMMUNITY_TREASURER: "../NEW COMMUNITY/trial.html",
+          ROLE_COMMITTEE_TREASURER: "../DASHBOARD/treasurer_dashboard.html",
+          ROLE_COMMITTEE_SECRETARY: "../DASHBOARD/dashboard.html",
+          ROLE_COMMITTEE_CHAIRPERSON: "../DASHBOARD/dashboard.html",
+          ROLE_PARISH_MEMBER: "../DASHBOARD/dashboard.html",
+        };
 
-    const matchedRole = roles.find(role => landingPages[role]);
-    console.log("Matched role:", matchedRole);
+        const matchedRole = roles.find((role) => landingPages[role]);
+        console.log("Matched role:", matchedRole);
 
-    const redirectTo = matchedRole ? landingPages[matchedRole] : "../DASHBOARD/dashboard.html";
-    console.log("Redirecting to:", redirectTo);
+        const redirectTo = matchedRole
+          ? landingPages[matchedRole]
+          : "../DASHBOARD/dashboard.html";
+        console.log("Redirecting to:", redirectTo);
 
-    window.location.href = redirectTo;
-  }
-</script>
-
-
+        window.location.href = redirectTo;
+      }
+    </script>
   </body>
 </html>

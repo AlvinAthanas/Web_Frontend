@@ -828,9 +828,7 @@
                     <td>${memberPhone}</td>
                     <td>
                       <div class="table-actions">
-                        <button class="btn btn-icon btn-edit edit-btn" data-id="${memberId}" title="Edit">
-                          <span class="material-icons-outlined">edit</span>
-                        </button>
+                        <!-- Removed edit icon button -->
                         <button class="btn btn-icon btn-danger delete-btn" data-id="${memberId}" title="Delete">
                           <span class="material-icons-outlined">delete</span>
                         </button>
@@ -847,14 +845,6 @@
         `;
 
         // Add event listeners to action buttons
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const memberId = btn.getAttribute('data-id');
-            editMember(memberId);
-          });
-        });
-
         document.querySelectorAll('.delete-btn').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1041,7 +1031,7 @@
           .then(member => {
             detailsModalTitle.textContent = `${member.name}'s Details`;
 
-            // Set member ID for add contribution button
+            // Remove the add contribution button for this modal
             addContributionBtn.setAttribute('data-member-id', member.id);
 
             detailsModalBody.innerHTML = `
@@ -1065,18 +1055,15 @@
                 <div class="detail-label">Gender:</div>
                 <div class="detail-value">${member.gender || 'N/A'}</div>
               </div>
-              <div class="contributions-list">
-                <h3>Contributions</h3>
-                <div id="memberContributions">
-                  <!-- Contributions will be loaded here -->
-                </div>
-              </div>
             `;
 
             detailsModal.classList.add('active');
 
-            // Fetch contributions for this member
-            fetchMemberContributions(memberId);
+            // Remove or comment out the following line to skip loading contributions
+            // fetchMemberContributions(memberId);
+
+            // Hide the add contribution button in the modal footer
+            document.getElementById('addContributionBtn').style.display = 'none';
           })
           .catch(error => {
             console.error("Error fetching member details:", error);

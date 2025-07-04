@@ -29,20 +29,19 @@
       href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
     />
 
-     <!-- Config.js -->
+    <!-- Config.js -->
     <script src="../config.js"></script>
-    
-    <style>
-        .main-cards {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 20px;
-          margin: 20px 0;
-        }
-        .card.five {
-          background-color: purple;
-        }
 
+    <style>
+      .main-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .card.five {
+        background-color: purple;
+      }
     </style>
   </head>
   <body>
@@ -84,7 +83,7 @@
 
           <a href="../PROJECTS/projects.html">
             <div class="card four" id="project-card">
-              <div class="card-inner" >
+              <div class="card-inner">
                 <h3>ONGOING PROJECTS</h3>
                 <span class="material-icons-outlined"> rowing </span>
               </div>
@@ -414,29 +413,24 @@
             });
 
           // Fetch logged-in user's parishId and project count
-          fetch(
-            `${BASE_API_URL}/user?email=` + getEmailFromToken(token),
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          )
+          fetch(`${BASE_API_URL}/user?email=` + getEmailFromToken(token), {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
             .then((res) => res.json())
             .then((user) => {
               const parishId = user.parishId;
               if (parishId) {
-                fetch(
-                  `${BASE_API_URL}/parish/${parishId}/project-count`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
-                )
+                fetch(`${BASE_API_URL}/parish/${parishId}/project-count`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                })
                   .then((res) => res.json())
                   .then((projectCount) => {
-                    document.querySelector("#project-card h1").textContent = projectCount;
+                    document.querySelector("#project-card h1").textContent =
+                      projectCount;
                   })
                   .catch((error) => {
                     console.error("Failed to fetch project count:", error);
@@ -449,8 +443,8 @@
               console.error("Failed to fetch user details:", error);
             });
 
-          // Fetch total expenses amount (placeholder - you'd need to implement this endpoint)
-          fetch(`${BASE_API_URL}/expenses/totalAmount`, {
+          // Fetch total expenses amount using the new endpoint
+          fetch(`${BASE_API_URL}/total-expense`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -463,7 +457,8 @@
             .catch((error) => {
               console.error("Failed to fetch total expenses:", error);
               // Set a default value if the endpoint doesn't exist yet
-              document.querySelector("#expenses-card h1").textContent = "125000";
+              document.querySelector("#expenses-card h1").textContent =
+                "125000";
             });
 
           // Fetch all contributions

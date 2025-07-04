@@ -57,6 +57,14 @@
           <h5>Assign Roles</h5>
           <hr />
           <div class="roles"></div>
+
+          <!-- Add this after the roles checkboxes, hidden by default -->
+          <div id="community-search-container" style="display:none; margin-top:10px;">
+            <label for="community-search">Assign to Community:</label>
+            <input type="text" id="community-search" autocomplete="off" placeholder="Search community..." />
+            <div id="community-suggestions" class="suggestions-list"></div>
+          </div>
+
           <button class="assign-btn">Assign</button>
         </form>
       </div>
@@ -379,8 +387,24 @@
         div.addEventListener("click", () => {
           nameInput.value = user.name;
           selectedUserId = user.id;
+          selectedUserObj = user; // <-- Set the full user object here!
           suggestionBox.innerHTML = "";
-          highlightRolesAndAuthorities();
+          // Fetch roles and authorities for this user
+          fetch(`${BASE_API_URL}/user/${selectedUserId}/roles`, {
+            headers: { ...getAuthHeader() }
+          })
+          .then(res => res.json())
+          .then(roles => {
+            renderRolesCheckboxes(roles);
+            checkCommunityRoleAndShowSearch(roles, selectedUserObj);
+          });
+          fetch(`${BASE_API_URL}/user/${selectedUserId}/authorities`, {
+            headers: { ...getAuthHeader() }
+          })
+          .then(res => res.json())
+          .then(authorities => {
+            renderAuthoritiesAssignable(authorities);
+          });
         });
         suggestionBox.appendChild(div);
       });
@@ -392,30 +416,116 @@
     });
   });
 
+  // List of community roles (adjust as needed)
+  const communityRoles = [
+    "COMMUNITY_CHAIRPERSON",
+    "COMMUNITY_SECRETARY",
+    "COMMUNITY_TREASURER"
+  ];
+
+  // Track selected groupId for assignment
+  let selectedGroupId = null;
+
+  // Helper: Check if user has a community group
+  function userHasCommunityGroup(user) {
+    return (user.groups || []).some(g => g.description && g.description.toLowerCase() === "community");
+  }
+
+  // Store last selected user object
+  let selectedUserObj = null;
+
+  // --- Update highlightRolesAndAuthorities to store user object ---
   function highlightRolesAndAuthorities() {
     if (!selectedUserId) return;
-    // Highlight Roles
-    fetch(`${BASE_API_URL}/user/${selectedUserId}/roles`, {
-      headers: {
-        ...getAuthHeader(),
-      },
+    // Fetch user object
+    fetch(`${BASE_API_URL}/user/${selectedUserId}`, {
+      headers: { ...getAuthHeader() }
     })
-    .then((res) => res.json())
-    .then((roles) => {
-      renderRolesCheckboxes(roles);
-    });
+    .then(res => res.json())
+    .then(user => {
+      selectedUserObj = user;
+      // Highlight Roles
+      fetch(`${BASE_API_URL}/user/${selectedUserId}/roles`, {
+        headers: { ...getAuthHeader() }
+      })
+      .then(res => res.json())
+      .then(roles => {
+        renderRolesCheckboxes(roles);
+        checkCommunityRoleAndShowSearch(roles, user);
+      });
 
-    // Highlight Authorities (updated)
-    fetch(`${BASE_API_URL}/user/${selectedUserId}/authorities`, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    })
-    .then((res) => res.json())
-    .then((authorities) => {
-      renderAuthoritiesAssignable(authorities);
+      // Highlight Authorities
+      fetch(`${BASE_API_URL}/user/${selectedUserId}/authorities`, {
+        headers: { ...getAuthHeader() }
+      })
+      .then(res => res.json())
+      .then(authorities => {
+        renderAuthoritiesAssignable(authorities);
+      });
     });
   }
+
+  // --- Show/hide community search bar logic ---
+  function checkCommunityRoleAndShowSearch(selectedRoles, userObj) {
+    const hasCommunityRole = selectedRoles.some(r => communityRoles.includes(r));
+    const hasCommunity = userHasCommunityGroup(userObj);
+    const container = document.getElementById('community-search-container');
+    if (hasCommunityRole && !hasCommunity) {
+      container.style.display = '';
+    } else {
+      container.style.display = 'none';
+      selectedGroupId = null;
+      document.getElementById('community-search').value = '';
+      document.getElementById('community-suggestions').innerHTML = '';
+    }
+  }
+
+  // --- Listen for role checkbox changes to trigger community search bar ---
+  document.addEventListener('change', function(e) {
+    if (e.target.closest('.roles')) {
+      const checkedRoles = Array.from(document.querySelectorAll(".roles input[type='checkbox']:checked")).map(cb => cb.value);
+      if (selectedUserObj) {
+        checkCommunityRoleAndShowSearch(checkedRoles, selectedUserObj);
+      }
+    }
+  });
+
+  // --- Community search logic ---
+  const communityInput = document.getElementById('community-search');
+  const communitySuggestions = document.getElementById('community-suggestions');
+
+  communityInput.addEventListener('input', function() {
+    const query = communityInput.value.trim();
+    if (query.length < 1) {
+      communitySuggestions.innerHTML = '';
+      selectedGroupId = null;
+      return;
+    }
+    fetch(`${BASE_API_URL}/group/search?name=${encodeURIComponent(query)}`, {
+      headers: { ...getAuthHeader() }
+    })
+    .then(res => res.json())
+    .then(groups => {
+      communitySuggestions.innerHTML = '';
+      groups.forEach(group => {
+        const div = document.createElement('div');
+        div.textContent = group.name;
+        div.dataset.id = group.id;
+        div.classList.add('user-suggestion');
+        div.addEventListener('click', () => {
+          communityInput.value = group.name;
+          selectedGroupId = group.id;
+          communitySuggestions.innerHTML = '';
+        });
+        communitySuggestions.appendChild(div);
+      });
+      if (groups.length === 0) {
+        const noMatch = document.createElement('div');
+        noMatch.textContent = "No matching communities found";
+        communitySuggestions.appendChild(noMatch);
+      }
+    });
+  });
 
   // ---- FORM SUBMISSION: ASSIGN ROLES ----
   document.querySelector("#roles-form").addEventListener("submit", function(e){
@@ -428,6 +538,17 @@
     if (checkedRoles.length === 0) {
       if (!confirm("No roles selected. This will remove all roles from the user. Proceed?")) return;
     }
+
+    // Check if community assignment is needed
+    const needsCommunity = checkedRoles.some(r => communityRoles.includes(r)) &&
+                        selectedUserObj && !userHasCommunityGroup(selectedUserObj);
+
+    if (needsCommunity && !selectedGroupId) {
+      alert("Please select a community for this user.");
+      return;
+    }
+
+    // Assign roles first
     fetch(`${BASE_API_URL}/user/${selectedUserId}/roles`, {
       method: "PUT",
       headers: {
@@ -438,8 +559,31 @@
     })
     .then((res) => {
       if (res.ok) {
-        alert("Roles updated successfully!");
-        highlightRolesAndAuthorities();
+        // If community assignment needed, assign to group
+        if (needsCommunity && selectedGroupId) {
+          return fetch(`${BASE_API_URL}/group/assignMember`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({
+              userId: selectedUserId,
+              groupId: selectedGroupId
+            }),
+          })
+          .then(resp => {
+            if (resp.ok) {
+              alert("Roles and community assigned successfully!");
+              highlightRolesAndAuthorities();
+            } else {
+              alert("Roles assigned, but failed to assign community.");
+            }
+          });
+        } else {
+          alert("Roles updated successfully!");
+          highlightRolesAndAuthorities();
+        }
       } else {
         alert("Failed to update roles.");
       }
