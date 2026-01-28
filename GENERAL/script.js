@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     openSidebar();
     closeSidebar();
     loadParishName(); // <-- Call after sidebar is loaded
-    setupLogout();    // <-- Add logout logic here
+    setupLogout(); // <-- Add logout logic here
 
     restrictSidebarByRole(); // Restrict sidebar based on user role
   });
@@ -100,14 +100,14 @@ async function loadParishName() {
     }
 
     const parishResponse = await fetch(
-      `http://localhost:8080/parish/${user.parishId}`,
+      `http://76.13.14.56/api/parish/${user.parishId}`,
       {
         method: "GET",
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (parishResponse.ok) {
@@ -139,12 +139,12 @@ function setupLogout() {
 // After getting the logged-in user info
 const user = getUserFromStorage();
 if (user && user.parishId) {
-    localStorage.setItem('parishId', user.parishId);
+  localStorage.setItem("parishId", user.parishId);
 }
 
 // Store the user's community group in localStorage
 if (user && Array.isArray(user.groups)) {
-  const communityGroup = user.groups.find(g => g.description === "community");
+  const communityGroup = user.groups.find((g) => g.description === "community");
   if (communityGroup) {
     localStorage.setItem("currentCommunity", JSON.stringify(communityGroup));
   } else {
@@ -158,13 +158,13 @@ if (user && Array.isArray(user.groups)) {
 
 function parseJwt(token) {
   try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
@@ -198,7 +198,7 @@ function restrictSidebarByRole() {
     "announcement.html",
     "reports.html",
     "feedback.html",
-    "index.html" // Logout
+    "index.html", // Logout
   ];
 
   // Role-based access map
@@ -240,21 +240,21 @@ function restrictSidebarByRole() {
       "projects.html",
       "feedback.html",
       "announcement.html",
-      "index.html"
+      "index.html",
     ],
-      ROLE_COMMITTEE_CHAIRPERSON: [
-        "dashboard.html",
-        "members.html",
-        "roles.html",
-        "contribution.html",
-        "reports.html",
-        "events.html",
-        "schedules.html",
-        "projects.html",
-        "feedback.html",
-        "announcement.html",
-        "index.html"
-      ],
+    ROLE_COMMITTEE_CHAIRPERSON: [
+      "dashboard.html",
+      "members.html",
+      "roles.html",
+      "contribution.html",
+      "reports.html",
+      "events.html",
+      "schedules.html",
+      "projects.html",
+      "feedback.html",
+      "announcement.html",
+      "index.html",
+    ],
     ROLE_PARISHIONER: [
       "dashboard.html",
       "about_church.html",
@@ -269,13 +269,12 @@ function restrictSidebarByRole() {
       "reports.html",
       "announcement.html",
       "feedback.html",
-      "index.html"
-    ] 
-
+      "index.html",
+    ],
   };
 
   // Find the first matching role in the rules
-  const userRole = roles.find(role => visibilityRules[role]);
+  const userRole = roles.find((role) => visibilityRules[role]);
 
   if (!userRole) {
     console.log("No restrictions for this role.");
@@ -287,9 +286,9 @@ function restrictSidebarByRole() {
   console.log("Allowed pages:", allowedPages);
 
   // Restrict sidebar
-  document.querySelectorAll(".sidebar-list a").forEach(link => {
+  document.querySelectorAll(".sidebar-list a").forEach((link) => {
     const href = link.getAttribute("href");
-    const page = href?.split('/').pop();
+    const page = href?.split("/").pop();
     if (!allowedPages.includes(page)) {
       console.log("Hiding link:", page);
       link.style.display = "none";
@@ -297,9 +296,9 @@ function restrictSidebarByRole() {
   });
 
   // Restrict bottom (logout section)
-  document.querySelectorAll(".bottom-content a").forEach(link => {
+  document.querySelectorAll(".bottom-content a").forEach((link) => {
     const href = link.getAttribute("href");
-    const page = href?.split('/').pop();
+    const page = href?.split("/").pop();
     if (!allowedPages.includes(page)) {
       link.style.display = "none";
     }
@@ -332,12 +331,15 @@ async function setHeaderUserNameFromAPI() {
   if (!email) return;
 
   try {
-    const res = await fetch(`http://localhost:8080/user?email=${encodeURIComponent(email)}`, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        "Content-Type": "application/json"
-      }
-    });
+    const res = await fetch(
+      `http://76.13.14.56/api/user?email=${encodeURIComponent(email)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
     if (res.ok) {
       const user = await res.json();
       // Only show first and last name
@@ -345,7 +347,8 @@ async function setHeaderUserNameFromAPI() {
       let initials = "U";
       if (name) {
         const parts = name.trim().split(" ");
-        name = parts[0] + (parts.length > 1 ? " " + parts[parts.length - 1] : "");
+        name =
+          parts[0] + (parts.length > 1 ? " " + parts[parts.length - 1] : "");
         initials = getInitials(name);
       }
       const userNameEl = document.getElementById("userName");

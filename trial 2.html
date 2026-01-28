@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -53,7 +53,8 @@
         margin: auto;
       }
 
-      h2, p {
+      h2,
+      p {
         margin: 10px 0;
       }
 
@@ -72,7 +73,8 @@
         border-collapse: collapse;
       }
 
-      .attendance-table th, .attendance-table td {
+      .attendance-table th,
+      .attendance-table td {
         padding: 10px;
         border: 1px solid #ccc;
         text-align: center;
@@ -84,7 +86,7 @@
 
       .mark-btn {
         padding: 5px 10px;
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         border: none;
         border-radius: 5px;
@@ -103,10 +105,14 @@
         <div class="details-container">
           <h2 id="communityName">Community Details</h2>
           <p>Total Members: <span id="memberCount">Loading...</span></p>
-          <p>Total Contributions: <span id="totalContributions">Loading...</span></p>
+          <p>
+            Total Contributions: <span id="totalContributions">Loading...</span>
+          </p>
 
           <h3>Members</h3>
-          <ul id="memberList">Loading...</ul>
+          <ul id="memberList">
+            Loading...
+          </ul>
 
           <h3>Attendance Tracking</h3>
           <table class="attendance-table" id="attendanceTable">
@@ -125,7 +131,7 @@
     </div>
 
     <script>
-      const apiUrl = "http://localhost:8080";
+      const apiUrl = "http://76.13.14.56/api";
       const params = new URLSearchParams(window.location.search);
       const communityId = params.get("communityId");
 
@@ -134,10 +140,13 @@
           // Get community name
           const communityRes = await fetch(`${apiUrl}/group/${communityId}`);
           const community = await communityRes.json();
-          document.getElementById("communityName").textContent = `Community: ${community.name}`;
+          document.getElementById("communityName").textContent =
+            `Community: ${community.name}`;
 
           // Get members
-          const membersRes = await fetch(`${apiUrl}/group/${communityId}/members`);
+          const membersRes = await fetch(
+            `${apiUrl}/group/${communityId}/members`,
+          );
           const members = await membersRes.json();
           document.getElementById("memberCount").textContent = members.length;
 
@@ -152,7 +161,7 @@
             return;
           }
 
-          members.forEach(member => {
+          members.forEach((member) => {
             const li = document.createElement("li");
             li.textContent = member.name;
             memberList.appendChild(li);
@@ -167,13 +176,16 @@
           });
 
           // Get total contributions
-          const contribRes = await fetch(`${apiUrl}/group/${communityId}/contributions/total`);
+          const contribRes = await fetch(
+            `${apiUrl}/group/${communityId}/contributions/total`,
+          );
           const total = await contribRes.json();
-          document.getElementById("totalContributions").textContent = `${total.amount} TZS`;
-
+          document.getElementById("totalContributions").textContent =
+            `${total.amount} TZS`;
         } catch (error) {
           console.error("Error loading details:", error);
-          document.getElementById("communityName").textContent = "Error loading community";
+          document.getElementById("communityName").textContent =
+            "Error loading community";
         }
       }
 
@@ -187,7 +199,7 @@
             },
             body: JSON.stringify({
               memberId: memberId,
-              date: new Date().toISOString().split('T')[0]  // today's date
+              date: new Date().toISOString().split("T")[0], // today's date
             }),
           });
 

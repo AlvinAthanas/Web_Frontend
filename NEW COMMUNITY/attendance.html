@@ -317,7 +317,7 @@
         `<tr><td colspan="10" style="text-align: center; padding: 20px;">Loading members...</td></tr>`;
       
       // Replace this URL with your actual API endpoint
-      const url = `http://localhost:8080/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
+      const url = `http://76.13.14.56/api/group/members?description=community&name=${encodeURIComponent(window.currentCommunity.name)}`;
       
       fetch(url, {
         headers: {
@@ -362,7 +362,7 @@
     }
     
     function fetchAttendances() {
-      fetch('http://localhost:8080/attendances', {
+      fetch('http://76.13.14.56/api/attendances', {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
@@ -488,7 +488,7 @@
 
       if (!attendanceId) {
         // Create new attendance
-        fetch('http://localhost:8080/attendance', {
+        fetch('http://76.13.14.56/api/attendance', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -508,7 +508,7 @@
         });
       } else {
         // Update existing attendance
-        fetch(`http://localhost:8080/attendance/${attendanceId}`, {
+        fetch(`http://76.13.14.56/api/attendance/${attendanceId}`, {
           method: 'PUT',
           headers: {
             Authorization: `Bearer ${authToken}`,
