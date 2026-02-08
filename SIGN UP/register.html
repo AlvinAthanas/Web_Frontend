@@ -751,7 +751,7 @@
           }
 
           fetch(
-            `http://76.13.14.56/api/diocese/search?name=${encodeURIComponent(
+            `http://76.13.14.56:8080/api/diocese/search?name=${encodeURIComponent(
               input,
             )}`,
           )
@@ -806,7 +806,7 @@
           }
 
           fetch(
-            `http://76.13.14.56/api/parish/search?name=${encodeURIComponent(
+            `http://76.13.14.56:8080/api/parish/search?name=${encodeURIComponent(
               input,
             )}`,
           )
@@ -1113,7 +1113,7 @@
 
               // Submit to the new backend endpoint
               const response = await fetch(
-                "http://76.13.14.56/api/admin/register",
+                "http://76.13.14.56:8080/api/admin/register",
                 {
                   method: "POST",
                   headers: {
@@ -1190,7 +1190,7 @@
             try {
               const command = { email, key };
               const response = await fetch(
-                "http://76.13.14.56/api/verify-key",
+                "http://76.13.14.56:8080/api/verify-key",
                 {
                   method: "POST",
                   headers: {

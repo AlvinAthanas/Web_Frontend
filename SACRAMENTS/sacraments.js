@@ -316,7 +316,7 @@ async function addParticipant(user) {
 
     // 1. Create candidate
     const candidateRes = await fetch(
-      "http://76.13.14.56/api/sacrament/candidate",
+      "http://76.13.14.56:8080/api/sacrament/candidate",
       {
         method: "POST",
         headers: {
@@ -347,7 +347,7 @@ async function addParticipant(user) {
       startDate,
       completionDate,
     };
-    const regRes = await fetch("http://76.13.14.56/api/sacrament", {
+    const regRes = await fetch("http://76.13.14.56:8080/api/sacrament", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -391,7 +391,7 @@ async function completeTraining(participantId) {
 
     // Send completion request to backend
     const response = await fetch(
-      "http://76.13.14.56/api/sacrament/completion",
+      "http://76.13.14.56:8080/api/sacrament/completion",
       {
         method: "PUT",
         headers: {
@@ -447,7 +447,7 @@ async function batchCompleteTraining() {
     participants.training.map(async (candidate) => {
       try {
         const response = await fetch(
-          "http://76.13.14.56/api/sacrament/completion",
+          "http://76.13.14.56:8080/api/sacrament/completion",
           {
             method: "PUT",
             headers: {

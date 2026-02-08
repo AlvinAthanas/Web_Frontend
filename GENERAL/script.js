@@ -100,7 +100,7 @@ async function loadParishName() {
     }
 
     const parishResponse = await fetch(
-      `http://76.13.14.56/api/parish/${user.parishId}`,
+      `http://76.13.14.56:8080/api/parish/${user.parishId}`,
       {
         method: "GET",
         headers: {
@@ -332,7 +332,7 @@ async function setHeaderUserNameFromAPI() {
 
   try {
     const res = await fetch(
-      `http://76.13.14.56/api/user?email=${encodeURIComponent(email)}`,
+      `http://76.13.14.56:8080/api/user?email=${encodeURIComponent(email)}`,
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
